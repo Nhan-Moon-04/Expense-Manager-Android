@@ -23,6 +23,10 @@ class GroupService {
     required String name,
     required String ownerId,
     String? description,
+    String? avatarUrl,
+    double? targetAmount,
+    String? targetDescription,
+    DateTime? targetDeadline,
   }) async {
     try {
       String inviteCode = _generateInviteCode();
@@ -36,6 +40,7 @@ class GroupService {
         id: '',
         name: name,
         description: description,
+        avatarUrl: avatarUrl,
         ownerId: ownerId,
         inviteCode: inviteCode,
         members: [
@@ -47,6 +52,10 @@ class GroupService {
           ),
         ],
         totalExpense: 0.0,
+        totalIncome: 0.0,
+        targetAmount: targetAmount,
+        targetDescription: targetDescription,
+        targetDeadline: targetDeadline,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         isActive: true,
@@ -211,8 +220,9 @@ class GroupService {
   Future<void> updateMemberContribution(
     String groupId,
     String memberId,
-    double amount,
-  ) async {
+    double amount, {
+    bool isIncome = false,
+  }) async {
     try {
       DocumentSnapshot doc = await _firestore
           .collection(_collection)
@@ -227,16 +237,25 @@ class GroupService {
             role: m.role,
             contribution: m.contribution + amount,
             joinedAt: m.joinedAt,
+            displayName: m.displayName,
+            avatarUrl: m.avatarUrl,
           );
         }
         return m;
       }).toList();
 
-      await _firestore.collection(_collection).doc(groupId).update({
+      Map<String, dynamic> updateData = {
         'members': updatedMembers.map((m) => m.toMap()).toList(),
-        'totalExpense': FieldValue.increment(amount),
         'updatedAt': Timestamp.now(),
-      });
+      };
+
+      if (isIncome) {
+        updateData['totalIncome'] = FieldValue.increment(amount);
+      } else {
+        updateData['totalExpense'] = FieldValue.increment(amount);
+      }
+
+      await _firestore.collection(_collection).doc(groupId).update(updateData);
     } catch (e) {
       rethrow;
     }

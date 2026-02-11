@@ -193,6 +193,40 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // Update user avatar (handles null for removal)
+  Future<bool> updateUserAvatar(String? avatarUrl) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      if (_user == null) {
+        _setLoading(false);
+        return false;
+      }
+
+      await _authService.updateUserAvatar(_user!.uid, avatarUrl);
+      _user = UserModel(
+        uid: _user!.uid,
+        email: _user!.email,
+        fullName: _user!.fullName,
+        phone: _user!.phone,
+        avatarUrl: avatarUrl,
+        totalBalance: _user!.totalBalance,
+        role: _user!.role,
+        createdAt: _user!.createdAt,
+        updatedAt: DateTime.now(),
+        isActive: _user!.isActive,
+        settings: _user!.settings,
+      );
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setError('Đã có lỗi xảy ra khi cập nhật ảnh đại diện.');
+      _setLoading(false);
+      return false;
+    }
+  }
+
   // Refresh user data
   Future<void> refreshUser() async {
     if (firebaseUser != null) {

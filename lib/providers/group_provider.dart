@@ -41,6 +41,10 @@ class GroupProvider with ChangeNotifier {
     required String name,
     required String ownerId,
     String? description,
+    String? avatarUrl,
+    double? targetAmount,
+    String? targetDescription,
+    DateTime? targetDeadline,
   }) async {
     _setLoading(true);
     _clearError();
@@ -50,6 +54,10 @@ class GroupProvider with ChangeNotifier {
         name: name,
         ownerId: ownerId,
         description: description,
+        avatarUrl: avatarUrl,
+        targetAmount: targetAmount,
+        targetDescription: targetDescription,
+        targetDeadline: targetDeadline,
       );
       _groups.insert(0, newGroup);
       _setLoading(false);
@@ -151,6 +159,7 @@ class GroupProvider with ChangeNotifier {
           expense.groupId!,
           expense.userId,
           expense.amount,
+          isIncome: expense.type == ExpenseType.income,
         );
       }
 

@@ -135,6 +135,18 @@ class AuthService {
     }
   }
 
+  // Update user avatar (handles null for removal)
+  Future<void> updateUserAvatar(String uid, String? avatarUrl) async {
+    try {
+      await _firestore.collection('users').doc(uid).update({
+        'avatarUrl': avatarUrl,
+        'updatedAt': Timestamp.now(),
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Reset password
   Future<void> resetPassword(String email) async {
     try {

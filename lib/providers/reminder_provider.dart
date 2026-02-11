@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import '../models/reminder_model.dart';
 import '../services/reminder_service.dart';
+import '../services/push_notification_service.dart';
 
 class ReminderProvider with ChangeNotifier {
   final ReminderService _reminderService = ReminderService();
+  final PushNotificationService _pushNotificationService =
+      PushNotificationService();
 
   List<ReminderModel> _reminders = [];
   List<ReminderModel> _upcomingReminders = [];
@@ -23,8 +26,49 @@ class ReminderProvider with ChangeNotifier {
   void listenToReminders(String userId) {
     _reminderService.getUserReminders(userId).listen((reminders) {
       _reminders = reminders;
+      _scheduleAllReminders(); // Schedule push notifications for all active reminders
       notifyListeners();
     });
+  }
+
+  // Schedule push notifications for all active reminders
+  void _scheduleAllReminders() {
+    for (var reminder in activeReminders) {
+      if (reminder.reminderTime.isAfter(DateTime.now())) {
+        _scheduleReminderNotification(reminder);
+      }
+    }
+  }
+
+  // Schedule a single reminder notification
+  Future<void> _scheduleReminderNotification(ReminderModel reminder) async {
+    try {
+      final notificationId = reminder.id.hashCode;
+      String body =
+          reminder.description ?? 'Đến lúc thực hiện nhắc nhở của bạn';
+      if (reminder.amount != null) {
+        body = '${reminder.amount!.toStringAsFixed(0)}₫ - $body';
+      }
+
+      await _pushNotificationService.scheduleNotification(
+        id: notificationId,
+        title: '⏰ ${reminder.title}',
+        body: body,
+        scheduledDate: reminder.reminderTime,
+        payload: 'reminder_${reminder.id}',
+      );
+    } catch (e) {
+      debugPrint('Error scheduling reminder notification: $e');
+    }
+  }
+
+  // Cancel a reminder notification
+  Future<void> _cancelReminderNotification(String reminderId) async {
+    try {
+      await _pushNotificationService.cancelNotification(reminderId.hashCode);
+    } catch (e) {
+      debugPrint('Error canceling reminder notification: $e');
+    }
   }
 
   // Load upcoming reminders
@@ -45,6 +89,13 @@ class ReminderProvider with ChangeNotifier {
     try {
       ReminderModel newReminder = await _reminderService.addReminder(reminder);
       _reminders.insert(0, newReminder);
+
+      // Schedule push notification if reminder is in the future
+      if (newReminder.isActive &&
+          newReminder.reminderTime.isAfter(DateTime.now())) {
+        await _scheduleReminderNotification(newReminder);
+      }
+
       _setLoading(false);
       return true;
     } catch (e) {
@@ -67,6 +118,14 @@ class ReminderProvider with ChangeNotifier {
         _reminders[index] = reminder;
       }
 
+      // Update push notification
+      await _cancelReminderNotification(reminder.id);
+      if (reminder.isActive &&
+          !reminder.isCompleted &&
+          reminder.reminderTime.isAfter(DateTime.now())) {
+        await _scheduleReminderNotification(reminder);
+      }
+
       _setLoading(false);
       return true;
     } catch (e) {
@@ -83,6 +142,7 @@ class ReminderProvider with ChangeNotifier {
 
     try {
       await _reminderService.deleteReminder(reminderId);
+      await _cancelReminderNotification(reminderId); // Cancel push notification
       _reminders.removeWhere((r) => r.id == reminderId);
       _setLoading(false);
       return true;
@@ -97,6 +157,7 @@ class ReminderProvider with ChangeNotifier {
   Future<bool> markAsCompleted(String reminderId) async {
     try {
       await _reminderService.markAsCompleted(reminderId);
+      await _cancelReminderNotification(reminderId); // Cancel push notification
 
       int index = _reminders.indexWhere((r) => r.id == reminderId);
       if (index != -1) {
@@ -121,6 +182,15 @@ class ReminderProvider with ChangeNotifier {
         _reminders[index] = _reminders[index].copyWith(
           isActive: newActiveState,
         );
+
+        // Update push notification based on new state
+        if (newActiveState &&
+            _reminders[index].reminderTime.isAfter(DateTime.now())) {
+          await _scheduleReminderNotification(_reminders[index]);
+        } else {
+          await _cancelReminderNotification(reminderId);
+        }
+
         notifyListeners();
         return true;
       }
