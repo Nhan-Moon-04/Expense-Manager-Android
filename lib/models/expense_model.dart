@@ -28,6 +28,7 @@ class ExpenseModel {
   final DateTime updatedAt;
   final String? receiptUrl;
   final Map<String, dynamic>? metadata;
+  final bool isAutoAdded; // true if added automatically from bank notification
 
   ExpenseModel({
     required this.id,
@@ -38,11 +39,13 @@ class ExpenseModel {
     required this.category,
     this.description,
     required this.date,
-    required this.createdAt,
-    required this.updatedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     this.receiptUrl,
     this.metadata,
-  });
+    this.isAutoAdded = false,
+  }) : createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   factory ExpenseModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
@@ -65,6 +68,7 @@ class ExpenseModel {
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       receiptUrl: data['receiptUrl'],
       metadata: data['metadata'],
+      isAutoAdded: data['isAutoAdded'] ?? false,
     );
   }
 
@@ -81,6 +85,7 @@ class ExpenseModel {
       'updatedAt': Timestamp.fromDate(updatedAt),
       'receiptUrl': receiptUrl,
       'metadata': metadata,
+      'isAutoAdded': isAutoAdded,
     };
   }
 
@@ -97,6 +102,7 @@ class ExpenseModel {
     DateTime? updatedAt,
     String? receiptUrl,
     Map<String, dynamic>? metadata,
+    bool? isAutoAdded,
   }) {
     return ExpenseModel(
       id: id ?? this.id,
@@ -111,6 +117,7 @@ class ExpenseModel {
       updatedAt: updatedAt ?? this.updatedAt,
       receiptUrl: receiptUrl ?? this.receiptUrl,
       metadata: metadata ?? this.metadata,
+      isAutoAdded: isAutoAdded ?? this.isAutoAdded,
     );
   }
 

@@ -12,6 +12,7 @@ import 'providers/note_provider.dart';
 import 'providers/group_provider.dart';
 import 'providers/reminder_provider.dart';
 import 'providers/notification_provider.dart';
+import 'providers/auto_expense_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
 
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => GroupProvider()),
         ChangeNotifierProvider(create: (_) => ReminderProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => AutoExpenseProvider()),
       ],
       child: MaterialApp(
         title: AppStrings.appName,
