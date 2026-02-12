@@ -1,14 +1,24 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/notification_model.dart';
 import '../services/notification_service.dart';
+import '../services/push_notification_service.dart';
 
 class NotificationProvider with ChangeNotifier {
   final NotificationService _notificationService = NotificationService();
+  final PushNotificationService _pushService = PushNotificationService();
 
   List<NotificationModel> _notifications = [];
   int _unreadCount = 0;
   bool _isLoading = false;
   String? _error;
+
+  /// Track notification IDs we already showed push for
+  final Set<String> _shownPushIds = {};
+  bool _isFirstLoad = true;
+
+  StreamSubscription? _notifSubscription;
+  StreamSubscription? _unreadSubscription;
 
   List<NotificationModel> get notifications => _notifications;
   int get unreadCount => _unreadCount;
@@ -17,15 +27,46 @@ class NotificationProvider with ChangeNotifier {
 
   // Listen to notifications
   void listenToNotifications(String userId) {
-    _notificationService.getUserNotifications(userId).listen((notifications) {
+    _notifSubscription?.cancel();
+    _unreadSubscription?.cancel();
+    _isFirstLoad = true;
+
+    _notifSubscription = _notificationService.getUserNotifications(userId).listen((notifications) {
+      if (_isFirstLoad) {
+        // First load: mark all existing notification IDs as "already shown"
+        // so we don't spam push notifications for old ones
+        for (var n in notifications) {
+          _shownPushIds.add(n.id);
+        }
+        _isFirstLoad = false;
+      } else {
+        // Subsequent updates: show push notification for NEW unread ones
+        for (var n in notifications) {
+          if (!n.isRead && !_shownPushIds.contains(n.id)) {
+            _shownPushIds.add(n.id);
+            _showPushForNotification(n);
+          }
+        }
+      }
+
       _notifications = notifications;
       notifyListeners();
     });
 
-    _notificationService.getUnreadCount(userId).listen((count) {
+    _unreadSubscription = _notificationService.getUnreadCount(userId).listen((count) {
       _unreadCount = count;
       notifyListeners();
     });
+  }
+
+  /// Show a local push notification for an admin/system notification
+  void _showPushForNotification(NotificationModel notification) {
+    _pushService.showNotification(
+      id: notification.id.hashCode,
+      title: notification.title,
+      body: notification.message,
+      payload: 'notification:${notification.id}',
+    );
   }
 
   // Mark as read
@@ -95,5 +136,12 @@ class NotificationProvider with ChangeNotifier {
   void _setError(String? error) {
     _error = error;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _notifSubscription?.cancel();
+    _unreadSubscription?.cancel();
+    super.dispose();
   }
 }

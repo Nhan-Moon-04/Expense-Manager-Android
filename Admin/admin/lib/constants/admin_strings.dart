@@ -1,5 +1,5 @@
 class AdminStrings {
-  static const String appName = 'Admin - Quản Lý Chi Tiêu';
+  static const String appName = 'Admin QLCT';
   static const String login = 'Đăng Nhập Admin';
   static const String email = 'Email';
   static const String password = 'Mật khẩu';
