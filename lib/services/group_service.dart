@@ -27,6 +27,8 @@ class GroupService {
     double? targetAmount,
     String? targetDescription,
     DateTime? targetDeadline,
+    String? ownerDisplayName,
+    String? ownerAvatarUrl,
   }) async {
     try {
       String inviteCode = _generateInviteCode();
@@ -49,6 +51,8 @@ class GroupService {
             role: 'owner',
             contribution: 0.0,
             joinedAt: DateTime.now(),
+            displayName: ownerDisplayName,
+            avatarUrl: ownerAvatarUrl,
           ),
         ],
         totalExpense: 0.0,
@@ -82,7 +86,12 @@ class GroupService {
   }
 
   // Join group by invite code
-  Future<GroupModel?> joinGroup(String inviteCode, String userId) async {
+  Future<GroupModel?> joinGroup(
+    String inviteCode,
+    String userId, {
+    String? displayName,
+    String? avatarUrl,
+  }) async {
     try {
       QuerySnapshot snapshot = await _firestore
           .collection(_collection)
@@ -109,6 +118,8 @@ class GroupService {
         role: 'member',
         contribution: 0.0,
         joinedAt: DateTime.now(),
+        displayName: displayName,
+        avatarUrl: avatarUrl,
       );
 
       await _firestore.collection(_collection).doc(doc.id).update({

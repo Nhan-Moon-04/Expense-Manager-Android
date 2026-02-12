@@ -3,10 +3,12 @@ import '../models/group_model.dart';
 import '../models/expense_model.dart';
 import '../services/group_service.dart';
 import '../services/expense_service.dart';
+import '../services/auth_service.dart';
 
 class GroupProvider with ChangeNotifier {
   final GroupService _groupService = GroupService();
   final ExpenseService _expenseService = ExpenseService();
+  final AuthService _authService = AuthService();
 
   List<GroupModel> _groups = [];
   GroupModel? _selectedGroup;
@@ -45,12 +47,14 @@ class GroupProvider with ChangeNotifier {
     double? targetAmount,
     String? targetDescription,
     DateTime? targetDeadline,
+    String? ownerDisplayName,
+    String? ownerAvatarUrl,
   }) async {
     _setLoading(true);
     _clearError();
 
     try {
-      GroupModel newGroup = await _groupService.createGroup(
+      await _groupService.createGroup(
         name: name,
         ownerId: ownerId,
         description: description,
@@ -58,8 +62,10 @@ class GroupProvider with ChangeNotifier {
         targetAmount: targetAmount,
         targetDescription: targetDescription,
         targetDeadline: targetDeadline,
+        ownerDisplayName: ownerDisplayName,
+        ownerAvatarUrl: ownerAvatarUrl,
       );
-      _groups.insert(0, newGroup);
+      // Stream listener (listenToGroups) will update the list automatically
       _setLoading(false);
       return true;
     } catch (e) {
@@ -70,15 +76,23 @@ class GroupProvider with ChangeNotifier {
   }
 
   // Join group
-  Future<bool> joinGroup(String inviteCode, String userId) async {
+  Future<bool> joinGroup(
+    String inviteCode,
+    String userId, {
+    String? displayName,
+    String? avatarUrl,
+  }) async {
     _setLoading(true);
     _clearError();
 
     try {
-      GroupModel? group = await _groupService.joinGroup(inviteCode, userId);
-      if (group != null) {
-        _groups.insert(0, group);
-      }
+      await _groupService.joinGroup(
+        inviteCode,
+        userId,
+        displayName: displayName,
+        avatarUrl: avatarUrl,
+      );
+      // Stream listener (listenToGroups) will update the list automatically
       _setLoading(false);
       return true;
     } catch (e) {
@@ -177,6 +191,43 @@ class GroupProvider with ChangeNotifier {
     _selectedGroup = group;
     listenToGroupExpenses(group.id);
     notifyListeners();
+    // Fetch display names for members that don't have one
+    _enrichMemberData(group);
+  }
+
+  // Fetch user info for members missing displayName
+  Future<void> _enrichMemberData(GroupModel group) async {
+    bool updated = false;
+    List<GroupMember> enrichedMembers = List.from(group.members);
+
+    for (int i = 0; i < enrichedMembers.length; i++) {
+      final member = enrichedMembers[i];
+      if (member.displayName == null || member.displayName!.isEmpty) {
+        try {
+          final userData = await _authService.getUserData(member.userId);
+          if (userData != null) {
+            enrichedMembers[i] = member.copyWith(
+              displayName: userData.fullName,
+              avatarUrl: userData.avatarUrl,
+            );
+            updated = true;
+          }
+        } catch (e) {
+          debugPrint('Error fetching user data for ${member.userId}: $e');
+        }
+      }
+    }
+
+    if (updated) {
+      _selectedGroup = group.copyWith(members: enrichedMembers);
+      notifyListeners();
+      // Also update in Firestore so next time it's cached
+      try {
+        await _groupService.updateGroup(_selectedGroup!);
+      } catch (e) {
+        debugPrint('Error updating group members: $e');
+      }
+    }
   }
 
   // Clear selected group

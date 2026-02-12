@@ -677,6 +677,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               ? _targetDescriptionController.text.trim()
               : null,
           targetDeadline: _hasTarget ? _targetDeadline : null,
+          ownerDisplayName: authProvider.user!.fullName,
+          ownerAvatarUrl: authProvider.user!.avatarUrl,
         );
       }
 

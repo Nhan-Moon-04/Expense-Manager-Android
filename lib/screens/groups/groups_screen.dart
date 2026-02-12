@@ -861,6 +861,8 @@ class _GroupsScreenState extends State<GroupsScreen>
                               bool success = await groupProvider.joinGroup(
                                 codeController.text.trim().toUpperCase(),
                                 authProvider.user!.uid,
+                                displayName: authProvider.user!.fullName,
+                                avatarUrl: authProvider.user!.avatarUrl,
                               );
 
                               if (context.mounted) {

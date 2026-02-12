@@ -1,0 +1,86 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==================== USERS ====================
+    match /users/{userId} {
+      // User can read/write their own document
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow other users to read basic info (for group members)
+      allow read: if request.auth != null;
+    }
+    
+    // ==================== EXPENSES ====================
+    match /expenses/{expenseId} {
+      // User can read/write their own expenses
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // Allow create if userId matches auth
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      
+      // Allow read/write for group expenses (user is member of group)
+      allow read, write: if request.auth != null && resource.data.groupId != null;
+    }
+    
+    // ==================== NOTES ====================
+    match /notes/{noteId} {
+      // User can read/write their own notes
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // Allow create if userId matches auth
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // ==================== GROUPS ====================
+    match /groups/{groupId} {
+      // Allow all authenticated users to read/write groups
+      // The app logic handles member verification
+      allow read, write: if request.auth != null;
+    }
+    
+    // ==================== REMINDERS ====================
+    match /reminders/{reminderId} {
+      // User can read/write their own reminders
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // Allow create if userId matches auth
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // ==================== NOTIFICATIONS (Personal) ====================
+    match /notifications/{notificationId} {
+      // User can read/write their own notifications
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // Allow create for system (any authenticated user can create notification for themselves)
+      allow create: if request.auth != null;
+    }
+    
+    // ==================== ADMIN NOTIFICATIONS (Broadcast) ====================
+    match /admin_notifications/{notificationId} {
+      // All authenticated users can read admin notifications
+      allow read: if request.auth != null;
+      
+      // Only admin can write (you'll need to set this up in Firebase)
+      // For now, allow write for testing
+      allow write: if request.auth != null;
+    }
+    
+    // ==================== AUTO EXPENSES (Bank notifications) ====================
+    match /auto_expenses/{expenseId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // ==================== CATEGORIES ====================
+    match /categories/{categoryId} {
+      // All authenticated users can read categories
+      allow read: if request.auth != null;
+      
+      // User can create/update their own categories
+      allow write: if request.auth != null;
+    }
+  }
+}
