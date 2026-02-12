@@ -35,7 +35,11 @@ class _GroupsScreenState extends State<GroupsScreen>
       curve: Curves.easeInOut,
     );
     _animationController.forward();
-    _loadGroups();
+
+    // Delay load to after the build phase to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadGroups();
+    });
   }
 
   @override
@@ -739,6 +743,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         ],
       ),
       child: FloatingActionButton(
+        heroTag: 'groups_fab',
         onPressed: () {
           Navigator.push(
             context,

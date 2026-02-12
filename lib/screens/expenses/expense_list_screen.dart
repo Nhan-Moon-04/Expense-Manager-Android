@@ -36,7 +36,11 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
       curve: Curves.easeInOut,
     );
     _animationController.forward();
-    _loadData();
+
+    // Delay _loadData to after the build phase to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
   }
 
   @override
@@ -819,6 +823,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
         ],
       ),
       child: FloatingActionButton(
+        heroTag: 'expense_list_fab',
         onPressed: () {
           Navigator.push(
             context,

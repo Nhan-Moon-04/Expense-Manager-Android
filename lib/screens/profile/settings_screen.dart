@@ -9,6 +9,7 @@ import '../../constants/app_strings.dart';
 import '../../providers/auto_expense_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/cloudinary_service.dart';
+import '../../services/push_notification_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -938,9 +939,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
             value: _reminderEnabled,
             onChanged: (value) => setState(() => _reminderEnabled = value),
           ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _buildListTile(
+            icon: Icons.science_rounded,
+            title: 'Test thông báo',
+            subtitle: 'Gửi thông báo test ngay lập tức',
+            onTap: _testNotification,
+          ),
         ]),
       ],
     );
+  }
+
+  Future<void> _testNotification() async {
+    try {
+      await PushNotificationService().showReminderNotification(
+        id: DateTime.now().millisecondsSinceEpoch,
+        title: '🔔 Test thông báo',
+        body: 'Nếu bạn thấy thông báo này, push notification đang hoạt động!',
+        payload: 'test',
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Đã gửi thông báo test'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    }
   }
 
   Widget _buildDisplaySection() {

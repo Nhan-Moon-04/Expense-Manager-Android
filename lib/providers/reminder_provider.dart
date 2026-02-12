@@ -88,7 +88,7 @@ class ReminderProvider with ChangeNotifier {
 
     try {
       ReminderModel newReminder = await _reminderService.addReminder(reminder);
-      _reminders.insert(0, newReminder);
+      // Don't manually insert - Firestore stream will handle it
 
       // Schedule push notification if reminder is in the future
       if (newReminder.isActive &&

@@ -30,8 +30,12 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    _loadGroupData();
     _scrollController.addListener(_onScroll);
+
+    // Delay load to after the build phase to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadGroupData();
+    });
   }
 
   void _loadGroupData() {
@@ -1286,6 +1290,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         ],
       ),
       child: FloatingActionButton(
+        heroTag: 'group_detail_fab',
         onPressed: _showAddTransactionSheet,
         backgroundColor: Colors.transparent,
         elevation: 0,

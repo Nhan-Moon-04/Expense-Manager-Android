@@ -23,7 +23,11 @@ class _RemindersScreenState extends State<RemindersScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _loadReminders();
+
+    // Delay load to after the build phase to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadReminders();
+    });
   }
 
   @override
@@ -65,6 +69,7 @@ class _RemindersScreenState extends State<RemindersScreen>
         children: [_buildReminderList(false), _buildReminderList(true)],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'reminders_fab',
         onPressed: () {
           Navigator.push(
             context,

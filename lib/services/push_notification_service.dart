@@ -19,7 +19,9 @@ class PushNotificationService {
   Future<void> initialize() async {
     if (_isInitialized) return;
 
+    // Initialize timezone with Vietnam timezone
     tz.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('Asia/Ho_Chi_Minh'));
 
     // Android initialization settings
     const AndroidInitializationSettings androidSettings =
@@ -45,14 +47,21 @@ class PushNotificationService {
 
     // Request permission for Android 13+
     if (Platform.isAndroid) {
-      await _notificationsPlugin
+      final androidPlugin = _notificationsPlugin
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
-          >()
-          ?.requestNotificationsPermission();
+          >();
+
+      if (androidPlugin != null) {
+        await androidPlugin.requestNotificationsPermission();
+        await androidPlugin.requestExactAlarmsPermission();
+      }
     }
 
     _isInitialized = true;
+    debugPrint(
+      'PushNotificationService initialized with timezone: ${tz.local.name}',
+    );
   }
 
   /// Handle notification tap
@@ -235,17 +244,38 @@ class PushNotificationService {
     required DateTime scheduledDate,
     String? payload,
   }) async {
+    // Convert to TZDateTime
+    final tz.TZDateTime scheduledTZ = tz.TZDateTime.from(
+      scheduledDate,
+      tz.local,
+    );
+
+    // Don't schedule if the time has passed
+    if (scheduledTZ.isBefore(tz.TZDateTime.now(tz.local))) {
+      debugPrint(
+        'Notification not scheduled - time has passed: $scheduledDate',
+      );
+      return;
+    }
+
+    debugPrint(
+      'Scheduling notification: id=$id, title=$title, time=$scheduledTZ',
+    );
+
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-          'scheduled_channel',
-          'Thông báo theo lịch',
-          channelDescription: 'Thông báo được lên lịch trước',
-          importance: Importance.high,
-          priority: Priority.high,
+          'reminder_channel',
+          'Nhắc nhở',
+          channelDescription: 'Thông báo nhắc nhở chi tiêu',
+          importance: Importance.max,
+          priority: Priority.max,
           icon: '@mipmap/ic_launcher',
           largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
           playSound: true,
           enableVibration: true,
+          fullScreenIntent: true,
+          category: AndroidNotificationCategory.reminder,
+          visibility: NotificationVisibility.public,
         );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
@@ -263,13 +293,15 @@ class PushNotificationService {
       id,
       title,
       body,
-      tz.TZDateTime.from(scheduledDate, tz.local),
+      scheduledTZ,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
     );
+
+    debugPrint('Notification scheduled successfully: id=$id');
   }
 
   /// Schedule a recurring daily notification
