@@ -3,84 +3,104 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    // ==================== HELPER FUNCTIONS ====================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Kiểm tra user có role admin trong Firestore
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
     // ==================== USERS ====================
     match /users/{userId} {
-      // User can read/write their own document
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Admin đọc/ghi tất cả user
+      allow read, write: if isAdmin();
       
-      // Allow other users to read basic info (for group members)
-      allow read: if request.auth != null;
+      // User đọc/ghi document của chính mình
+      allow read, write: if isAuthenticated() && isOwner(userId);
+      
+      // Cho phép user khác đọc (cho group members)
+      allow read: if isAuthenticated();
     }
     
     // ==================== EXPENSES ====================
     match /expenses/{expenseId} {
-      // User can read/write their own expenses
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Admin đọc tất cả expenses (thống kê)
+      allow read: if isAdmin();
       
-      // Allow create if userId matches auth
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      // User đọc/ghi expenses của mình
+      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
       
-      // Allow read/write for group expenses (user is member of group)
-      allow read, write: if request.auth != null && resource.data.groupId != null;
+      // User tạo expense cho mình
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // Đọc/ghi group expenses
+      allow read, write: if isAuthenticated() && resource.data.groupId != null;
     }
     
     // ==================== NOTES ====================
     match /notes/{noteId} {
-      // User can read/write their own notes
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-      
-      // Allow create if userId matches auth
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
     }
     
     // ==================== GROUPS ====================
     match /groups/{groupId} {
-      // Allow all authenticated users to read/write groups
-      // The app logic handles member verification
-      allow read, write: if request.auth != null;
+      // Admin đọc tất cả groups (thống kê)
+      allow read: if isAdmin();
+      
+      allow read, write: if isAuthenticated();
+      allow create: if isAuthenticated() && request.resource.data.ownerId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
     }
     
     // ==================== REMINDERS ====================
     match /reminders/{reminderId} {
-      // User can read/write their own reminders
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-      
-      // Allow create if userId matches auth
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
     }
     
     // ==================== NOTIFICATIONS (Personal) ====================
     match /notifications/{notificationId} {
-      // User can read/write their own notifications
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Admin đọc/ghi tất cả notifications (gửi thông báo cho user)
+      allow read, write: if isAdmin();
       
-      // Allow create for system (any authenticated user can create notification for themselves)
-      allow create: if request.auth != null;
+      // User đọc/ghi notifications của mình
+      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      
+      // Cho phép tạo notification
+      allow create: if isAuthenticated();
+    }
+    
+    // ==================== ADMIN NOTIFICATION LOGS ====================
+    match /admin_notification_logs/{logId} {
+      // Chỉ admin mới đọc/ghi logs
+      allow read, write: if isAdmin();
     }
     
     // ==================== ADMIN NOTIFICATIONS (Broadcast) ====================
     match /admin_notifications/{notificationId} {
-      // All authenticated users can read admin notifications
-      allow read: if request.auth != null;
-      
-      // Only admin can write (you'll need to set this up in Firebase)
-      // For now, allow write for testing
-      allow write: if request.auth != null;
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
     
     // ==================== AUTO EXPENSES (Bank notifications) ====================
     match /auto_expenses/{expenseId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
     }
     
     // ==================== CATEGORIES ====================
     match /categories/{categoryId} {
-      // All authenticated users can read categories
-      allow read: if request.auth != null;
-      
-      // User can create/update their own categories
-      allow write: if request.auth != null;
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
     }
   }
 }

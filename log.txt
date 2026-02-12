@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --------------------
+    // Helper functions
+    // --------------------
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return request.auth != null
+        && resource.data.userId == request.auth.uid;
+    }
+
+    function isCreateOwner() {
+      return request.auth != null
+        && request.resource.data.userId == request.auth.uid;
+    }
+
+    // --------------------
+    // Users
+    // --------------------
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId);
+    }
+
+    // --------------------
+    // Expenses
+    // --------------------
+    match /expenses/{expenseId} {
+
+      // đọc:
+      // - chủ sở hữu
+      // - hoặc là expense thuộc group
+      allow read: if isAuthenticated() &&
+        (
+          resource.data.userId == request.auth.uid ||
+          resource.data.groupId != null
+        );
+
+      allow create: if isAuthenticated()
+                     && request.resource.data.userId == request.auth.uid;
+
+      allow update, delete: if isAuthenticated()
+                             && resource.data.userId == request.auth.uid;
+    }
+
+    // --------------------
+    // Notes
+    // --------------------
+    match /notes/{noteId} {
+
+      allow read, update, delete: if isDocOwner();
+
+      allow create: if isCreateOwner();
+    }
+
+    // --------------------
+    // Reminders
+    // --------------------
+    match /reminders/{reminderId} {
+
+      allow read, update, delete: if isDocOwner();
+
+      allow create: if isCreateOwner();
+    }
+
+    // --------------------
+    // Notifications
+    // --------------------
+    match /notifications/{notificationId} {
+
+      allow read, update, delete: if isDocOwner();
+
+      allow create: if isAuthenticated();
+    }
+
+    // --------------------
+    // Groups  (tính năng nhóm)
+    // --------------------
+    match /groups/{groupId} {
+
+      // theo rule mới bạn gửi:
+      // chỉ cần đăng nhập là đọc được
+      allow read: if isAuthenticated();
+
+      // tạo nhóm: phải là owner
+      allow create: if isAuthenticated()
+                     && request.resource.data.ownerId == request.auth.uid;
+
+      // update: chỉ cần đăng nhập
+      allow update: if isAuthenticated();
+
+      // xóa: chỉ owner
+      allow delete: if isAuthenticated()
+                     && resource.data.ownerId == request.auth.uid;
+    }
+
+  }
+}

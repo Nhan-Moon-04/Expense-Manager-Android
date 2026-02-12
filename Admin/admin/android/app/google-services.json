@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "590813077328",
+    "project_id": "nthiennhan-954cf",
+    "storage_bucket": "nthiennhan-954cf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590813077328:android:0ebe2fe56409f30a4fd655",
+        "android_client_info": {
+          "package_name": "com.example.expense_manager_android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBs0f8TVT2__R6EDYRj_-QOI-6GjIyvcCo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
