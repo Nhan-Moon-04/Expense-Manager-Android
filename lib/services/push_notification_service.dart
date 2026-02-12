@@ -4,6 +4,12 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
+/// Background notification response handler - must be top-level function
+@pragma('vm:entry-point')
+void _onBackgroundNotificationResponse(NotificationResponse response) {
+  debugPrint('Background notification tapped: ${response.payload}');
+}
+
 class PushNotificationService {
   static final PushNotificationService _instance =
       PushNotificationService._internal();
@@ -43,6 +49,8 @@ class PushNotificationService {
     await _notificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _onNotificationTapped,
+      onDidReceiveBackgroundNotificationResponse:
+          _onBackgroundNotificationResponse,
     );
 
     // Request permission for Android 13+
@@ -273,7 +281,6 @@ class PushNotificationService {
           largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
           playSound: true,
           enableVibration: true,
-          fullScreenIntent: true,
           category: AndroidNotificationCategory.reminder,
           visibility: NotificationVisibility.public,
         );

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import '../models/reminder_model.dart';
 import '../services/reminder_service.dart';
 import '../services/push_notification_service.dart';
+import '../services/notification_service.dart';
 
 class ReminderProvider with ChangeNotifier {
   final ReminderService _reminderService = ReminderService();
   final PushNotificationService _pushNotificationService =
       PushNotificationService();
+  final NotificationService _notificationService = NotificationService();
 
   List<ReminderModel> _reminders = [];
   List<ReminderModel> _upcomingReminders = [];
@@ -45,6 +47,9 @@ class ReminderProvider with ChangeNotifier {
         // Mark as completed automatically
         await _reminderService.markAsCompleted(reminder.id);
         await _cancelReminderNotification(reminder.id);
+
+        // Create in-app notification
+        await _createCompletionNotification(reminder);
       }
     }
   }
@@ -86,6 +91,24 @@ class ReminderProvider with ChangeNotifier {
       await _pushNotificationService.cancelNotification(reminderId.hashCode);
     } catch (e) {
       debugPrint('Error canceling reminder notification: $e');
+    }
+  }
+
+  // Create in-app notification when reminder completes
+  Future<void> _createCompletionNotification(ReminderModel reminder) async {
+    try {
+      String message = reminder.description ?? 'Nhắc nhở đã hoàn thành';
+      if (reminder.amount != null) {
+        message = '${reminder.amount!.toStringAsFixed(0)}₫ - $message';
+      }
+      await _notificationService.createReminderNotification(
+        userId: reminder.userId,
+        title: '✅ ${reminder.title}',
+        message: message,
+        data: {'reminderId': reminder.id},
+      );
+    } catch (e) {
+      debugPrint('Error creating completion notification: $e');
     }
   }
 
@@ -179,7 +202,11 @@ class ReminderProvider with ChangeNotifier {
 
       int index = _reminders.indexWhere((r) => r.id == reminderId);
       if (index != -1) {
-        _reminders[index] = _reminders[index].copyWith(isCompleted: true);
+        final reminder = _reminders[index];
+        _reminders[index] = reminder.copyWith(isCompleted: true);
+
+        // Create in-app notification
+        await _createCompletionNotification(reminder);
       }
 
       notifyListeners();

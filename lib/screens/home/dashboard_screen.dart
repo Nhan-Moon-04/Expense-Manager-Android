@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
@@ -161,11 +162,13 @@ class _DashboardScreenState extends State<DashboardScreen>
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: AppColors.primaryGradient,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: user?.avatarUrl == null || user!.avatarUrl!.isEmpty
+                    ? const LinearGradient(
+                        colors: AppColors.primaryGradient,
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : null,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -175,15 +178,54 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ),
                 ],
               ),
-              child: Center(
-                child: Text(
-                  _getInitials(user?.fullName ?? 'U'),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: user.avatarUrl!,
+                        fit: BoxFit.cover,
+                        width: 52,
+                        height: 52,
+                        placeholder: (context, url) => Center(
+                          child: Text(
+                            _getInitials(user.fullName ?? 'U'),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: AppColors.primaryGradient,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _getInitials(user.fullName ?? 'U'),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          _getInitials(user?.fullName ?? 'U'),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
               ),
             ),
             const SizedBox(width: 14),
