@@ -16,6 +16,8 @@ class ReminderProvider with ChangeNotifier {
   List<ReminderModel> get reminders => _reminders;
   List<ReminderModel> get upcomingReminders => _upcomingReminders;
   List<ReminderModel> get activeReminders =>
+      _reminders.where((r) => !r.isCompleted).toList();
+  List<ReminderModel> get enabledReminders =>
       _reminders.where((r) => r.isActive && !r.isCompleted).toList();
   List<ReminderModel> get completedReminders =>
       _reminders.where((r) => r.isCompleted).toList();
@@ -26,14 +28,30 @@ class ReminderProvider with ChangeNotifier {
   void listenToReminders(String userId) {
     _reminderService.getUserReminders(userId).listen((reminders) {
       _reminders = reminders;
-      _scheduleAllReminders(); // Schedule push notifications for all active reminders
+      _scheduleAllReminders();
+      _autoCompletePastReminders(userId);
       notifyListeners();
     });
   }
 
+  // Auto-complete non-repeating reminders that have passed
+  Future<void> _autoCompletePastReminders(String userId) async {
+    final now = DateTime.now();
+    for (var reminder in _reminders) {
+      if (!reminder.isCompleted &&
+          reminder.isActive &&
+          reminder.repeat == ReminderRepeat.none &&
+          reminder.reminderTime.isBefore(now)) {
+        // Mark as completed automatically
+        await _reminderService.markAsCompleted(reminder.id);
+        await _cancelReminderNotification(reminder.id);
+      }
+    }
+  }
+
   // Schedule push notifications for all active reminders
   void _scheduleAllReminders() {
-    for (var reminder in activeReminders) {
+    for (var reminder in enabledReminders) {
       if (reminder.reminderTime.isAfter(DateTime.now())) {
         _scheduleReminderNotification(reminder);
       }

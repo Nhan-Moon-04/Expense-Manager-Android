@@ -110,11 +110,18 @@ class _RemindersScreenState extends State<RemindersScreen>
           );
         }
 
+        // Sort: enabled first, then disabled
+        final sortedReminders = List<ReminderModel>.from(reminders)
+          ..sort((a, b) {
+            if (a.isActive != b.isActive) return a.isActive ? -1 : 1;
+            return a.reminderTime.compareTo(b.reminderTime);
+          });
+
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: reminders.length,
+          itemCount: sortedReminders.length,
           itemBuilder: (context, index) {
-            return _buildReminderCard(reminders[index]);
+            return _buildReminderCard(sortedReminders[index]);
           },
         );
       },
@@ -123,6 +130,7 @@ class _RemindersScreenState extends State<RemindersScreen>
 
   Widget _buildReminderCard(ReminderModel reminder) {
     final isPast = reminder.reminderTime.isBefore(DateTime.now());
+    final isDisabled = !reminder.isActive;
     final timeColor = isPast && !reminder.isCompleted
         ? AppColors.error
         : AppColors.textSecondary;
@@ -174,132 +182,165 @@ class _RemindersScreenState extends State<RemindersScreen>
             ),
           );
         },
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              // Checkbox
-              GestureDetector(
-                onTap: () {
-                  if (!reminder.isCompleted) {
-                    Provider.of<ReminderProvider>(
-                      context,
-                      listen: false,
-                    ).markAsCompleted(reminder.id);
-                  }
-                },
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: reminder.isCompleted
-                          ? AppColors.success
-                          : AppColors.textHint,
-                      width: 2,
-                    ),
-                    color: reminder.isCompleted
-                        ? AppColors.success
-                        : Colors.transparent,
-                  ),
-                  child: reminder.isCompleted
-                      ? const Icon(Icons.check, size: 16, color: Colors.white)
-                      : null,
-                ),
-              ),
-              const SizedBox(width: 16),
-
-              // Content
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      reminder.title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: reminder.isCompleted
-                            ? AppColors.textSecondary
-                            : AppColors.textPrimary,
-                        decoration: reminder.isCompleted
-                            ? TextDecoration.lineThrough
-                            : null,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(Icons.access_time, size: 14, color: timeColor),
-                        const SizedBox(width: 4),
-                        Text(
-                          DateFormat(
-                            'HH:mm - dd/MM/yyyy',
-                          ).format(reminder.reminderTime),
-                          style: TextStyle(fontSize: 12, color: timeColor),
-                        ),
-                        if (reminder.repeat != ReminderRepeat.none) ...[
-                          const SizedBox(width: 12),
-                          Icon(
-                            Icons.repeat,
-                            size: 14,
-                            color: AppColors.textSecondary,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            ReminderModel.getRepeatName(reminder.repeat),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    if (reminder.description != null &&
-                        reminder.description!.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        reminder.description!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+        child: Opacity(
+          opacity: isDisabled ? 0.5 : 1.0,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDisabled ? Colors.grey.shade100 : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: isDisabled
+                  ? Border.all(color: Colors.grey.shade300)
+                  : null,
+              boxShadow: isDisabled
+                  ? []
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
                       ),
                     ],
-                  ],
+            ),
+            child: Row(
+              children: [
+                // Checkbox
+                GestureDetector(
+                  onTap: () {
+                    if (!reminder.isCompleted) {
+                      Provider.of<ReminderProvider>(
+                        context,
+                        listen: false,
+                      ).markAsCompleted(reminder.id);
+                    }
+                  },
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: reminder.isCompleted
+                            ? AppColors.success
+                            : AppColors.textHint,
+                        width: 2,
+                      ),
+                      color: reminder.isCompleted
+                          ? AppColors.success
+                          : Colors.transparent,
+                    ),
+                    child: reminder.isCompleted
+                        ? const Icon(Icons.check, size: 16, color: Colors.white)
+                        : null,
+                  ),
                 ),
-              ),
+                const SizedBox(width: 16),
 
-              // Toggle
-              Switch(
-                value: reminder.isActive,
-                onChanged: reminder.isCompleted
-                    ? null
-                    : (value) {
-                        Provider.of<ReminderProvider>(
-                          context,
-                          listen: false,
-                        ).toggleActive(reminder.id);
-                      },
-                activeColor: AppColors.primary,
-              ),
-            ],
+                // Content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              reminder.title,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: reminder.isCompleted || isDisabled
+                                    ? AppColors.textSecondary
+                                    : AppColors.textPrimary,
+                                decoration: reminder.isCompleted
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                              ),
+                            ),
+                          ),
+                          if (isDisabled && !reminder.isCompleted)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Đã tắt',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(Icons.access_time, size: 14, color: timeColor),
+                          const SizedBox(width: 4),
+                          Text(
+                            DateFormat(
+                              'HH:mm - dd/MM/yyyy',
+                            ).format(reminder.reminderTime),
+                            style: TextStyle(fontSize: 12, color: timeColor),
+                          ),
+                          if (reminder.repeat != ReminderRepeat.none) ...[
+                            const SizedBox(width: 12),
+                            Icon(
+                              Icons.repeat,
+                              size: 14,
+                              color: AppColors.textSecondary,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              ReminderModel.getRepeatName(reminder.repeat),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (reminder.description != null &&
+                          reminder.description!.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          reminder.description!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+
+                // Toggle
+                Switch(
+                  value: reminder.isActive,
+                  onChanged: reminder.isCompleted
+                      ? null
+                      : (value) {
+                          Provider.of<ReminderProvider>(
+                            context,
+                            listen: false,
+                          ).toggleActive(reminder.id);
+                        },
+                  activeColor: AppColors.primary,
+                ),
+              ],
+            ),
           ),
         ),
       ),

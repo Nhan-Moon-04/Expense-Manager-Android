@@ -624,7 +624,13 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget _buildUpcomingReminders() {
     return Consumer<ReminderProvider>(
       builder: (context, reminderProvider, child) {
-        final reminders = reminderProvider.upcomingReminders.take(3).toList();
+        // Show enabled (active + not completed) reminders, sorted by time
+        final allEnabled =
+            reminderProvider.enabledReminders
+                .where((r) => r.reminderTime.isAfter(DateTime.now()))
+                .toList()
+              ..sort((a, b) => a.reminderTime.compareTo(b.reminderTime));
+        final reminders = allEnabled.take(3).toList();
         if (reminders.isEmpty) {
           return const SizedBox.shrink();
         }
