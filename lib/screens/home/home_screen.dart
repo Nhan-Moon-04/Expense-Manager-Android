@@ -5,6 +5,7 @@ import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/notification_provider.dart';
+import '../../providers/auto_expense_provider.dart';
 import '../expenses/expense_list_screen.dart';
 import '../notes/notes_screen.dart';
 import '../groups/groups_screen.dart';
@@ -52,6 +53,14 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         listen: false,
       ).listenToNotifications(userId);
+
+      // Initialize auto expense listener with user ID
+      final autoExpenseProvider = Provider.of<AutoExpenseProvider>(
+        context,
+        listen: false,
+      );
+      autoExpenseProvider.setUserId(userId);
+      autoExpenseProvider.checkNotificationAccess();
     }
   }
 

@@ -53,6 +53,10 @@ class AutoExpenseProvider with ChangeNotifier {
 
   void setUserId(String userId) {
     _userId = userId;
+    // Auto-start listening if enabled
+    if (_isEnabled && _subscription == null) {
+      _startListening();
+    }
   }
 
   Future<void> checkNotificationAccess() async {

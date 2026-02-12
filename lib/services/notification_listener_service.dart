@@ -50,6 +50,16 @@ class BankNotification {
         return 'Techcombank';
       case 'bidv':
         return 'BIDV';
+      case 'vietinbank':
+        return 'VietinBank';
+      case 'tpbank':
+        return 'TPBank';
+      case 'acb':
+        return 'ACB';
+      case 'sacombank':
+        return 'Sacombank';
+      case 'agribank':
+        return 'Agribank';
       default:
         return 'Ngân hàng';
     }

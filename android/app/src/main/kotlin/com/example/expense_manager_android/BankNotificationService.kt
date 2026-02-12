@@ -96,7 +96,12 @@ class BankNotificationService : NotificationListenerService() {
                 packageName.contains("mbmobile") -> parseMBBankTransaction(title, text)
                 packageName.contains("techcombank") -> parseTechcombankTransaction(title, text)
                 packageName.contains("bidv") -> parseBIDVTransaction(title, text)
-                else -> parseGenericTransaction(title, text)
+                packageName.contains("vietinbank") -> parseVietinBankTransaction(title, text)
+                packageName.contains("tpb") -> parseGenericBankTransaction("tpbank", title, text)
+                packageName.contains("acb") -> parseGenericBankTransaction("acb", title, text)
+                packageName.contains("sacombank") -> parseGenericBankTransaction("sacombank", title, text)
+                packageName.contains("agribank") -> parseGenericBankTransaction("agribank", title, text)
+                else -> parseGenericBankTransaction("other", title, text)
             }
         } catch (e: Exception) {
             null
@@ -150,23 +155,169 @@ class BankNotificationService : NotificationListenerService() {
         
         val fullText = "$title $text"
         
-        val isExpense = text.contains("-") || text.lowercase().contains("ghi nợ")
-        val isIncome = text.contains("+") || text.lowercase().contains("ghi có")
+        // Look for transaction amount with +/- sign (ignore balance after "SD:")
+        val transPattern = Pattern.compile("(?:GD|Giao dich|TK[^:]*):?\\s*([-+])([\\d,.]+)\\s*(VND|đ)", Pattern.CASE_INSENSITIVE)
+        val transMatcher = transPattern.matcher(fullText)
         
-        if (!isExpense && !isIncome) return null
-        
-        val amountPattern = Pattern.compile("[-+]?([\\d,.]+)\\s*(VND|đ)", Pattern.CASE_INSENSITIVE)
-        val matcher = amountPattern.matcher(text)
-        
-        if (matcher.find()) {
-            val amountStr = matcher.group(1)?.replace(",", "")?.replace(".", "") ?: return null
+        if (transMatcher.find()) {
+            val sign = transMatcher.group(1) ?: "-"
+            val amountStr = transMatcher.group(2)?.replace(",", "")?.replace(".", "") ?: return null
             val amount = amountStr.toDoubleOrNull() ?: return null
+            val isExpense = sign == "-"
+            
+            // Extract description - look for "ND:" or "Noi dung:" 
+            val descPattern = Pattern.compile("(?:ND|Noi dung|N\\.D)[:\\s]+(.+?)(?:\\.|$)", Pattern.CASE_INSENSITIVE)
+            val descMatcher = descPattern.matcher(fullText)
+            val description = if (descMatcher.find()) descMatcher.group(1)?.trim() ?: text.take(100) else text.take(100)
             
             return mapOf(
                 "source" to "vcb",
                 "type" to if (isExpense) "expense" else "income",
                 "amount" to amount,
-                "description" to text.take(100),
+                "description" to description,
+                "rawTitle" to title,
+                "rawText" to text,
+                "timestamp" to System.currentTimeMillis()
+            )
+        }
+        
+        return parseGenericBankTransaction("vcb", title, text)
+    }
+    
+    private fun parseVietinBankTransaction(title: String, text: String): Map<String, Any>? {
+        // VietinBank iPay notification format:
+        // Title: "Biến động số dư"
+        // Text: "Thời gian: 11/02/2026 21:53\nTài khoản: 100610161104\nGiao dịch: -50,000VND\nSố dư hiện tại: 69,220VND\nNội dung: MoMo CASHIN 0989057191 118001479611 2009"
+        
+        val fullText = "$title $text"
+        
+        // Extract transaction amount from "Giao dịch: -50,000VND" or "Giao dich: +100,000VND"
+        val transPattern = Pattern.compile("Giao d[iị]ch[:\\s]*([-+])([\\d,.]+)\\s*(VND|đ)", Pattern.CASE_INSENSITIVE)
+        val transMatcher = transPattern.matcher(fullText)
+        
+        if (transMatcher.find()) {
+            val sign = transMatcher.group(1) ?: "-"
+            val amountStr = transMatcher.group(2)?.replace(",", "")?.replace(".", "") ?: return null
+            val amount = amountStr.toDoubleOrNull() ?: return null
+            val isExpense = sign == "-"
+            
+            // Extract description from "Nội dung: ..."
+            val descPattern = Pattern.compile("N[oộ]i dung[:\\s]+(.+?)(?:\\n|$)", Pattern.CASE_INSENSITIVE)
+            val descMatcher = descPattern.matcher(fullText)
+            val description = if (descMatcher.find()) descMatcher.group(1)?.trim() ?: "" else ""
+            
+            return mapOf(
+                "source" to "vietinbank",
+                "type" to if (isExpense) "expense" else "income",
+                "amount" to amount,
+                "description" to description.ifEmpty { text.take(100) },
+                "rawTitle" to title,
+                "rawText" to text,
+                "timestamp" to System.currentTimeMillis()
+            )
+        }
+        
+        return parseGenericBankTransaction("vietinbank", title, text)
+    }
+    
+    private fun parseMBBankTransaction(title: String, text: String): Map<String, Any>? {
+        // MB Bank format: "TK 0xxxx: -500,000VND lúc 21:53 11/02/2026. SD: 1,000,000VND. ND: Chuyen tien"
+        val fullText = "$title $text"
+        
+        val transPattern = Pattern.compile("([-+])([\\d,.]+)\\s*(VND|đ)", Pattern.CASE_INSENSITIVE)
+        val transMatcher = transPattern.matcher(fullText)
+        
+        if (transMatcher.find()) {
+            val sign = transMatcher.group(1) ?: "-"
+            val amountStr = transMatcher.group(2)?.replace(",", "")?.replace(".", "") ?: return null
+            val amount = amountStr.toDoubleOrNull() ?: return null
+            val isExpense = sign == "-"
+            
+            val descPattern = Pattern.compile("(?:ND|Noi dung|N\\.D)[:\\s]+(.+?)(?:\\.|$)", Pattern.CASE_INSENSITIVE)
+            val descMatcher = descPattern.matcher(fullText)
+            val description = if (descMatcher.find()) descMatcher.group(1)?.trim() ?: text.take(100) else text.take(100)
+            
+            return mapOf(
+                "source" to "mbbank",
+                "type" to if (isExpense) "expense" else "income",
+                "amount" to amount,
+                "description" to description,
+                "rawTitle" to title,
+                "rawText" to text,
+                "timestamp" to System.currentTimeMillis()
+            )
+        }
+        
+        return parseGenericBankTransaction("mbbank", title, text)
+    }
+    
+    private fun parseTechcombankTransaction(title: String, text: String): Map<String, Any>? {
+        return parseGenericBankTransaction("techcombank", title, text)
+    }
+    
+    private fun parseBIDVTransaction(title: String, text: String): Map<String, Any>? {
+        return parseGenericBankTransaction("bidv", title, text)
+    }
+    
+    private fun parseGenericBankTransaction(source: String, title: String, text: String): Map<String, Any>? {
+        val fullText = "$title $text"
+        
+        // Strategy 1: Look for explicit +/- amount patterns (most reliable for bank notifications)
+        // Matches: "-50,000VND", "+100,000 VND", "- 50.000 đ", "Giao dich: -50,000VND"
+        val signedAmountPattern = Pattern.compile("([-+])\\s?([\\d,.]+)\\s*(VND|đ|vnđ)", Pattern.CASE_INSENSITIVE)
+        val signedMatcher = signedAmountPattern.matcher(fullText)
+        
+        if (signedMatcher.find()) {
+            val sign = signedMatcher.group(1) ?: "-"
+            val amountStr = signedMatcher.group(2)?.replace(",", "")?.replace(".", "") ?: return null
+            val amount = amountStr.toDoubleOrNull() ?: return null
+            
+            if (amount <= 0) return null
+            
+            val isExpense = sign == "-"
+            
+            // Try to extract description
+            val description = extractDescription(fullText) ?: text.take(100)
+            
+            return mapOf(
+                "source" to source,
+                "type" to if (isExpense) "expense" else "income",
+                "amount" to amount,
+                "description" to description,
+                "rawTitle" to title,
+                "rawText" to text,
+                "timestamp" to System.currentTimeMillis()
+            )
+        }
+        
+        // Strategy 2: keyword-based detection (for MoMo, wallet apps etc.)
+        val lowerText = fullText.lowercase()
+        
+        val expenseKeywords = listOf("chuyển", "thanh toán", "chi", "trừ", "ghi nợ", "debit", "payment", "withdrawal")
+        val incomeKeywords = listOf("nhận", "cộng", "ghi có", "credit", "receive", "deposit")
+        
+        val isExpense = expenseKeywords.any { lowerText.contains(it) }
+        val isIncome = incomeKeywords.any { lowerText.contains(it) }
+        
+        if (!isExpense && !isIncome) return null
+        
+        // Extract amount
+        val amountPattern = Pattern.compile("([\\d]{1,3}(?:[,.]\\d{3})+)\\s*(đ|vnd|vnđ)?", Pattern.CASE_INSENSITIVE)
+        val amountMatcher = amountPattern.matcher(fullText)
+        
+        if (amountMatcher.find()) {
+            val amountStr = amountMatcher.group(1)?.replace(",", "")?.replace(".", "") ?: return null
+            val amount = amountStr.toDoubleOrNull() ?: return null
+            
+            if (amount <= 0) return null
+            
+            val description = extractDescription(fullText) ?: text.take(100)
+            
+            return mapOf(
+                "source" to source,
+                "type" to if (isExpense) "expense" else "income",
+                "amount" to amount,
+                "description" to description,
                 "rawTitle" to title,
                 "rawText" to text,
                 "timestamp" to System.currentTimeMillis()
@@ -176,65 +327,22 @@ class BankNotificationService : NotificationListenerService() {
         return null
     }
     
-    private fun parseMBBankTransaction(title: String, text: String): Map<String, Any>? {
-        return parseGenericTransaction(title, text)?.plus("source" to "mbbank")
-    }
-    
-    private fun parseTechcombankTransaction(title: String, text: String): Map<String, Any>? {
-        return parseGenericTransaction(title, text)?.plus("source" to "techcombank")
-    }
-    
-    private fun parseBIDVTransaction(title: String, text: String): Map<String, Any>? {
-        return parseGenericTransaction(title, text)?.plus("source" to "bidv")
-    }
-    
-    private fun parseGenericTransaction(title: String, text: String): Map<String, Any>? {
-        val fullText = "$title $text".lowercase()
-        
-        // Common expense keywords
-        val expenseKeywords = listOf(
-            "chuyển", "thanh toán", "chi", "trừ", "ghi nợ", "debit", 
-            "payment", "transfer out", "withdrawal", "-"
-        )
-        
-        // Common income keywords
-        val incomeKeywords = listOf(
-            "nhận", "cộng", "ghi có", "credit", "receive", 
-            "transfer in", "deposit", "+"
-        )
-        
-        val isExpense = expenseKeywords.any { fullText.contains(it) }
-        val isIncome = incomeKeywords.any { fullText.contains(it) }
-        
-        if (!isExpense && !isIncome) return null
-        
-        // Try to extract amount
+    private fun extractDescription(text: String): String? {
+        // Try common description patterns
         val patterns = listOf(
-            Pattern.compile("([\\d,.]+)\\s*(đ|vnd|vnđ)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("[-+]([\\d,.]+)\\s*(đ|vnd|vnđ)?", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("(\\d{1,3}(?:[,.]\\d{3})+)"),
+            Pattern.compile("N[oộ]i dung[:\\s]+(.+?)(?:\\n|$)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("(?:ND|N\\.D)[:\\s]+(.+?)(?:\\.|\\n|$)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("(?:Lý do|Ly do)[:\\s]+(.+?)(?:\\.|\\n|$)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("(?:Memo|Ghi chú|Ghi chu)[:\\s]+(.+?)(?:\\.|\\n|$)", Pattern.CASE_INSENSITIVE),
         )
         
         for (pattern in patterns) {
-            val matcher = pattern.matcher(fullText)
+            val matcher = pattern.matcher(text)
             if (matcher.find()) {
-                val amountStr = matcher.group(1)?.replace(",", "")?.replace(".", "") ?: continue
-                val amount = amountStr.toDoubleOrNull() ?: continue
-                
-                if (amount > 0) {
-                    return mapOf(
-                        "source" to "other",
-                        "type" to if (isExpense) "expense" else "income",
-                        "amount" to amount,
-                        "description" to text.take(100),
-                        "rawTitle" to title,
-                        "rawText" to text,
-                        "timestamp" to System.currentTimeMillis()
-                    )
-                }
+                val desc = matcher.group(1)?.trim()
+                if (!desc.isNullOrEmpty()) return desc
             }
         }
-        
         return null
     }
 }
