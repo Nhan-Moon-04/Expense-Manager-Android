@@ -396,31 +396,48 @@ class _DashboardScreenState extends State<DashboardScreen>
               Row(
                 children: [
                   Expanded(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: _isBalanceVisible
-                          ? Text(
-                              currencyFormat.format(balance),
-                              key: const ValueKey('visible'),
-                              style: const TextStyle(
-                                fontSize: 36,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: -1,
+                    child: SizedBox(
+                      height: 38, // cố định chiều cao
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        switchInCurve: Curves.easeOut,
+                        switchOutCurve: Curves.easeIn,
+                        layoutBuilder: (currentChild, previousChildren) {
+                          return Stack(
+                            alignment: Alignment.centerLeft,
+                            children: [
+                              ...previousChildren,
+                              if (currentChild != null) currentChild,
+                            ],
+                          );
+                        },
+                        child: _isBalanceVisible
+                            ? Text(
+                                currencyFormat.format(balance),
+                                key: const ValueKey('visible'),
+                                style: const TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: -1,
+                                  height: 1.1, // rất quan trọng
+                                ),
+                              )
+                            : Text(
+                                '••••••••',
+                                key: const ValueKey('hidden'),
+                                style: const TextStyle(
+                                  fontSize: 30, // giữ y chang
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 4,
+                                  height: 1.1, // giữ y chang
+                                ),
                               ),
-                            )
-                          : Text(
-                              '••••••••',
-                              key: const ValueKey('hidden'),
-                              style: const TextStyle(
-                                fontSize: 36,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: 4,
-                              ),
-                            ),
+                      ),
                     ),
                   ),
+
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {

@@ -4,11 +4,20 @@ import 'package:intl/intl.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
+import 'about_screen.dart';
 import 'edit_profile_screen.dart';
+import 'help_screen.dart';
 import 'settings_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool _isBalanceVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -129,17 +138,48 @@ class ProfileScreen extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    currencyFormat.format(
-                                      user?.totalBalance ?? 0,
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimary,
+                                  AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 200),
+                                    layoutBuilder:
+                                        (currentChild, previousChildren) {
+                                          return Stack(
+                                            alignment: Alignment.centerLeft,
+                                            children: [
+                                              ...previousChildren,
+                                              if (currentChild != null)
+                                                currentChild,
+                                            ],
+                                          );
+                                        },
+                                    child: Text(
+                                      _isBalanceVisible
+                                          ? currencyFormat.format(
+                                              user?.totalBalance ?? 0,
+                                            )
+                                          : '••••••••',
+                                      key: ValueKey(_isBalanceVisible),
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimary,
+                                      ),
                                     ),
                                   ),
                                 ],
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _isBalanceVisible = !_isBalanceVisible;
+                                });
+                              },
+                              child: Icon(
+                                _isBalanceVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: AppColors.textSecondary,
+                                size: 22,
                               ),
                             ),
                           ],
@@ -207,12 +247,26 @@ class ProfileScreen extends StatelessWidget {
                           _buildMenuItem(
                             icon: Icons.info_outline,
                             title: AppStrings.about,
-                            onTap: () => _showAboutDialog(context),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AboutScreen(),
+                                ),
+                              );
+                            },
                           ),
                           _buildMenuItem(
                             icon: Icons.help_outline,
                             title: 'Trợ Giúp',
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const HelpScreen(),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -395,55 +449,6 @@ class ProfileScreen extends StatelessWidget {
                     : Text(AppStrings.confirm),
               );
             },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAboutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppStrings.about),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.account_balance_wallet,
-              size: 64,
-              color: AppColors.primary,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppStrings.appName,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Phiên bản ${AppStrings.appVersion}',
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Ứng dụng quản lý chi tiêu thông minh, giúp bạn theo dõi và kiểm soát tài chính cá nhân một cách hiệu quả.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Đóng'),
           ),
         ],
       ),
