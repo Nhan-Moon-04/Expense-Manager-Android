@@ -4,13 +4,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'push_notification_service.dart';
 
-/// Background message handler - must be top-level function
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  debugPrint('Handling background message: ${message.messageId}');
-  // The notification will be shown automatically by FCM
-}
-
 class FCMService {
   static final FCMService _instance = FCMService._internal();
   factory FCMService() => _instance;
@@ -29,9 +22,6 @@ class FCMService {
   /// Initialize FCM service
   Future<void> initialize() async {
     if (_isInitialized) return;
-
-    // Set up background message handler
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     // Request permissions
     NotificationSettings settings = await _messaging.requestPermission(
