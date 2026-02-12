@@ -141,7 +141,7 @@ class _GroupsScreenState extends State<GroupsScreen>
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -222,7 +222,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: gradient.first.withOpacity(0.3),
+            color: gradient.first.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -234,7 +234,7 @@ class _GroupsScreenState extends State<GroupsScreen>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: Colors.white, size: 20),
@@ -244,7 +244,7 @@ class _GroupsScreenState extends State<GroupsScreen>
             title,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -313,11 +313,11 @@ class _GroupsScreenState extends State<GroupsScreen>
             borderRadius: BorderRadius.circular(16),
             border: isPrimary
                 ? null
-                : Border.all(color: AppColors.textHint.withOpacity(0.3)),
+                : Border.all(color: AppColors.textHint.withValues(alpha: 0.3)),
             boxShadow: isPrimary
                 ? [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.3),
+                      color: AppColors.primary.withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -378,7 +378,7 @@ class _GroupsScreenState extends State<GroupsScreen>
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -436,7 +436,7 @@ class _GroupsScreenState extends State<GroupsScreen>
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 20,
                 offset: const Offset(0, 4),
               ),
@@ -487,7 +487,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.primary.withOpacity(0.1),
+                                      color: AppColors.primary.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
@@ -541,7 +541,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                     Container(
                       width: 1,
                       height: 40,
-                      color: AppColors.textHint.withOpacity(0.2),
+                      color: AppColors.textHint.withValues(alpha: 0.2),
                     ),
                     Expanded(
                       child: _buildStatItem(
@@ -576,7 +576,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.2),
+            color: AppColors.primary.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -672,7 +672,7 @@ class _GroupsScreenState extends State<GroupsScreen>
           borderRadius: BorderRadius.circular(8),
           child: LinearProgressIndicator(
             value: group.targetProgress,
-            backgroundColor: AppColors.primary.withOpacity(0.1),
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
             minHeight: 8,
           ),
@@ -698,7 +698,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: color, size: 16),
@@ -736,7 +736,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.4),
+            color: AppColors.primary.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -783,7 +783,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.textHint.withOpacity(0.3),
+                    color: AppColors.textHint.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -823,7 +823,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide(
-                      color: AppColors.textHint.withOpacity(0.3),
+                      color: AppColors.textHint.withValues(alpha: 0.3),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(

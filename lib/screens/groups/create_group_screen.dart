@@ -80,7 +80,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -150,7 +150,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 borderRadius: BorderRadius.circular(32),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -180,7 +180,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         Text(
                           'Thêm ảnh',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
@@ -199,7 +199,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.4),
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.4,
+                                  ),
                                   blurRadius: 8,
                                 ),
                               ],
@@ -275,7 +277,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   }
                 });
               },
-              activeColor: AppColors.primary,
+              activeThumbColor: AppColors.primary,
             ),
           ],
         ),
@@ -330,7 +332,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -400,7 +402,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -517,7 +519,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.textHint.withOpacity(0.3),
+                color: AppColors.textHint.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -625,6 +627,16 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     try {
       String? uploadedAvatarUrl = _avatarUrl;
 
+      final groupProvider = Provider.of<GroupProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      double? targetAmount;
+      if (_hasTarget && _targetAmountController.text.isNotEmpty) {
+        targetAmount = double.tryParse(
+          _targetAmountController.text.replaceAll(',', ''),
+        );
+      }
+
       // Upload image if selected
       if (_selectedImage != null) {
         final groupId = isEditing
@@ -633,16 +645,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         uploadedAvatarUrl = await _cloudinaryService.uploadGroupAvatar(
           _selectedImage!,
           groupId,
-        );
-      }
-
-      final groupProvider = Provider.of<GroupProvider>(context, listen: false);
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-      double? targetAmount;
-      if (_hasTarget && _targetAmountController.text.isNotEmpty) {
-        targetAmount = double.tryParse(
-          _targetAmountController.text.replaceAll(',', ''),
         );
       }
 
@@ -707,7 +709,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text('Lỗi: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     } finally {
@@ -722,7 +727,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   void _showDeleteConfirmation() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Xóa nhóm'),
         content: const Text(
@@ -730,20 +735,20 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Hủy'),
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context);
+              final groupProvider = Provider.of<GroupProvider>(
+                dialogContext,
+                listen: false,
+              );
+              Navigator.pop(dialogContext);
               setState(() {
                 _isLoading = true;
               });
 
-              final groupProvider = Provider.of<GroupProvider>(
-                context,
-                listen: false,
-              );
               final success = await groupProvider.deleteGroup(widget.group!.id);
 
               if (mounted) {

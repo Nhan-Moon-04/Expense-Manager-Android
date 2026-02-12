@@ -107,7 +107,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         icon: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(_isHeaderCollapsed ? 0 : 0.2),
+            color: Colors.white.withValues(alpha: _isHeaderCollapsed ? 0 : 0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
@@ -119,7 +119,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(_isHeaderCollapsed ? 0 : 0.2),
+              color: Colors.white.withValues(alpha: _isHeaderCollapsed ? 0 : 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -135,7 +135,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(_isHeaderCollapsed ? 0 : 0.2),
+                color: Colors.white.withValues(alpha: _isHeaderCollapsed ? 0 : 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -157,7 +157,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(_isHeaderCollapsed ? 0 : 0.2),
+              color: Colors.white.withValues(alpha: _isHeaderCollapsed ? 0 : 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -244,14 +244,14 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                             Icon(
                               Icons.people_rounded,
                               size: 16,
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                             const SizedBox(width: 4),
                             Text(
                               '${group.members.length} thành viên',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                               ),
                             ),
                           ],
@@ -279,9 +279,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
       width: 72,
       height: 72,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 2),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
@@ -325,7 +325,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -339,7 +339,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   Icon(
                     Icons.flag_rounded,
                     size: 18,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -347,7 +347,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -367,7 +367,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
               value: group.targetProgress,
-              backgroundColor: Colors.white.withOpacity(0.2),
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               minHeight: 10,
             ),
@@ -388,7 +388,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                 '/ ${currencyFormat.format(group.targetAmount)}',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -405,7 +405,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -423,7 +423,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                       'Đã góp',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -446,7 +446,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -464,7 +464,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                       'Đã chi',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -532,7 +532,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -588,7 +588,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: AppColors.primary, size: 20),
@@ -630,7 +630,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -640,13 +640,13 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         children: [
           Row(
             children: [
-              Icon(Icons.vpn_key_rounded, color: Colors.white.withOpacity(0.9)),
+              Icon(Icons.vpn_key_rounded, color: Colors.white.withValues(alpha: 0.9)),
               const SizedBox(width: 12),
               Text(
                 'Mã mời nhóm',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                 ),
               ),
             ],
@@ -689,9 +689,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
   }
 
   Widget _buildTargetDetailsCard(GroupModel group) {
-    final daysLeft = group.targetDeadline != null
-        ? group.targetDeadline!.difference(DateTime.now()).inDays
-        : null;
+    final daysLeft = group.targetDeadline?.difference(DateTime.now()).inDays;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -700,7 +698,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -714,7 +712,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withOpacity(0.1),
+                  color: AppColors.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -849,7 +847,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
             ),
             ...dayExpenses
                 .map((expense) => _buildExpenseItem(expense))
-                .toList(),
+                ,
           ],
         );
       },
@@ -867,7 +865,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -879,7 +877,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: (isIncome ? AppColors.incomeColor : AppColors.expenseColor)
-                  .withOpacity(0.1),
+                  .withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
@@ -952,7 +950,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1008,8 +1006,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                         ),
                         decoration: BoxDecoration(
                           color: isOwner
-                              ? AppColors.warning.withOpacity(0.1)
-                              : AppColors.info.withOpacity(0.1),
+                              ? AppColors.warning.withValues(alpha: 0.1)
+                              : AppColors.info.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -1077,7 +1075,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                   blurRadius: 15,
                   offset: const Offset(0, 6),
                 ),
@@ -1089,7 +1087,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   'Tổng chi tiêu nhóm',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -1108,7 +1106,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -1164,7 +1162,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -1180,7 +1178,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                           (isOwed
                                   ? AppColors.incomeColor
                                   : AppColors.expenseColor)
-                              .withOpacity(0.1),
+                              .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(
@@ -1229,7 +1227,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                 ],
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -1247,7 +1245,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 48, color: AppColors.primary),
@@ -1283,7 +1281,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.4),
+            color: AppColors.primary.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -1319,7 +1317,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.textHint.withOpacity(0.3),
+                    color: AppColors.textHint.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1344,7 +1342,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -1418,7 +1416,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: AppColors.textHint.withOpacity(0.3),
+                      color: AppColors.textHint.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -1606,7 +1604,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
     required VoidCallback onTap,
   }) {
     return Material(
-      color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
+      color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -1616,7 +1614,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected ? color : AppColors.textHint.withOpacity(0.3),
+              color: isSelected ? color : AppColors.textHint.withValues(alpha: 0.3),
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -1654,7 +1652,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.error.withOpacity(0.1),
+                color: AppColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(Icons.delete_forever_rounded, color: AppColors.error),
@@ -1675,9 +1673,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.error.withOpacity(0.1),
+                color: AppColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.error.withOpacity(0.3)),
+                border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [

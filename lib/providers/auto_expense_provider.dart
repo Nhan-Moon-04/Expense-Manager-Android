@@ -16,8 +16,8 @@ class AutoExpenseProvider with ChangeNotifier {
   bool _autoAddIncome = true;
   bool _showConfirmation = true;
 
-  List<BankNotification> _pendingNotifications = [];
-  List<BankNotification> _processedNotifications = [];
+  final List<BankNotification> _pendingNotifications = [];
+  final List<BankNotification> _processedNotifications = [];
 
   StreamSubscription? _subscription;
   String? _userId;
@@ -164,7 +164,7 @@ class AutoExpenseProvider with ChangeNotifier {
     try {
       await _expenseService.addExpense(expense);
     } catch (e) {
-      print('Error auto-adding expense: $e');
+      debugPrint('Error auto-adding expense: $e');
     }
   }
 

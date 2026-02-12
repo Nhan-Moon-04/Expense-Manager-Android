@@ -28,7 +28,6 @@ class DefaultFirebaseOptions {
     }
   }
 
-  // TODO: Để lấy cấu hình web chính xác, vào Firebase Console > Project Settings > General
   // > Your apps > Add app > Web, sau đó copy các giá trị vào đây
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyBs0f8TVT2__R6EDYRj_-QOI-6GjIyvcCo',

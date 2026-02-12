@@ -197,7 +197,7 @@ class _RemindersScreenState extends State<RemindersScreen>
                   ? []
                   : [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 2),
                       ),
@@ -337,7 +337,7 @@ class _RemindersScreenState extends State<RemindersScreen>
                             listen: false,
                           ).toggleActive(reminder.id);
                         },
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                 ),
               ],
             ),

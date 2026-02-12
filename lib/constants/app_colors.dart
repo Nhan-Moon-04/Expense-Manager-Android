@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class AppColors {
   // Primary Colors - Modern Deep Blue/Purple Gradient
@@ -63,5 +63,5 @@ class AppColors {
   ];
 
   // Card shadow color
-  static Color shadowColor = const Color(0xFF6366F1).withOpacity(0.08);
+  static Color shadowColor = const Color(0xFF6366F1).withValues(alpha: 0.08);
 }

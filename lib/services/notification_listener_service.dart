@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class BankNotification {
@@ -94,7 +95,7 @@ class NotificationListenerService {
       );
       return result ?? false;
     } on PlatformException catch (e) {
-      print('Error checking notification access: ${e.message}');
+      debugPrint('Error checking notification access: ${e.message}');
       return false;
     }
   }
@@ -104,7 +105,7 @@ class NotificationListenerService {
     try {
       await _methodChannel.invokeMethod('openNotificationAccessSettings');
     } on PlatformException catch (e) {
-      print('Error opening notification settings: ${e.message}');
+      debugPrint('Error opening notification settings: ${e.message}');
     }
   }
 
@@ -116,7 +117,7 @@ class NotificationListenerService {
       );
       return result?.cast<String>() ?? [];
     } on PlatformException catch (e) {
-      print('Error getting supported apps: ${e.message}');
+      debugPrint('Error getting supported apps: ${e.message}');
       return [];
     }
   }
@@ -131,12 +132,12 @@ class NotificationListenerService {
             final notification = BankNotification.fromMap(event);
             _notificationController.add(notification);
           } catch (e) {
-            print('Error parsing notification: $e');
+            debugPrint('Error parsing notification: $e');
           }
         }
       },
       onError: (error) {
-        print('Notification stream error: $error');
+        debugPrint('Notification stream error: $error');
       },
     );
   }

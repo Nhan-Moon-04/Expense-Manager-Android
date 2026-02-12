@@ -8,6 +8,7 @@ class ExpenseProvider with ChangeNotifier {
   List<ExpenseModel> _expenses = [];
   List<ExpenseModel> _todayExpenses = [];
   List<ExpenseModel> _monthExpenses = [];
+  List<ExpenseModel> _previousMonthExpenses = [];
   Map<ExpenseCategory, double> _categoryExpenses = {};
   Map<int, Map<String, double>> _dailySummary = {};
   bool _isLoading = false;
@@ -16,6 +17,7 @@ class ExpenseProvider with ChangeNotifier {
   List<ExpenseModel> get expenses => _expenses;
   List<ExpenseModel> get todayExpenses => _todayExpenses;
   List<ExpenseModel> get monthExpenses => _monthExpenses;
+  List<ExpenseModel> get previousMonthExpenses => _previousMonthExpenses;
   Map<ExpenseCategory, double> get categoryExpenses => _categoryExpenses;
   Map<int, Map<String, double>> get dailySummary => _dailySummary;
   bool get isLoading => _isLoading;
@@ -37,6 +39,29 @@ class ExpenseProvider with ChangeNotifier {
     return _monthExpenses
         .where((e) => e.type == ExpenseType.income)
         .fold(0, (sum, e) => sum + e.amount);
+  }
+
+  /// Net balance of this month (income - expense)
+  double get monthNet => monthIncome - monthTotal;
+
+  /// Net balance of previous month (income - expense)
+  double get previousMonthNet {
+    final prevIncome = _previousMonthExpenses
+        .where((e) => e.type == ExpenseType.income)
+        .fold(0.0, (sum, e) => sum + e.amount);
+    final prevExpense = _previousMonthExpenses
+        .where((e) => e.type == ExpenseType.expense)
+        .fold(0.0, (sum, e) => sum + e.amount);
+    return prevIncome - prevExpense;
+  }
+
+  /// Growth percentage compared to previous month
+  /// Positive = improving (more net income), Negative = declining
+  double get monthGrowthPercent {
+    if (previousMonthNet == 0) {
+      return monthNet > 0 ? 100 : (monthNet < 0 ? -100 : 0);
+    }
+    return ((monthNet - previousMonthNet) / previousMonthNet.abs()) * 100;
   }
 
   // Listen to expenses
@@ -64,10 +89,28 @@ class ExpenseProvider with ChangeNotifier {
     _setLoading(true);
     try {
       _monthExpenses = await _expenseService.getMonthExpenses(userId);
+      // Also load previous month for growth comparison
+      await _loadPreviousMonthExpenses(userId);
       _setLoading(false);
     } catch (e) {
       _setError('Không thể tải chi tiêu tháng này.');
       _setLoading(false);
+    }
+  }
+
+  // Load previous month's expenses for growth comparison
+  Future<void> _loadPreviousMonthExpenses(String userId) async {
+    try {
+      final now = DateTime.now();
+      final prevMonth = DateTime(now.year, now.month - 1, 1);
+      final endOfPrevMonth = DateTime(now.year, now.month, 0, 23, 59, 59);
+      _previousMonthExpenses = await _expenseService.getExpensesByDateRange(
+        userId,
+        prevMonth,
+        endOfPrevMonth,
+      );
+    } catch (e) {
+      _previousMonthExpenses = [];
     }
   }
 

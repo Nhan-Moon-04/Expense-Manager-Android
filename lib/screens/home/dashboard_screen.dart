@@ -9,6 +9,7 @@ import '../../providers/expense_provider.dart';
 import '../../providers/reminder_provider.dart';
 import '../../models/expense_model.dart';
 import '../expenses/add_expense_screen.dart';
+import '../expenses/expense_list_screen.dart';
 import '../reminders/reminders_screen.dart';
 import '../notifications/notifications_screen.dart';
 
@@ -24,6 +25,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  bool _isBalanceVisible = false;
 
   @override
   void initState() {
@@ -126,7 +128,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.4),
+                color: AppColors.primary.withValues(alpha: 0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -172,7 +174,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -188,7 +190,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         height: 52,
                         placeholder: (context, url) => Center(
                           child: Text(
-                            _getInitials(user.fullName ?? 'U'),
+                            _getInitials(user.fullName),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -206,7 +208,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ),
                           child: Center(
                             child: Text(
-                              _getInitials(user.fullName ?? 'U'),
+                              _getInitials(user.fullName),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -268,7 +270,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -317,9 +319,24 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _buildBalanceCard() {
-    return Consumer<AuthProvider>(
-      builder: (context, authProvider, child) {
+    return Consumer2<AuthProvider, ExpenseProvider>(
+      builder: (context, authProvider, expenseProvider, child) {
         final balance = authProvider.user?.totalBalance ?? 0;
+        final growthPercent = expenseProvider.monthGrowthPercent;
+        final isGrowthPositive = growthPercent >= 0;
+
+        // Determine growth label
+        String growthLabel;
+        if (growthPercent > 10) {
+          growthLabel = 'Tốt';
+        } else if (growthPercent >= 0) {
+          growthLabel = 'Ổn định';
+        } else if (growthPercent > -10) {
+          growthLabel = 'Giảm nhẹ';
+        } else {
+          growthLabel = 'Giảm';
+        }
+
         return Container(
           width: double.infinity,
           padding: const EdgeInsets.all(24),
@@ -332,7 +349,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.35),
+                color: AppColors.primary.withValues(alpha: 0.35),
                 blurRadius: 24,
                 offset: const Offset(0, 12),
               ),
@@ -350,14 +367,14 @@ class _DashboardScreenState extends State<DashboardScreen>
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           Icons.account_balance_wallet_rounded,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           size: 16,
                         ),
                         const SizedBox(width: 6),
@@ -365,39 +382,83 @@ class _DashboardScreenState extends State<DashboardScreen>
                           'Số dư hiện tại',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.more_horiz_rounded,
-                    color: Colors.white.withOpacity(0.7),
-                  ),
+                  _buildBalanceMenuButton(balance),
                 ],
               ),
               const SizedBox(height: 20),
-              Text(
-                currencyFormat.format(balance),
-                style: const TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: -1,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: _isBalanceVisible
+                          ? Text(
+                              currencyFormat.format(balance),
+                              key: const ValueKey('visible'),
+                              style: const TextStyle(
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: -1,
+                              ),
+                            )
+                          : Text(
+                              '••••••••',
+                              key: const ValueKey('hidden'),
+                              style: const TextStyle(
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 4,
+                              ),
+                            ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isBalanceVisible = !_isBalanceVisible;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        _isBalanceVisible
+                            ? Icons.visibility_rounded
+                            : Icons.visibility_off_rounded,
+                        color: Colors.white.withValues(alpha: 0.9),
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  _buildBalanceTrend(isPositive: balance >= 0),
+                  _buildBalanceTrend(
+                    isPositive: isGrowthPositive,
+                    label: growthLabel,
+                    percent: growthPercent,
+                  ),
                   const SizedBox(width: 8),
                   Text(
-                    'Cập nhật hôm nay',
+                    'So với tháng trước',
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -409,11 +470,94 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildBalanceTrend({required bool isPositive}) {
+  Widget _buildBalanceMenuButton(double balance) {
+    return PopupMenuButton<String>(
+      icon: Icon(
+        Icons.more_horiz_rounded,
+        color: Colors.white.withValues(alpha: 0.7),
+      ),
+      color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      offset: const Offset(0, 40),
+      onSelected: (value) {
+        switch (value) {
+          case 'toggle':
+            setState(() {
+              _isBalanceVisible = !_isBalanceVisible;
+            });
+            break;
+          case 'refresh':
+            _loadData();
+            break;
+          case 'details':
+            // Navigate to expense list / details
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ExpenseListScreen(),
+              ),
+            );
+            break;
+        }
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: 'toggle',
+          child: Row(
+            children: [
+              Icon(
+                _isBalanceVisible
+                    ? Icons.visibility_off_rounded
+                    : Icons.visibility_rounded,
+                size: 20,
+                color: AppColors.textSecondary,
+              ),
+              const SizedBox(width: 12),
+              Text(_isBalanceVisible ? 'Ẩn số dư' : 'Hiện số dư'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 'refresh',
+          child: Row(
+            children: [
+              Icon(
+                Icons.refresh_rounded,
+                size: 20,
+                color: AppColors.textSecondary,
+              ),
+              const SizedBox(width: 12),
+              const Text('Làm mới'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 'details',
+          child: Row(
+            children: [
+              Icon(
+                Icons.receipt_long_rounded,
+                size: 20,
+                color: AppColors.textSecondary,
+              ),
+              const SizedBox(width: 12),
+              const Text('Xem chi tiết'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBalanceTrend({
+    required bool isPositive,
+    required String label,
+    required double percent,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -428,7 +572,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(width: 4),
           Text(
-            isPositive ? 'Tốt' : 'Âm',
+            '${percent.abs().toStringAsFixed(0)}% $label',
             style: const TextStyle(
               fontSize: 12,
               color: Colors.white,
@@ -451,7 +595,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 amount: expenseProvider.monthIncome,
                 icon: Icons.arrow_downward_rounded,
                 gradientColors: AppColors.incomeGradient,
-                iconBgColor: AppColors.success.withOpacity(0.15),
+                iconBgColor: AppColors.success.withValues(alpha: 0.15),
                 iconColor: AppColors.success,
               ),
             ),
@@ -462,7 +606,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 amount: expenseProvider.monthTotal,
                 icon: Icons.arrow_upward_rounded,
                 gradientColors: AppColors.expenseGradient,
-                iconBgColor: AppColors.error.withOpacity(0.15),
+                iconBgColor: AppColors.error.withValues(alpha: 0.15),
                 iconColor: AppColors.error,
               ),
             ),
@@ -487,7 +631,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -563,7 +707,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               icon: Icons.remove_circle_outline_rounded,
               label: 'Chi tiêu',
               color: AppColors.expenseColor,
-              bgColor: AppColors.expenseColor.withOpacity(0.1),
+              bgColor: AppColors.expenseColor.withValues(alpha: 0.1),
               onTap: () {
                 Navigator.push(
                   context,
@@ -578,7 +722,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               icon: Icons.add_circle_outline_rounded,
               label: 'Thu nhập',
               color: AppColors.incomeColor,
-              bgColor: AppColors.incomeColor.withOpacity(0.1),
+              bgColor: AppColors.incomeColor.withValues(alpha: 0.1),
               onTap: () {
                 Navigator.push(
                   context,
@@ -594,7 +738,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               icon: Icons.notifications_active_outlined,
               label: 'Nhắc nhở',
               color: AppColors.warning,
-              bgColor: AppColors.warning.withOpacity(0.1),
+              bgColor: AppColors.warning.withValues(alpha: 0.1),
               onTap: () {
                 Navigator.push(
                   context,
@@ -630,7 +774,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -724,7 +868,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -737,8 +881,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            AppColors.warning.withOpacity(0.2),
-                            AppColors.accent.withOpacity(0.1),
+                            AppColors.warning.withValues(alpha: 0.2),
+                            AppColors.accent.withValues(alpha: 0.1),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(14),
@@ -833,7 +977,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -882,7 +1026,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -924,7 +1068,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: categoryColor.withOpacity(0.12),
+              color: categoryColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(

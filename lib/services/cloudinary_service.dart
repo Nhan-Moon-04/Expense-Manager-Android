@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 
@@ -49,11 +50,11 @@ class CloudinaryService {
         final data = jsonDecode(response.body);
         return data['secure_url'];
       } else {
-        print('Cloudinary upload error: ${response.body}');
+        debugPrint('Cloudinary upload error: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Cloudinary upload exception: $e');
+      debugPrint('Cloudinary upload exception: $e');
       return null;
     }
   }
@@ -96,7 +97,7 @@ class CloudinaryService {
       }
       return false;
     } catch (e) {
-      print('Cloudinary delete exception: $e');
+      debugPrint('Cloudinary delete exception: $e');
       return false;
     }
   }

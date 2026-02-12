@@ -451,7 +451,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: isSelected
-                  ? _getCategoryColor(category).withOpacity(0.2)
+                  ? _getCategoryColor(category).withValues(alpha: 0.2)
                   : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(

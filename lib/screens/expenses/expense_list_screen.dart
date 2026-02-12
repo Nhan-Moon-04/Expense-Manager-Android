@@ -164,7 +164,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -198,7 +198,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -307,7 +307,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 boxShadow: [
                   BoxShadow(
                     color: (balance >= 0 ? AppColors.primary : AppColors.error)
-                        .withOpacity(0.3),
+                        .withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -324,14 +324,14 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
                           children: [
                             Icon(
                               Icons.account_balance_wallet_rounded,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                               size: 14,
                             ),
                             const SizedBox(width: 6),
@@ -339,7 +339,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                               'Số dư tháng này',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -363,7 +363,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                     '${expenses.length} giao dịch trong tháng',
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -411,7 +411,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -422,7 +422,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 18),
@@ -490,8 +490,8 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
               boxShadow: [
                 BoxShadow(
                   color: isSelected
-                      ? AppColors.primary.withOpacity(0.3)
-                      : Colors.black.withOpacity(0.04),
+                      ? AppColors.primary.withValues(alpha: 0.3)
+                      : Colors.black.withValues(alpha: 0.04),
                   blurRadius: isSelected ? 12 : 8,
                   offset: const Offset(0, 4),
                 ),
@@ -537,7 +537,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -607,7 +607,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -619,7 +619,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.background.withOpacity(0.5),
+                      color: AppColors.background.withValues(alpha: 0.5),
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(20),
                       ),
@@ -741,7 +741,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: categoryColor.withOpacity(0.12),
+                  color: categoryColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
@@ -816,7 +816,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.4),
+            color: AppColors.primary.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -903,7 +903,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: isSelected
-            ? AppColors.primary.withOpacity(0.1)
+            ? AppColors.primary.withValues(alpha: 0.1)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
@@ -916,7 +916,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: isSelected
-                ? AppColors.primary.withOpacity(0.15)
+                ? AppColors.primary.withValues(alpha: 0.15)
                 : AppColors.background,
             borderRadius: BorderRadius.circular(10),
           ),
