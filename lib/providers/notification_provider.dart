@@ -31,29 +31,33 @@ class NotificationProvider with ChangeNotifier {
     _unreadSubscription?.cancel();
     _isFirstLoad = true;
 
-    _notifSubscription = _notificationService.getUserNotifications(userId).listen((notifications) {
-      if (_isFirstLoad) {
-        // First load: mark all existing notification IDs as "already shown"
-        // so we don't spam push notifications for old ones
-        for (var n in notifications) {
-          _shownPushIds.add(n.id);
-        }
-        _isFirstLoad = false;
-      } else {
-        // Subsequent updates: show push notification for NEW unread ones
-        for (var n in notifications) {
-          if (!n.isRead && !_shownPushIds.contains(n.id)) {
-            _shownPushIds.add(n.id);
-            _showPushForNotification(n);
+    _notifSubscription = _notificationService
+        .getUserNotifications(userId)
+        .listen((notifications) {
+          if (_isFirstLoad) {
+            // First load: mark all existing notification IDs as "already shown"
+            // so we don't spam push notifications for old ones
+            for (var n in notifications) {
+              _shownPushIds.add(n.id);
+            }
+            _isFirstLoad = false;
+          } else {
+            // Subsequent updates: show push notification for NEW unread ones
+            for (var n in notifications) {
+              if (!n.isRead && !_shownPushIds.contains(n.id)) {
+                _shownPushIds.add(n.id);
+                _showPushForNotification(n);
+              }
+            }
           }
-        }
-      }
 
-      _notifications = notifications;
-      notifyListeners();
-    });
+          _notifications = notifications;
+          notifyListeners();
+        });
 
-    _unreadSubscription = _notificationService.getUnreadCount(userId).listen((count) {
+    _unreadSubscription = _notificationService.getUnreadCount(userId).listen((
+      count,
+    ) {
       _unreadCount = count;
       notifyListeners();
     });
