@@ -117,7 +117,7 @@ class _ScheduledReminderTabState extends State<ScheduledReminderTab> {
               Switch(
                 value: provider.enabled,
                 onChanged: (value) => provider.updateEnabled(value),
-                activeColor: AdminColors.accent,
+                activeTrackColor: AdminColors.accent,
               ),
             ],
           ),

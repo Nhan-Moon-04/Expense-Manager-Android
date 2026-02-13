@@ -41,14 +41,18 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await flutterLocalNotificationsPlugin.initialize(initSettings);
 
   const androidDetails = AndroidNotificationDetails(
-    'fcm_background_channel',
-    'Thông báo',
-    channelDescription: 'Thông báo từ quản trị viên',
-    importance: Importance.high,
-    priority: Priority.high,
+    'fcm_high_importance_channel',
+    'Thông báo quan trọng',
+    channelDescription: 'Thông báo từ quản trị viên và hệ thống',
+    importance: Importance.max,
+    priority: Priority.max,
     icon: '@mipmap/ic_launcher',
     playSound: true,
     enableVibration: true,
+    // Show on lock screen
+    visibility: NotificationVisibility.public,
+    // Full screen intent for urgent notifications
+    fullScreenIntent: true,
   );
 
   const notificationDetails = NotificationDetails(android: androidDetails);
@@ -62,12 +66,44 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   );
 }
 
+/// Create the high-importance notification channel that matches
+/// the one declared in AndroidManifest.xml for system-delivered FCM notifications
+Future<void> _createFCMNotificationChannel() async {
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final androidPlugin = flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin
+      >();
+
+  if (androidPlugin != null) {
+    // This channel MUST match the ID in AndroidManifest.xml
+    // "com.google.firebase.messaging.default_notification_channel_id"
+    // When app is KILLED and FCM sends a notification message,
+    // Android system uses this channel to display it automatically.
+    // This is exactly how Zalo, banking apps, etc. work.
+    const channel = AndroidNotificationChannel(
+      'fcm_high_importance_channel', // Must match AndroidManifest.xml
+      'Thông báo quan trọng',
+      description: 'Thông báo từ quản trị viên và hệ thống',
+      importance: Importance.max,
+      playSound: true,
+      enableVibration: true,
+      showBadge: true,
+    );
+    await androidPlugin.createNotificationChannel(channel);
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Register background handler BEFORE any other FCM calls
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Create the FCM notification channel (MUST be done before any notification arrives)
+  // This channel is used by Android system to show FCM notifications when app is killed
+  await _createFCMNotificationChannel();
 
   await initializeDateFormatting('vi_VN', null);
 

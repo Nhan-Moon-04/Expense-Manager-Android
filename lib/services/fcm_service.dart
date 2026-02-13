@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -58,7 +59,7 @@ class FCMService {
         _handleMessageOpenedApp(initialMessage);
       }
 
-      // Listen for token refresh
+      // Listen for token refresh and update Firestore
       _messaging.onTokenRefresh.listen((newToken) {
         _fcmToken = newToken;
         debugPrint('FCM Token refreshed: $newToken');
@@ -66,6 +67,55 @@ class FCMService {
 
       _isInitialized = true;
       debugPrint('FCM Service initialized');
+    }
+  }
+
+  /// Save FCM token to Firestore for the current user
+  /// This is CRITICAL - Cloud Functions use this token to send push notifications
+  /// that work even when the app is killed (like Zalo, banking apps)
+  Future<void> saveTokenForUser(String userId) async {
+    try {
+      // Get fresh token
+      _fcmToken = await _messaging.getToken();
+      if (_fcmToken == null) return;
+
+      // Save token to user document
+      await _firestore.collection('users').doc(userId).update({
+        'fcmToken': _fcmToken,
+        'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+        'platform': Platform.isAndroid ? 'android' : 'ios',
+      });
+
+      debugPrint('FCM token saved for user: $userId');
+
+      // Also listen for future token refreshes and update Firestore
+      _messaging.onTokenRefresh.listen((newToken) async {
+        _fcmToken = newToken;
+        try {
+          await _firestore.collection('users').doc(userId).update({
+            'fcmToken': newToken,
+            'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+          });
+          debugPrint('FCM token refreshed and saved for user: $userId');
+        } catch (e) {
+          debugPrint('Error saving refreshed FCM token: $e');
+        }
+      });
+    } catch (e) {
+      debugPrint('Error saving FCM token: $e');
+    }
+  }
+
+  /// Remove FCM token when user logs out
+  Future<void> removeTokenForUser(String userId) async {
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'fcmToken': FieldValue.delete(),
+        'fcmTokenUpdatedAt': FieldValue.delete(),
+      });
+      debugPrint('FCM token removed for user: $userId');
+    } catch (e) {
+      debugPrint('Error removing FCM token: $e');
     }
   }
 

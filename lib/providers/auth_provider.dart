@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
+import '../services/fcm_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
+  final FCMService _fcmService = FCMService();
 
   UserModel? _user;
   bool _isLoading = false;
@@ -46,6 +48,10 @@ class AuthProvider with ChangeNotifier {
             );
             await _authService.createUserDocument(_user!);
           }
+
+          // Save FCM token so server can send push notifications
+          // This is what makes notifications work even when app is killed
+          await _fcmService.saveTokenForUser(firebaseUser.uid);
         } catch (e) {
           debugPrint('Error getting/creating user data: $e');
           _user = null;
@@ -112,6 +118,10 @@ class AuthProvider with ChangeNotifier {
   Future<void> signOut() async {
     _setLoading(true);
     try {
+      // Remove FCM token before signing out so no more push notifications
+      if (_user != null) {
+        await _fcmService.removeTokenForUser(_user!.uid);
+      }
       await _authService.signOut();
       _user = null;
     } catch (e) {
