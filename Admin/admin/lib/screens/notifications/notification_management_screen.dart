@@ -8,6 +8,7 @@ import '../../models/user_model.dart';
 import '../../providers/admin_auth_provider.dart';
 import '../../providers/admin_notification_provider.dart';
 import '../../providers/admin_user_provider.dart';
+import 'scheduled_reminder_tab.dart';
 
 class NotificationManagementScreen extends StatefulWidget {
   const NotificationManagementScreen({super.key});
@@ -25,7 +26,7 @@ class _NotificationManagementScreenState
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AdminNotificationProvider>().listenToLogs();
@@ -74,6 +75,7 @@ class _NotificationManagementScreenState
                   indicatorColor: AdminColors.accent,
                   tabs: const [
                     Tab(text: 'Gửi Thông Báo'),
+                    Tab(text: 'Nhắc Nhở Tự Động'),
                     Tab(text: 'Lịch Sử'),
                   ],
                 ),
@@ -85,7 +87,11 @@ class _NotificationManagementScreenState
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: [_buildSendTab(), _buildHistoryTab()],
+            children: [
+              _buildSendTab(),
+              const ScheduledReminderTab(),
+              _buildHistoryTab(),
+            ],
           ),
         ),
       ],

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -13,6 +14,8 @@ import '../../providers/settings_provider.dart';
 import '../../services/cloudinary_service.dart';
 import '../../services/push_notification_service.dart';
 import '../../services/backup_service.dart';
+import '../../services/version_service.dart';
+import '../widgets/update_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -28,6 +31,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isBackingUp = false;
   bool _isRestoring = false;
   bool _isExporting = false;
+  String _currentVersion = '';
   final CloudinaryService _cloudinaryService = CloudinaryService();
   final BackupService _backupService = BackupService();
 
@@ -37,6 +41,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AutoExpenseProvider>().checkNotificationAccess();
     });
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() => _currentVersion = info.version);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -70,6 +84,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _buildDataSection(),
                       const SizedBox(height: 24),
                       _buildDangerSection(),
+                      const SizedBox(height: 24),
+                      _buildAboutSection(),
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -1665,5 +1681,79 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildAboutSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader('Thông tin', Icons.info_rounded),
+        const SizedBox(height: 12),
+        _buildSettingsCard([
+          _buildListTile(
+            icon: Icons.update_rounded,
+            title: 'Phiên bản',
+            subtitle: _currentVersion.isNotEmpty
+                ? 'v$_currentVersion'
+                : 'Đang tải...',
+            onTap: () => _checkForUpdate(),
+          ),
+        ]),
+      ],
+    );
+  }
+
+  Future<void> _checkForUpdate() async {
+    // Hiện loading
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(child: Text('Đang kiểm tra phiên bản...')),
+          ],
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
+    final result = await VersionService().checkForUpdate();
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    if (result.status == UpdateStatus.upToDate) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 12),
+              Expanded(child: Text('Bạn đang dùng phiên bản mới nhất!')),
+            ],
+          ),
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+    } else {
+      UpdateDialog.checkAndShow(context);
+    }
   }
 }

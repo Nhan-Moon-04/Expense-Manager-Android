@@ -70,6 +70,11 @@ service cloud.firestore {
     match /backups/{userId} {
       allow read, write: if isOwner(userId);
     }
+
+    // App config (version check)
+    match /app_config/{docId} {
+      allow read: if isAuthenticated();
+    }
   }
 }
 ```

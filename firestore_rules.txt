@@ -107,5 +107,11 @@ service cloud.firestore {
     match /backups/{userId} {
       allow read, write: if isAuthenticated() && isOwner(userId);
     }
+
+    // ==================== APP CONFIG (Version check) ====================
+    match /app_config/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
   }
 }

@@ -10,6 +10,7 @@ import '../expenses/expense_list_screen.dart';
 import '../notes/notes_screen.dart';
 import '../groups/groups_screen.dart';
 import '../profile/profile_screen.dart';
+import '../widgets/update_dialog.dart';
 import 'dashboard_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -36,6 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // Delay initialization to after the build phase
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeData();
+      // Kiểm tra phiên bản khi mở app
+      UpdateDialog.checkAndShow(context);
     });
   }
 

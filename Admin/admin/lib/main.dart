@@ -9,6 +9,7 @@ import 'providers/admin_auth_provider.dart';
 import 'providers/admin_user_provider.dart';
 import 'providers/admin_stats_provider.dart';
 import 'providers/admin_notification_provider.dart';
+import 'providers/scheduled_reminder_provider.dart';
 import 'screens/login/admin_login_screen.dart';
 import 'screens/dashboard/admin_dashboard_screen.dart';
 import 'screens/users/user_list_screen.dart';
@@ -33,6 +34,7 @@ class AdminApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AdminUserProvider()),
         ChangeNotifierProvider(create: (_) => AdminStatsProvider()),
         ChangeNotifierProvider(create: (_) => AdminNotificationProvider()),
+        ChangeNotifierProvider(create: (_) => ScheduledReminderProvider()),
       ],
       child: MaterialApp(
         title: AdminStrings.appName,
