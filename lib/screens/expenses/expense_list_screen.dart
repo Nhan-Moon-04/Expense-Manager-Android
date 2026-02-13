@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../../models/expense_model.dart';
 import 'add_expense_screen.dart';
 import 'expense_detail_screen.dart';
@@ -18,7 +19,8 @@ class ExpenseListScreen extends StatefulWidget {
 
 class _ExpenseListScreenState extends State<ExpenseListScreen>
     with SingleTickerProviderStateMixin {
-  final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+  NumberFormat get currencyFormat =>
+      context.read<SettingsProvider>().currencyFormat;
   DateTime _selectedMonth = DateTime.now();
   String _filterType = 'all';
   late AnimationController _animationController;

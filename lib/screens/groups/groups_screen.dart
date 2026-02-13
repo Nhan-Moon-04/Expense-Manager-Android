@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/group_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../../models/group_model.dart';
 import 'group_detail_screen.dart';
 import 'create_group_screen.dart';
@@ -19,7 +20,8 @@ class GroupsScreen extends StatefulWidget {
 
 class _GroupsScreenState extends State<GroupsScreen>
     with SingleTickerProviderStateMixin {
-  final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+  NumberFormat get currencyFormat =>
+      context.read<SettingsProvider>().currencyFormat;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -487,7 +489,9 @@ class _GroupsScreenState extends State<GroupsScreen>
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.primary.withValues(alpha: 0.1),
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.1,
+                                      ),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(

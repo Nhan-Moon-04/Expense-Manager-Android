@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/settings_provider.dart';
 import 'about_screen.dart';
 import 'edit_profile_screen.dart';
 import 'help_screen.dart';
@@ -21,7 +21,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+    final currencyFormat = context.watch<SettingsProvider>().currencyFormat;
 
     return Scaffold(
       backgroundColor: AppColors.background,

@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/group_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../../models/group_model.dart';
 import '../../models/expense_model.dart';
 import 'create_group_screen.dart';
@@ -22,7 +23,8 @@ class GroupDetailScreen extends StatefulWidget {
 class _GroupDetailScreenState extends State<GroupDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+  NumberFormat get currencyFormat =>
+      context.read<SettingsProvider>().currencyFormat;
   final _scrollController = ScrollController();
   bool _isHeaderCollapsed = false;
 
@@ -119,7 +121,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: _isHeaderCollapsed ? 0 : 0.2),
+              color: Colors.white.withValues(
+                alpha: _isHeaderCollapsed ? 0 : 0.2,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -135,7 +139,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: _isHeaderCollapsed ? 0 : 0.2),
+                color: Colors.white.withValues(
+                  alpha: _isHeaderCollapsed ? 0 : 0.2,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -157,7 +163,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: _isHeaderCollapsed ? 0 : 0.2),
+              color: Colors.white.withValues(
+                alpha: _isHeaderCollapsed ? 0 : 0.2,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -281,7 +289,10 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 2),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.3),
+          width: 2,
+        ),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
@@ -640,7 +651,10 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         children: [
           Row(
             children: [
-              Icon(Icons.vpn_key_rounded, color: Colors.white.withValues(alpha: 0.9)),
+              Icon(
+                Icons.vpn_key_rounded,
+                color: Colors.white.withValues(alpha: 0.9),
+              ),
               const SizedBox(width: 12),
               Text(
                 'Mã mời nhóm',
@@ -845,9 +859,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                 ),
               ),
             ),
-            ...dayExpenses
-                .map((expense) => _buildExpenseItem(expense))
-                ,
+            ...dayExpenses.map((expense) => _buildExpenseItem(expense)),
           ],
         );
       },
@@ -1614,7 +1626,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected ? color : AppColors.textHint.withValues(alpha: 0.3),
+              color: isSelected
+                  ? color
+                  : AppColors.textHint.withValues(alpha: 0.3),
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -1675,7 +1689,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
               decoration: BoxDecoration(
                 color: AppColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: AppColors.error.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 children: [

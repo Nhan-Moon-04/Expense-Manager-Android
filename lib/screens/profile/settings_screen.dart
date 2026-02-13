@@ -4,12 +4,15 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/auto_expense_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../../services/cloudinary_service.dart';
 import '../../services/push_notification_service.dart';
+import '../../services/backup_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -21,10 +24,12 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   bool _reminderEnabled = true;
-  String _currency = 'VND';
-  String _language = 'vi';
   bool _isUploadingAvatar = false;
+  bool _isBackingUp = false;
+  bool _isRestoring = false;
+  bool _isExporting = false;
   final CloudinaryService _cloudinaryService = CloudinaryService();
+  final BackupService _backupService = BackupService();
 
   @override
   void initState() {
@@ -447,7 +452,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   Icon(Icons.check_circle, color: Colors.white),
                   SizedBox(width: 12),
-                  Text('Đã cập nhật ảnh đại diện'),
+                  Expanded(child: Text('Đã cập nhật ảnh đại diện')),
                 ],
               ),
               backgroundColor: AppColors.success,
@@ -489,7 +494,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Icon(Icons.check_circle, color: Colors.white),
                 SizedBox(width: 12),
-                Text('Đã xóa ảnh đại diện'),
+                Expanded(child: Text('Đã xóa ảnh đại diện')),
               ],
             ),
             backgroundColor: AppColors.success,
@@ -590,7 +595,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Icon(Icons.check_circle, color: Colors.white),
                 SizedBox(width: 12),
-                Text('Đã cập nhật tên hiển thị'),
+                Expanded(child: Text('Đã cập nhật tên hiển thị')),
               ],
             ),
             backgroundColor: AppColors.success,
@@ -615,7 +620,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               const Icon(Icons.error_outline, color: Colors.white),
               const SizedBox(width: 12),
-              Text(message),
+              Expanded(child: Text(message)),
             ],
           ),
           backgroundColor: AppColors.error,
@@ -978,27 +983,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildDisplaySection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader('Hiển thị', Icons.palette_rounded),
-        const SizedBox(height: 12),
-        _buildSettingsCard([
-          _buildListTile(
-            icon: Icons.attach_money_rounded,
-            title: AppStrings.currency,
-            subtitle: _getCurrencyName(),
-            onTap: _showCurrencyPicker,
-          ),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          _buildListTile(
-            icon: Icons.language_rounded,
-            title: AppStrings.language,
-            subtitle: _getLanguageName(),
-            onTap: _showLanguagePicker,
-          ),
-        ]),
-      ],
+    return Consumer<SettingsProvider>(
+      builder: (context, settings, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader('Hiển thị', Icons.palette_rounded),
+            const SizedBox(height: 12),
+            _buildSettingsCard([
+              _buildListTile(
+                icon: Icons.attach_money_rounded,
+                title: AppStrings.currency,
+                subtitle: settings.currencyDisplayName,
+                onTap: _showCurrencyPicker,
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              _buildListTile(
+                icon: Icons.language_rounded,
+                title: AppStrings.language,
+                subtitle: settings.languageDisplayName,
+                onTap: _showLanguagePicker,
+              ),
+            ]),
+          ],
+        );
+      },
     );
   }
 
@@ -1013,21 +1022,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon: Icons.cloud_upload_rounded,
             title: 'Sao lưu dữ liệu',
             subtitle: 'Sao lưu lên đám mây',
-            onTap: () => _showComingSoon(),
+            onTap: _isBackingUp ? () {} : _performBackup,
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _buildListTile(
             icon: Icons.cloud_download_rounded,
             title: 'Khôi phục dữ liệu',
             subtitle: 'Khôi phục từ bản sao lưu',
-            onTap: () => _showComingSoon(),
+            onTap: _isRestoring ? () {} : _showRestoreDialog,
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _buildListTile(
             icon: Icons.download_rounded,
             title: 'Xuất báo cáo',
-            subtitle: 'Xuất dữ liệu ra file Excel',
-            onTap: () => _showComingSoon(),
+            subtitle: 'Xuất dữ liệu ra file CSV',
+            onTap: _isExporting ? () {} : _performExport,
           ),
         ]),
       ],
@@ -1218,30 +1227,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  String _getCurrencyName() {
-    switch (_currency) {
-      case 'VND':
-        return 'Việt Nam Đồng (₫)';
-      case 'USD':
-        return 'US Dollar (\$)';
-      case 'EUR':
-        return 'Euro (€)';
-      default:
-        return _currency;
-    }
-  }
-
-  String _getLanguageName() {
-    switch (_language) {
-      case 'vi':
-        return 'Tiếng Việt';
-      case 'en':
-        return 'English';
-      default:
-        return _language;
-    }
-  }
-
   void _showComingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1249,7 +1234,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Icon(Icons.info_outline, color: Colors.white),
             SizedBox(width: 12),
-            Text('Tính năng đang phát triển'),
+            Expanded(child: Text('Tính năng đang phát triển')),
           ],
         ),
         backgroundColor: AppColors.primary,
@@ -1261,6 +1246,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showCurrencyPicker() {
+    final settings = context.read<SettingsProvider>();
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1299,25 +1285,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildPickerOption(
                   'VND',
                   'Việt Nam Đồng (₫)',
-                  _currency == 'VND',
-                  () {
-                    setState(() => _currency = 'VND');
-                    Navigator.pop(context);
+                  settings.currency == 'VND',
+                  () async {
+                    await settings.setCurrency('VND');
+                    await _syncSettingsToFirestore();
+                    if (context.mounted) Navigator.pop(context);
                   },
                 ),
                 _buildPickerOption(
                   'USD',
                   'US Dollar (\$)',
-                  _currency == 'USD',
-                  () {
-                    setState(() => _currency = 'USD');
-                    Navigator.pop(context);
+                  settings.currency == 'USD',
+                  () async {
+                    await settings.setCurrency('USD');
+                    await _syncSettingsToFirestore();
+                    if (context.mounted) Navigator.pop(context);
                   },
                 ),
-                _buildPickerOption('EUR', 'Euro (€)', _currency == 'EUR', () {
-                  setState(() => _currency = 'EUR');
-                  Navigator.pop(context);
-                }),
+                _buildPickerOption(
+                  'EUR',
+                  'Euro (€)',
+                  settings.currency == 'EUR',
+                  () async {
+                    await settings.setCurrency('EUR');
+                    await _syncSettingsToFirestore();
+                    if (context.mounted) Navigator.pop(context);
+                  },
+                ),
                 const SizedBox(height: 16),
               ],
             ),
@@ -1328,6 +1322,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showLanguagePicker() {
+    final settings = context.read<SettingsProvider>();
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1363,16 +1358,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                _buildPickerOption('vi', 'Tiếng Việt', _language == 'vi', () {
-                  setState(() => _language = 'vi');
-                  Navigator.pop(context);
-                  _showComingSoon();
-                }),
-                _buildPickerOption('en', 'English', _language == 'en', () {
-                  setState(() => _language = 'en');
-                  Navigator.pop(context);
-                  _showComingSoon();
-                }),
+                _buildPickerOption(
+                  'vi',
+                  'Tiếng Việt',
+                  settings.language == 'vi',
+                  () async {
+                    await settings.setLanguage('vi');
+                    await _syncSettingsToFirestore();
+                    if (context.mounted) Navigator.pop(context);
+                  },
+                ),
+                _buildPickerOption(
+                  'en',
+                  'English',
+                  settings.language == 'en',
+                  () async {
+                    await settings.setLanguage('en');
+                    await _syncSettingsToFirestore();
+                    if (context.mounted) Navigator.pop(context);
+                  },
+                ),
                 const SizedBox(height: 16),
               ],
             ),
@@ -1380,6 +1385,180 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       },
     );
+  }
+
+  Future<void> _syncSettingsToFirestore() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final settings = Provider.of<SettingsProvider>(context, listen: false);
+      final user = authProvider.user;
+      if (user == null) return;
+
+      final updatedUser = user.copyWith(
+        settings: settings.toSettingsMap(),
+        updatedAt: DateTime.now(),
+      );
+      await authProvider.updateUser(updatedUser);
+    } catch (_) {}
+  }
+
+  Future<void> _performBackup() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.user;
+    if (user == null) return;
+
+    setState(() => _isBackingUp = true);
+    try {
+      await _backupService.backupToCloud(user.uid);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 12),
+                Expanded(child: Text('Đã sao lưu dữ liệu thành công')),
+              ],
+            ),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+      }
+    } catch (e) {
+      _showErrorSnackBar('Lỗi sao lưu: $e');
+    } finally {
+      if (mounted) setState(() => _isBackingUp = false);
+    }
+  }
+
+  void _showRestoreDialog() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.user;
+    if (user == null) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.restore_rounded,
+                color: AppColors.warning,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Khôi phục dữ liệu',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          'Dữ liệu hiện tại sẽ được gộp với bản sao lưu. Bạn có muốn tiếp tục?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.textSecondary,
+            ),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _performRestore();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Khôi phục'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _performRestore() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.user;
+    if (user == null) return;
+
+    setState(() => _isRestoring = true);
+    try {
+      final result = await _backupService.restoreFromCloud(user.uid);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Đã khôi phục ${result['expenses']} chi tiêu, '
+                    '${result['notes']} ghi chú, '
+                    '${result['reminders']} nhắc nhở',
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+      }
+    } catch (e) {
+      _showErrorSnackBar('$e');
+    } finally {
+      if (mounted) setState(() => _isRestoring = false);
+    }
+  }
+
+  Future<void> _performExport() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final settings = Provider.of<SettingsProvider>(context, listen: false);
+    final user = authProvider.user;
+    if (user == null) return;
+
+    setState(() => _isExporting = true);
+    try {
+      final filePath = await _backupService.exportToExcel(
+        user.uid,
+        settings.currencyFormat,
+      );
+      if (mounted) {
+        // Share the file
+        await SharePlus.instance.share(ShareParams(files: [XFile(filePath)]));
+      }
+    } catch (e) {
+      _showErrorSnackBar('Lỗi xuất file: $e');
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
   }
 
   Widget _buildPickerOption(

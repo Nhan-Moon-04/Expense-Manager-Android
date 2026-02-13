@@ -16,6 +16,7 @@ import 'providers/group_provider.dart';
 import 'providers/reminder_provider.dart';
 import 'providers/notification_provider.dart';
 import 'providers/auto_expense_provider.dart';
+import 'providers/settings_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'services/push_notification_service.dart';
@@ -70,23 +71,29 @@ void main() async {
 
   await initializeDateFormatting('vi_VN', null);
 
+  // Load settings
+  final settingsProvider = SettingsProvider();
+  await settingsProvider.loadSettings();
+
   // Initialize push notifications (local)
   await PushNotificationService().initialize();
 
   // Initialize Firebase Cloud Messaging (remote from admin)
   await FCMService().initialize();
 
-  runApp(const MyApp());
+  runApp(MyApp(settingsProvider: settingsProvider));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final SettingsProvider settingsProvider;
+  const MyApp({super.key, required this.settingsProvider});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider.value(value: settingsProvider),
         ChangeNotifierProvider(create: (_) => ExpenseProvider()),
         ChangeNotifierProvider(create: (_) => NoteProvider()),
         ChangeNotifierProvider(create: (_) => GroupProvider()),

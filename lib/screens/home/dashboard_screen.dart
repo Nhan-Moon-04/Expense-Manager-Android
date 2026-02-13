@@ -7,6 +7,7 @@ import '../../constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/reminder_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../../models/expense_model.dart';
 import '../expenses/add_expense_screen.dart';
 import '../expenses/expense_list_screen.dart';
@@ -22,7 +23,8 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen>
     with SingleTickerProviderStateMixin {
-  final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+  NumberFormat get currencyFormat =>
+      context.read<SettingsProvider>().currencyFormat;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   bool _isBalanceVisible = false;

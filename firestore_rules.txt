@@ -102,5 +102,10 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated();
     }
+
+    // ==================== BACKUPS ====================
+    match /backups/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+    }
   }
 }

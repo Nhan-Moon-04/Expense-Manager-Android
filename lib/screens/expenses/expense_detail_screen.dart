@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../constants/app_colors.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../../models/expense_model.dart';
 import 'add_expense_screen.dart';
 
@@ -14,7 +15,7 @@ class ExpenseDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+    final currencyFormat = context.watch<SettingsProvider>().currencyFormat;
     final isExpense = expense.type == ExpenseType.expense;
     final color = isExpense ? AppColors.expenseColor : AppColors.incomeColor;
 
