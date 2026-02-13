@@ -146,8 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             alignment: Alignment.centerLeft,
                                             children: [
                                               ...previousChildren,
-                                              if (currentChild != null)
-                                                currentChild,
+                                              ?currentChild,
                                             ],
                                           );
                                         },

@@ -405,10 +405,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         layoutBuilder: (currentChild, previousChildren) {
                           return Stack(
                             alignment: Alignment.centerLeft,
-                            children: [
-                              ...previousChildren,
-                              if (currentChild != null) currentChild,
-                            ],
+                            children: [...previousChildren, ?currentChild],
                           );
                         },
                         child: _isBalanceVisible

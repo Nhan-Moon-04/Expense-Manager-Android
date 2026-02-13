@@ -83,6 +83,50 @@ class AuthService {
     }
   }
 
+  // Sign in with Google
+  Future<UserModel?> signInWithGoogle() async {
+    try {
+      final googleProvider = GoogleAuthProvider();
+
+      final UserCredential result = await _auth.signInWithProvider(
+        googleProvider,
+      );
+      final User? user = result.user;
+
+      if (user != null) {
+        // Check if user document already exists
+        UserModel? existingUser = await getUserData(user.uid);
+        if (existingUser != null) {
+          return existingUser;
+        }
+
+        // Create new user document
+        final newUser = UserModel(
+          uid: user.uid,
+          email: user.email ?? '',
+          fullName: user.displayName ?? user.email?.split('@')[0] ?? 'User',
+          phone: user.phoneNumber,
+          avatarUrl: user.photoURL,
+          totalBalance: 0.0,
+          role: 'user',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          isActive: true,
+        );
+
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .set(newUser.toFirestore());
+
+        return newUser;
+      }
+      return null;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Get user data from Firestore
   Future<UserModel?> getUserData(String uid) async {
     try {

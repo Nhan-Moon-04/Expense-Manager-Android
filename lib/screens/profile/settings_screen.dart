@@ -956,8 +956,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await PushNotificationService().showReminderNotification(
         id: DateTime.now().millisecondsSinceEpoch,
         title: '🔔 Test thông báo',
-        body:
-            'Nếu bạn thấy thông báo này, push notification đang hoạt động!',
+        body: 'Nếu bạn thấy thông báo này, push notification đang hoạt động!',
         payload: 'test',
       );
 
@@ -972,10 +971,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: AppColors.error,
-          ),
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
         );
       }
     }
@@ -1367,16 +1363,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                _buildPickerOption(
-                  'vi',
-                  'Tiếng Việt',
-                  _language == 'vi',
-                  () {
-                    setState(() => _language = 'vi');
-                    Navigator.pop(context);
-                    _showComingSoon();
-                  },
-                ),
+                _buildPickerOption('vi', 'Tiếng Việt', _language == 'vi', () {
+                  setState(() => _language = 'vi');
+                  Navigator.pop(context);
+                  _showComingSoon();
+                }),
                 _buildPickerOption('en', 'English', _language == 'en', () {
                   setState(() => _language = 'en');
                   Navigator.pop(context);

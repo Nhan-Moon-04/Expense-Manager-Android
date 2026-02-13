@@ -9,6 +9,8 @@ class BankNotification {
   final String description;
   final String rawTitle;
   final String rawText;
+  final String bankName;
+  final String ruleName;
   final DateTime timestamp;
 
   BankNotification({
@@ -18,6 +20,8 @@ class BankNotification {
     required this.description,
     required this.rawTitle,
     required this.rawText,
+    this.bankName = '',
+    this.ruleName = '',
     required this.timestamp,
   });
 
@@ -29,6 +33,8 @@ class BankNotification {
       description: map['description'] as String? ?? '',
       rawTitle: map['rawTitle'] as String? ?? '',
       rawText: map['rawText'] as String? ?? '',
+      bankName: map['bankName'] as String? ?? '',
+      ruleName: map['ruleName'] as String? ?? '',
       timestamp: DateTime.fromMillisecondsSinceEpoch(
         (map['timestamp'] as num?)?.toInt() ??
             DateTime.now().millisecondsSinceEpoch,
@@ -40,6 +46,8 @@ class BankNotification {
   bool get isIncome => type == 'income';
 
   String get sourceName {
+    // Use bankName from remote JSON if available
+    if (bankName.isNotEmpty) return bankName;
     switch (source) {
       case 'momo':
         return 'MoMo';
@@ -119,6 +127,19 @@ class NotificationListenerService {
     } on PlatformException catch (e) {
       debugPrint('Error getting supported apps: ${e.message}');
       return [];
+    }
+  }
+
+  /// Force refresh bank rules from remote JSON
+  Future<bool> refreshBankRules() async {
+    try {
+      final result = await _methodChannel.invokeMethod<bool>(
+        'refreshBankRules',
+      );
+      return result ?? false;
+    } on PlatformException catch (e) {
+      debugPrint('Error refreshing bank rules: ${e.message}');
+      return false;
     }
   }
 

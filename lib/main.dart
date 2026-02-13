@@ -1,6 +1,8 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -21,11 +23,42 @@ import 'services/fcm_service.dart';
 
 /// Background message handler - MUST be top-level function
 /// Runs in a separate isolate when app is terminated/background
+/// This is what makes notifications work even when app is closed (like banking apps)
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // CRITICAL: Firebase must be initialized in this isolate
+  // Firebase must be initialized in this isolate
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  debugPrint('Handling background message: ${message.messageId}');
+
+  final notification = message.notification;
+  if (notification == null) return;
+
+  // Show local notification directly (PushNotificationService is not available in background isolate)
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+  const initSettings = InitializationSettings(android: androidSettings);
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  const androidDetails = AndroidNotificationDetails(
+    'fcm_background_channel',
+    'Thông báo',
+    channelDescription: 'Thông báo từ quản trị viên',
+    importance: Importance.high,
+    priority: Priority.high,
+    icon: '@mipmap/ic_launcher',
+    playSound: true,
+    enableVibration: true,
+  );
+
+  const notificationDetails = NotificationDetails(android: androidDetails);
+
+  await flutterLocalNotificationsPlugin.show(
+    message.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch,
+    notification.title ?? 'Thông báo',
+    notification.body ?? '',
+    notificationDetails,
+    payload: jsonEncode(message.data),
+  );
 }
 
 void main() async {

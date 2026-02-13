@@ -25,7 +25,11 @@ class MainActivity : FlutterActivity() {
                     result.success(true)
                 }
                 "getSupportedApps" -> {
-                    result.success(BankNotificationService.SUPPORTED_APPS)
+                    result.success(BankNotificationService.getSupportedApps())
+                }
+                "refreshBankRules" -> {
+                    BankNotificationService.refreshRules(this)
+                    result.success(true)
                 }
                 else -> {
                     result.notImplemented()
@@ -47,4 +51,3 @@ class MainActivity : FlutterActivity() {
         )
     }
 }
-

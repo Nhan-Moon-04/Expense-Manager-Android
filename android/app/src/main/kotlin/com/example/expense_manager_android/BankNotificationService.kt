@@ -4,39 +4,42 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import io.flutter.embedding.engine.FlutterEngine
+import android.util.Log
 import io.flutter.plugin.common.EventChannel
-import io.flutter.plugin.common.MethodChannel
+import org.json.JSONArray
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.regex.Pattern
 
 class BankNotificationService : NotificationListenerService() {
-    
+
     companion object {
-        private const val CHANNEL_ID = "com.example.expense_manager_android/notifications"
+        private const val TAG = "BankNotificationService"
+        private const val RULES_URL = "https://raw.githubusercontent.com/Nhan-Moon-04/Rules-Json/refs/heads/main/rule_bank.json"
+        private const val PREFS_NAME = "bank_rules_prefs"
+        private const val PREF_RULES_JSON = "cached_rules_json"
+        private const val PREF_RULES_VERSION = "cached_rules_version"
+        private const val REFRESH_INTERVAL_MS = 6 * 60 * 60 * 1000L // 6 hours
+        private const val PREF_LAST_FETCH = "last_fetch_time"
+
         private var eventSink: EventChannel.EventSink? = null
         private var instance: BankNotificationService? = null
-        
-        // Supported banking apps
-        val SUPPORTED_APPS = listOf(
-            "com.mservice.momotransfer",      // Momo
-            "com.VCB",                         // Vietcombank
-            "com.mbmobile",                    // MB Bank
-            "vn.com.techcombank.bb.app",      // Techcombank
-            "com.vnpay.bidv",                  // BIDV
-            "com.tpb.mb.gprsandroid",          // TPBank
-            "com.vietinbank.ipay",             // VietinBank
-            "vn.com.acb.acbmobile",           // ACB
-            "com.sacombank.ewallet",          // Sacombank
-            "com.agribank.agribankplus"       // Agribank
-        )
-        
+
+        // Parsed rules from JSON
+        private var bankRules: List<BankRule> = emptyList()
+        private var globalIgnorePatterns: List<String> = emptyList()
+        private var supportedPackages: Map<String, BankRule> = emptyMap()
+
         fun setEventSink(sink: EventChannel.EventSink?) {
             eventSink = sink
         }
-        
+
         fun isNotificationAccessEnabled(context: Context): Boolean {
             val enabledListeners = Settings.Secure.getString(
                 context.contentResolver,
@@ -45,304 +48,333 @@ class BankNotificationService : NotificationListenerService() {
             val componentName = ComponentName(context, BankNotificationService::class.java)
             return enabledListeners?.contains(componentName.flattenToString()) == true
         }
-        
+
         fun openNotificationAccessSettings(context: Context) {
             val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
         }
+
+        // Get supported app package names from loaded rules
+        fun getSupportedApps(): List<String> {
+            return supportedPackages.keys.toList()
+        }
+
+        // Force refresh rules from remote
+        fun refreshRules(context: Context) {
+            Thread {
+                try {
+                    fetchAndCacheRules(context)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error refreshing rules: ${e.message}")
+                }
+            }.start()
+        }
+
+        private fun fetchAndCacheRules(context: Context) {
+            try {
+                val url = URL(RULES_URL)
+                val conn = url.openConnection() as HttpURLConnection
+                conn.connectTimeout = 10000
+                conn.readTimeout = 10000
+                conn.requestMethod = "GET"
+
+                if (conn.responseCode == HttpURLConnection.HTTP_OK) {
+                    val json = conn.inputStream.bufferedReader().readText()
+                    conn.disconnect()
+
+                    // Cache to SharedPreferences
+                    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                    prefs.edit()
+                        .putString(PREF_RULES_JSON, json)
+                        .putLong(PREF_LAST_FETCH, System.currentTimeMillis())
+                        .apply()
+
+                    // Parse rules
+                    parseRulesFromJson(json)
+                    Log.d(TAG, "Rules fetched and cached successfully. Banks: ${bankRules.size}")
+                } else {
+                    conn.disconnect()
+                    Log.e(TAG, "Failed to fetch rules: HTTP ${conn.responseCode}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error fetching rules: ${e.message}")
+            }
+        }
+
+        private fun loadCachedRules(context: Context): Boolean {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val cachedJson = prefs.getString(PREF_RULES_JSON, null)
+            if (cachedJson != null) {
+                parseRulesFromJson(cachedJson)
+                Log.d(TAG, "Loaded cached rules. Banks: ${bankRules.size}")
+                return true
+            }
+            return false
+        }
+
+        private fun shouldRefresh(context: Context): Boolean {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val lastFetch = prefs.getLong(PREF_LAST_FETCH, 0)
+            return System.currentTimeMillis() - lastFetch > REFRESH_INTERVAL_MS
+        }
+
+        private fun parseRulesFromJson(json: String) {
+            try {
+                val root = JSONObject(json)
+                val banksArray = root.getJSONArray("banks")
+                val rules = mutableListOf<BankRule>()
+                val packageMap = mutableMapOf<String, BankRule>()
+
+                for (i in 0 until banksArray.length()) {
+                    val bankObj = banksArray.getJSONObject(i)
+                    val bankRule = BankRule.fromJson(bankObj)
+                    if (bankRule.enabled) {
+                        rules.add(bankRule)
+                        packageMap[bankRule.packageName] = bankRule
+                    }
+                }
+
+                bankRules = rules
+                supportedPackages = packageMap
+
+                // Parse global ignore patterns
+                val ignoreArray = root.optJSONArray("globalIgnorePatterns")
+                if (ignoreArray != null) {
+                    val patterns = mutableListOf<String>()
+                    for (i in 0 until ignoreArray.length()) {
+                        patterns.add(ignoreArray.getString(i).lowercase())
+                    }
+                    globalIgnorePatterns = patterns
+                }
+
+                Log.d(TAG, "Parsed ${bankRules.size} bank rules, ${globalIgnorePatterns.size} ignore patterns")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error parsing rules JSON: ${e.message}")
+            }
+        }
     }
-    
+
+    // Data classes for parsed rules
+    data class BankRule(
+        val id: String,
+        val name: String,
+        val packageName: String,
+        val enabled: Boolean,
+        val titleFilter: Pattern?,
+        val rules: List<NotificationRule>
+    ) {
+        companion object {
+            fun fromJson(obj: JSONObject): BankRule {
+                val rulesArray = obj.getJSONArray("rules")
+                val notifRules = mutableListOf<NotificationRule>()
+                for (i in 0 until rulesArray.length()) {
+                    notifRules.add(NotificationRule.fromJson(rulesArray.getJSONObject(i)))
+                }
+
+                val titleFilterStr = obj.optString("titleFilter", "").takeIf { it.isNotEmpty() && it != "null" }
+
+                return BankRule(
+                    id = obj.getString("id"),
+                    name = obj.getString("name"),
+                    packageName = obj.getString("packageName"),
+                    enabled = obj.optBoolean("enabled", true),
+                    titleFilter = titleFilterStr?.let {
+                        Pattern.compile(it, Pattern.CASE_INSENSITIVE)
+                    },
+                    rules = notifRules
+                )
+            }
+        }
+    }
+
+    data class NotificationRule(
+        val name: String,
+        val type: String, // "expense", "income", "auto" (auto = detect from +/- sign)
+        val titleMatch: Pattern?,
+        val bodyMatch: Pattern?,
+        val bodyExclude: Pattern?,
+        val amountPattern: Pattern?,
+        val descriptionPattern: Pattern?
+    ) {
+        companion object {
+            fun fromJson(obj: JSONObject): NotificationRule {
+                return NotificationRule(
+                    name = obj.optString("name", ""),
+                    type = obj.optString("type", "auto"),
+                    titleMatch = obj.optString("titleMatch", "").takeIf { it.isNotEmpty() && it != "null" }
+                        ?.let { Pattern.compile(it, Pattern.CASE_INSENSITIVE) },
+                    bodyMatch = obj.optString("bodyMatch", "").takeIf { it.isNotEmpty() && it != "null" }
+                        ?.let { Pattern.compile(it, Pattern.CASE_INSENSITIVE) },
+                    bodyExclude = obj.optString("bodyExclude", "").takeIf { it.isNotEmpty() && it != "null" }
+                        ?.let { Pattern.compile(it, Pattern.CASE_INSENSITIVE) },
+                    amountPattern = obj.optString("amountPattern", "").takeIf { it.isNotEmpty() && it != "null" }
+                        ?.let { Pattern.compile(it, Pattern.CASE_INSENSITIVE) },
+                    descriptionPattern = obj.optString("descriptionPattern", "").takeIf { it.isNotEmpty() && it != "null" }
+                        ?.let { Pattern.compile(it, Pattern.CASE_INSENSITIVE) }
+                )
+            }
+        }
+    }
+
+    private val handler = Handler(Looper.getMainLooper())
+
     override fun onCreate() {
         super.onCreate()
         instance = this
+
+        // Load cached rules first (instant), then fetch fresh in background
+        val hasCached = loadCachedRules(this)
+        if (!hasCached || shouldRefresh(this)) {
+            refreshRules(this)
+        }
+
+        // Schedule periodic refresh
+        scheduleRefresh()
     }
-    
+
     override fun onDestroy() {
         super.onDestroy()
         instance = null
+        handler.removeCallbacksAndMessages(null)
     }
-    
+
+    private fun scheduleRefresh() {
+        handler.postDelayed({
+            refreshRules(this)
+            scheduleRefresh()
+        }, REFRESH_INTERVAL_MS)
+    }
+
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         sbn?.let { notification ->
             val packageName = notification.packageName
-            
-            // Check if notification is from a supported banking app
-            if (SUPPORTED_APPS.contains(packageName)) {
-                val extras = notification.notification.extras
-                val title = extras.getString("android.title") ?: ""
-                val text = extras.getCharSequence("android.text")?.toString() ?: ""
-                
-                // Parse the notification
-                val transactionData = parseTransaction(packageName, title, text)
-                
-                transactionData?.let { data ->
-                    // Send to Flutter
-                    eventSink?.success(data)
+
+            // Find matching bank rule by package name
+            val bankRule = supportedPackages[packageName] ?: return
+
+            val extras = notification.notification.extras
+            val title = extras.getString("android.title") ?: ""
+            val text = extras.getCharSequence("android.text")?.toString() ?: ""
+            val fullText = "$title $text"
+
+            // Check global ignore patterns (OTP, spam, ads, etc.)
+            val lowerFullText = fullText.lowercase()
+            if (globalIgnorePatterns.any { lowerFullText.contains(it) }) {
+                Log.d(TAG, "Ignored notification from ${bankRule.name}: matched global ignore pattern")
+                return
+            }
+
+            // Check title filter - if set, title must match to continue
+            if (bankRule.titleFilter != null) {
+                if (!bankRule.titleFilter.matcher(title).find()) {
+                    Log.d(TAG, "Ignored notification from ${bankRule.name}: title doesn't match filter")
+                    return
+                }
+            }
+
+            // Try each rule in order
+            for (rule in bankRule.rules) {
+                val result = applyRule(bankRule, rule, title, text)
+                if (result != null) {
+                    Log.d(TAG, "Matched rule '${rule.name}' for ${bankRule.name}: $result")
+                    eventSink?.success(result)
+                    return
+                }
+            }
+
+            Log.d(TAG, "No rule matched for ${bankRule.name}: $title | $text")
+        }
+    }
+
+    override fun onNotificationRemoved(sbn: StatusBarNotification?) {
+        // Not needed
+    }
+
+    private fun applyRule(
+        bank: BankRule,
+        rule: NotificationRule,
+        title: String,
+        text: String
+    ): Map<String, Any>? {
+        val fullText = "$title $text"
+
+        // Check titleMatch if specified
+        if (rule.titleMatch != null && !rule.titleMatch.matcher(title).find()) {
+            return null
+        }
+
+        // Check bodyMatch if specified
+        if (rule.bodyMatch != null && !rule.bodyMatch.matcher(fullText).find()) {
+            return null
+        }
+
+        // Check bodyExclude - reject if matches
+        if (rule.bodyExclude != null && rule.bodyExclude.matcher(fullText).find()) {
+            return null
+        }
+
+        // Extract amount
+        if (rule.amountPattern == null) return null
+
+        val amountMatcher = rule.amountPattern.matcher(fullText)
+        if (!amountMatcher.find()) return null
+
+        var transactionType = rule.type
+        var amount: Double
+
+        // Handle "auto" type - detect from +/- sign in amount
+        if (rule.type == "auto") {
+            // Pattern should have groups: (sign)(amount)(currency)
+            val groupCount = amountMatcher.groupCount()
+            if (groupCount >= 3) {
+                val sign = amountMatcher.group(1) ?: "-"
+                val amountStr = amountMatcher.group(2)?.replace(",", "")?.replace(".", "") ?: return null
+                amount = amountStr.toDoubleOrNull() ?: return null
+                transactionType = if (sign == "-") "expense" else "income"
+            } else if (groupCount >= 1) {
+                val amountStr = amountMatcher.group(1)?.replace(",", "")?.replace(".", "") ?: return null
+                amount = amountStr.toDoubleOrNull() ?: return null
+                // Try to detect from keywords
+                val lower = fullText.lowercase()
+                transactionType = when {
+                    lower.contains("trừ") || lower.contains("ghi nợ") || lower.contains("chi") -> "expense"
+                    lower.contains("cộng") || lower.contains("ghi có") || lower.contains("nhận") -> "income"
+                    else -> "expense" // default to expense
+                }
+            } else {
+                return null
+            }
+        } else {
+            // Fixed type (expense/income), amount is group 1
+            val amountStr = amountMatcher.group(1)?.replace(",", "")?.replace(".", "") ?: return null
+            amount = amountStr.toDoubleOrNull() ?: return null
+        }
+
+        if (amount <= 0) return null
+
+        // Extract description
+        var description = text.take(100)
+        if (rule.descriptionPattern != null) {
+            val descMatcher = rule.descriptionPattern.matcher(fullText)
+            if (descMatcher.find()) {
+                val desc = descMatcher.group(1)?.trim()
+                if (!desc.isNullOrEmpty()) {
+                    description = desc
                 }
             }
         }
-    }
-    
-    override fun onNotificationRemoved(sbn: StatusBarNotification?) {
-        // Not needed for our use case
-    }
-    
-    private fun parseTransaction(packageName: String, title: String, text: String): Map<String, Any>? {
-        return try {
-            when {
-                packageName.contains("momo") -> parseMomoTransaction(title, text)
-                packageName.contains("VCB") -> parseVCBTransaction(title, text)
-                packageName.contains("mbmobile") -> parseMBBankTransaction(title, text)
-                packageName.contains("techcombank") -> parseTechcombankTransaction(title, text)
-                packageName.contains("bidv") -> parseBIDVTransaction(title, text)
-                packageName.contains("vietinbank") -> parseVietinBankTransaction(title, text)
-                packageName.contains("tpb") -> parseGenericBankTransaction("tpbank", title, text)
-                packageName.contains("acb") -> parseGenericBankTransaction("acb", title, text)
-                packageName.contains("sacombank") -> parseGenericBankTransaction("sacombank", title, text)
-                packageName.contains("agribank") -> parseGenericBankTransaction("agribank", title, text)
-                else -> parseGenericBankTransaction("other", title, text)
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-    
-    private fun parseMomoTransaction(title: String, text: String): Map<String, Any>? {
-        // Patterns for Momo notifications
-        // Example: "Bạn đã chuyển 50,000đ cho ABC"
-        // Example: "Bạn đã nhận 100,000đ từ XYZ"
-        // Example: "Thanh toán thành công 200,000đ tại ABC"
-        
-        val fullText = "$title $text".lowercase()
-        
-        val isExpense = fullText.contains("chuyển") || 
-                        fullText.contains("thanh toán") || 
-                        fullText.contains("chi") ||
-                        fullText.contains("trừ")
-        
-        val isIncome = fullText.contains("nhận") || 
-                       fullText.contains("cộng") ||
-                       fullText.contains("được")
-        
-        if (!isExpense && !isIncome) return null
-        
-        // Extract amount - look for patterns like "50,000đ" or "50.000đ" or "50000 VND"
-        val amountPattern = Pattern.compile("([\\d,.]+)\\s*(đ|vnd|vnđ|dong)", Pattern.CASE_INSENSITIVE)
-        val matcher = amountPattern.matcher(fullText)
-        
-        if (matcher.find()) {
-            val amountStr = matcher.group(1)?.replace(",", "")?.replace(".", "") ?: return null
-            val amount = amountStr.toDoubleOrNull() ?: return null
-            
-            return mapOf(
-                "source" to "momo",
-                "type" to if (isExpense) "expense" else "income",
-                "amount" to amount,
-                "description" to text.take(100),
-                "rawTitle" to title,
-                "rawText" to text,
-                "timestamp" to System.currentTimeMillis()
-            )
-        }
-        
-        return null
-    }
-    
-    private fun parseVCBTransaction(title: String, text: String): Map<String, Any>? {
-        // VCB notification patterns
-        // Example: "TK 1234xxx: -500,000 VND. SD: 1,000,000 VND"
-        
-        val fullText = "$title $text"
-        
-        // Look for transaction amount with +/- sign (ignore balance after "SD:")
-        val transPattern = Pattern.compile("(?:GD|Giao dich|TK[^:]*):?\\s*([-+])([\\d,.]+)\\s*(VND|đ)", Pattern.CASE_INSENSITIVE)
-        val transMatcher = transPattern.matcher(fullText)
-        
-        if (transMatcher.find()) {
-            val sign = transMatcher.group(1) ?: "-"
-            val amountStr = transMatcher.group(2)?.replace(",", "")?.replace(".", "") ?: return null
-            val amount = amountStr.toDoubleOrNull() ?: return null
-            val isExpense = sign == "-"
-            
-            // Extract description - look for "ND:" or "Noi dung:" 
-            val descPattern = Pattern.compile("(?:ND|Noi dung|N\\.D)[:\\s]+(.+?)(?:\\.|$)", Pattern.CASE_INSENSITIVE)
-            val descMatcher = descPattern.matcher(fullText)
-            val description = if (descMatcher.find()) descMatcher.group(1)?.trim() ?: text.take(100) else text.take(100)
-            
-            return mapOf(
-                "source" to "vcb",
-                "type" to if (isExpense) "expense" else "income",
-                "amount" to amount,
-                "description" to description,
-                "rawTitle" to title,
-                "rawText" to text,
-                "timestamp" to System.currentTimeMillis()
-            )
-        }
-        
-        return parseGenericBankTransaction("vcb", title, text)
-    }
-    
-    private fun parseVietinBankTransaction(title: String, text: String): Map<String, Any>? {
-        // VietinBank iPay notification format:
-        // Title: "Biến động số dư"
-        // Text: "Thời gian: 11/02/2026 21:53\nTài khoản: 100610161104\nGiao dịch: -50,000VND\nSố dư hiện tại: 69,220VND\nNội dung: MoMo CASHIN 0989057191 118001479611 2009"
-        
-        val fullText = "$title $text"
-        
-        // Extract transaction amount from "Giao dịch: -50,000VND" or "Giao dich: +100,000VND"
-        val transPattern = Pattern.compile("Giao d[iị]ch[:\\s]*([-+])([\\d,.]+)\\s*(VND|đ)", Pattern.CASE_INSENSITIVE)
-        val transMatcher = transPattern.matcher(fullText)
-        
-        if (transMatcher.find()) {
-            val sign = transMatcher.group(1) ?: "-"
-            val amountStr = transMatcher.group(2)?.replace(",", "")?.replace(".", "") ?: return null
-            val amount = amountStr.toDoubleOrNull() ?: return null
-            val isExpense = sign == "-"
-            
-            // Extract description from "Nội dung: ..."
-            val descPattern = Pattern.compile("N[oộ]i dung[:\\s]+(.+?)(?:\\n|$)", Pattern.CASE_INSENSITIVE)
-            val descMatcher = descPattern.matcher(fullText)
-            val description = if (descMatcher.find()) descMatcher.group(1)?.trim() ?: "" else ""
-            
-            return mapOf(
-                "source" to "vietinbank",
-                "type" to if (isExpense) "expense" else "income",
-                "amount" to amount,
-                "description" to description.ifEmpty { text.take(100) },
-                "rawTitle" to title,
-                "rawText" to text,
-                "timestamp" to System.currentTimeMillis()
-            )
-        }
-        
-        return parseGenericBankTransaction("vietinbank", title, text)
-    }
-    
-    private fun parseMBBankTransaction(title: String, text: String): Map<String, Any>? {
-        // MB Bank format: "TK 0xxxx: -500,000VND lúc 21:53 11/02/2026. SD: 1,000,000VND. ND: Chuyen tien"
-        val fullText = "$title $text"
-        
-        val transPattern = Pattern.compile("([-+])([\\d,.]+)\\s*(VND|đ)", Pattern.CASE_INSENSITIVE)
-        val transMatcher = transPattern.matcher(fullText)
-        
-        if (transMatcher.find()) {
-            val sign = transMatcher.group(1) ?: "-"
-            val amountStr = transMatcher.group(2)?.replace(",", "")?.replace(".", "") ?: return null
-            val amount = amountStr.toDoubleOrNull() ?: return null
-            val isExpense = sign == "-"
-            
-            val descPattern = Pattern.compile("(?:ND|Noi dung|N\\.D)[:\\s]+(.+?)(?:\\.|$)", Pattern.CASE_INSENSITIVE)
-            val descMatcher = descPattern.matcher(fullText)
-            val description = if (descMatcher.find()) descMatcher.group(1)?.trim() ?: text.take(100) else text.take(100)
-            
-            return mapOf(
-                "source" to "mbbank",
-                "type" to if (isExpense) "expense" else "income",
-                "amount" to amount,
-                "description" to description,
-                "rawTitle" to title,
-                "rawText" to text,
-                "timestamp" to System.currentTimeMillis()
-            )
-        }
-        
-        return parseGenericBankTransaction("mbbank", title, text)
-    }
-    
-    private fun parseTechcombankTransaction(title: String, text: String): Map<String, Any>? {
-        return parseGenericBankTransaction("techcombank", title, text)
-    }
-    
-    private fun parseBIDVTransaction(title: String, text: String): Map<String, Any>? {
-        return parseGenericBankTransaction("bidv", title, text)
-    }
-    
-    private fun parseGenericBankTransaction(source: String, title: String, text: String): Map<String, Any>? {
-        val fullText = "$title $text"
-        
-        // Strategy 1: Look for explicit +/- amount patterns (most reliable for bank notifications)
-        // Matches: "-50,000VND", "+100,000 VND", "- 50.000 đ", "Giao dich: -50,000VND"
-        val signedAmountPattern = Pattern.compile("([-+])\\s?([\\d,.]+)\\s*(VND|đ|vnđ)", Pattern.CASE_INSENSITIVE)
-        val signedMatcher = signedAmountPattern.matcher(fullText)
-        
-        if (signedMatcher.find()) {
-            val sign = signedMatcher.group(1) ?: "-"
-            val amountStr = signedMatcher.group(2)?.replace(",", "")?.replace(".", "") ?: return null
-            val amount = amountStr.toDoubleOrNull() ?: return null
-            
-            if (amount <= 0) return null
-            
-            val isExpense = sign == "-"
-            
-            // Try to extract description
-            val description = extractDescription(fullText) ?: text.take(100)
-            
-            return mapOf(
-                "source" to source,
-                "type" to if (isExpense) "expense" else "income",
-                "amount" to amount,
-                "description" to description,
-                "rawTitle" to title,
-                "rawText" to text,
-                "timestamp" to System.currentTimeMillis()
-            )
-        }
-        
-        // Strategy 2: keyword-based detection (for MoMo, wallet apps etc.)
-        val lowerText = fullText.lowercase()
-        
-        val expenseKeywords = listOf("chuyển", "thanh toán", "chi", "trừ", "ghi nợ", "debit", "payment", "withdrawal")
-        val incomeKeywords = listOf("nhận", "cộng", "ghi có", "credit", "receive", "deposit")
-        
-        val isExpense = expenseKeywords.any { lowerText.contains(it) }
-        val isIncome = incomeKeywords.any { lowerText.contains(it) }
-        
-        if (!isExpense && !isIncome) return null
-        
-        // Extract amount
-        val amountPattern = Pattern.compile("([\\d]{1,3}(?:[,.]\\d{3})+)\\s*(đ|vnd|vnđ)?", Pattern.CASE_INSENSITIVE)
-        val amountMatcher = amountPattern.matcher(fullText)
-        
-        if (amountMatcher.find()) {
-            val amountStr = amountMatcher.group(1)?.replace(",", "")?.replace(".", "") ?: return null
-            val amount = amountStr.toDoubleOrNull() ?: return null
-            
-            if (amount <= 0) return null
-            
-            val description = extractDescription(fullText) ?: text.take(100)
-            
-            return mapOf(
-                "source" to source,
-                "type" to if (isExpense) "expense" else "income",
-                "amount" to amount,
-                "description" to description,
-                "rawTitle" to title,
-                "rawText" to text,
-                "timestamp" to System.currentTimeMillis()
-            )
-        }
-        
-        return null
-    }
-    
-    private fun extractDescription(text: String): String? {
-        // Try common description patterns
-        val patterns = listOf(
-            Pattern.compile("N[oộ]i dung[:\\s]+(.+?)(?:\\n|$)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("(?:ND|N\\.D)[:\\s]+(.+?)(?:\\.|\\n|$)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("(?:Lý do|Ly do)[:\\s]+(.+?)(?:\\.|\\n|$)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("(?:Memo|Ghi chú|Ghi chu)[:\\s]+(.+?)(?:\\.|\\n|$)", Pattern.CASE_INSENSITIVE),
+
+        return mapOf(
+            "source" to bank.id,
+            "type" to transactionType,
+            "amount" to amount,
+            "description" to description,
+            "rawTitle" to title,
+            "rawText" to text,
+            "bankName" to bank.name,
+            "ruleName" to rule.name,
+            "timestamp" to System.currentTimeMillis()
         )
-        
-        for (pattern in patterns) {
-            val matcher = pattern.matcher(text)
-            if (matcher.find()) {
-                val desc = matcher.group(1)?.trim()
-                if (!desc.isNullOrEmpty()) return desc
-            }
-        }
-        return null
     }
 }

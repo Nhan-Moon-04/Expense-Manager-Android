@@ -1,0 +1,213 @@
+{
+  "version": 1,
+  "lastUpdated": "2026-02-13",
+  "banks": [
+    {
+      "id": "momo",
+      "name": "MoMo",
+      "packageName": "com.mservice.momotransfer",
+      "enabled": true,
+      "titleFilter": null,
+      "rules": [
+        {
+          "name": "Chuyển tiền / Thanh toán",
+          "type": "expense",
+          "titleMatch": null,
+          "bodyMatch": "(chuyển|thanh toán|chi|trừ|payment)",
+          "bodyExclude": "(khuyến mãi|thất bại|không thành công|thưởng|voucher|ưu đãi|giảm giá)",
+          "amountPattern": "([\\d,.]+)\\s*(đ|vnd|vnđ)",
+          "descriptionPattern": null
+        },
+        {
+          "name": "Nhận tiền",
+          "type": "income",
+          "titleMatch": null,
+          "bodyMatch": "(nhận|cộng|được|receive)",
+          "bodyExclude": "(khuyến mãi|thất bại|không thành công|thưởng|voucher|ưu đãi|giảm giá)",
+          "amountPattern": "([\\d,.]+)\\s*(đ|vnd|vnđ)",
+          "descriptionPattern": null
+        }
+      ]
+    },
+    {
+      "id": "vcb",
+      "name": "Vietcombank",
+      "packageName": "com.VCB",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|giao dịch|GD)",
+      "rules": [
+        {
+          "name": "Biến động số dư (có dấu +/-)",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])([\\d,.]+)\\s*(VND|đ)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung)[:\\s]+(.+?)(?:\\.|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "mbbank",
+      "name": "MB Bank",
+      "packageName": "com.mbmobile",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|giao dịch|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])([\\d,.]+)\\s*(VND|đ)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung)[:\\s]+(.+?)(?:\\.|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "techcombank",
+      "name": "Techcombank",
+      "packageName": "vn.com.techcombank.bb.app",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|giao dịch|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])([\\d,.]+)\\s*(VND|đ)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung)[:\\s]+(.+?)(?:\\.|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "bidv",
+      "name": "BIDV",
+      "packageName": "com.vnpay.bidv",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|giao dịch|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])([\\d,.]+)\\s*(VND|đ)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung|Lý do|Ly do)[:\\s]+(.+?)(?:\\.|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "tpbank",
+      "name": "TPBank",
+      "packageName": "com.tpb.mb.gprsandroid",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|giao dịch|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])([\\d,.]+)\\s*(VND|đ)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung)[:\\s]+(.+?)(?:\\.|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "vietinbank",
+      "name": "VietinBank",
+      "packageName": "com.vietinbank.ipay",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|Biến động)",
+      "rules": [
+        {
+          "name": "Biến động số dư iPay",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": "Giao d[iị]ch",
+          "bodyExclude": null,
+          "amountPattern": "Giao d[iị]ch[:\\s]*([-+])([\\d,.]+)\\s*(VND|đ)",
+          "descriptionPattern": "N[oộ]i dung[:\\s]+(.+?)(?:\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "acb",
+      "name": "ACB",
+      "packageName": "vn.com.acb.acbmobile",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|giao dịch|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])([\\d,.]+)\\s*(VND|đ)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung)[:\\s]+(.+?)(?:\\.|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "sacombank",
+      "name": "Sacombank",
+      "packageName": "com.sacombank.ewallet",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|giao dịch|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])([\\d,.]+)\\s*(VND|đ)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung)[:\\s]+(.+?)(?:\\.|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "agribank",
+      "name": "Agribank",
+      "packageName": "com.agribank.agribankplus",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|giao dịch|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])([\\d,.]+)\\s*(VND|đ)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung)[:\\s]+(.+?)(?:\\.|\\n|$)"
+        }
+      ]
+    }
+  ],
+  "globalIgnorePatterns": [
+    "OTP",
+    "mã xác thực",
+    "ma xac thuc",
+    "mã giao dịch",
+    "xác nhận",
+    "đăng nhập",
+    "dang nhap",
+    "mật khẩu",
+    "mat khau",
+    "cập nhật",
+    "cap nhat",
+    "nâng cấp",
+    "khuyến mãi đặc biệt",
+    "tải app",
+    "download",
+    "quảng cáo"
+  ]
+}

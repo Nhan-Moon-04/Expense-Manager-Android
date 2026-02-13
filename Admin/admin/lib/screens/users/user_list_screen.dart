@@ -319,7 +319,7 @@ class _UserListScreenState extends State<UserListScreen> {
                 user.uid,
                 !user.isActive,
               );
-              if (mounted) {
+              if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -363,7 +363,7 @@ class _UserListScreenState extends State<UserListScreen> {
             onPressed: () async {
               Navigator.pop(context);
               bool success = await provider.sendPasswordReset(user.email);
-              if (mounted) {
+              if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(

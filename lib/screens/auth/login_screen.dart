@@ -17,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isGoogleLoading = false;
 
   @override
   void dispose() {
@@ -53,6 +54,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _forgotPassword() {
     showDialog(context: context, builder: (context) => _ForgotPasswordDialog());
+  }
+
+  Future<void> _loginWithGoogle() async {
+    setState(() => _isGoogleLoading = true);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    bool success = await authProvider.signInWithGoogle();
+
+    if (!success && mounted) {
+      final error = authProvider.error;
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: AppColors.error),
+        );
+      }
+    }
+    if (mounted) {
+      setState(() => _isGoogleLoading = false);
+    }
   }
 
   @override
@@ -206,6 +225,77 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                       );
                     },
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Divider
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          color: AppColors.textSecondary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'hoặc',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(
+                          color: AppColors.textSecondary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Google Sign In button
+                  OutlinedButton(
+                    onPressed: _isGoogleLoading ? null : _loginWithGoogle,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: BorderSide(
+                        color: AppColors.textSecondary.withValues(alpha: 0.3),
+                      ),
+                      backgroundColor: Colors.white,
+                    ),
+                    child: _isGoogleLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'G',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF4285F4),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Đăng nhập bằng Google',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
                   const SizedBox(height: 24),
 

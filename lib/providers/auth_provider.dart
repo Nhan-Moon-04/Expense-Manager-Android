@@ -120,6 +120,26 @@ class AuthProvider with ChangeNotifier {
     _setLoading(false);
   }
 
+  // Sign in with Google
+  Future<bool> signInWithGoogle() async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      _user = await _authService.signInWithGoogle();
+      _setLoading(false);
+      return _user != null;
+    } on FirebaseAuthException catch (e) {
+      _setError(_getAuthErrorMessage(e.code));
+      _setLoading(false);
+      return false;
+    } catch (e) {
+      _setError('Đăng nhập Google thất bại. Vui lòng thử lại.');
+      _setLoading(false);
+      return false;
+    }
+  }
+
   // Update user
   Future<bool> updateUser(UserModel updatedUser) async {
     _setLoading(true);
