@@ -142,6 +142,14 @@ class NotificationProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Clear all local data (used when user deletes all data)
+  void clearAllData() {
+    _notifications.clear();
+    _unreadCount = 0;
+    _shownPushIds.clear();
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _notifSubscription?.cancel();

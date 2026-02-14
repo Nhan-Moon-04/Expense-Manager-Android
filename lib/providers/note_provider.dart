@@ -121,4 +121,10 @@ class NoteProvider with ChangeNotifier {
   void _clearError() {
     _error = null;
   }
+
+  /// Clear all local data (used when user deletes all data)
+  void clearAllData() {
+    _notes.clear();
+    notifyListeners();
+  }
 }

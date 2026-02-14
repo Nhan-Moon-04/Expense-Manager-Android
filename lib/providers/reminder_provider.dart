@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../models/reminder_model.dart';
 import '../services/reminder_service.dart';
 import '../services/push_notification_service.dart';
@@ -37,33 +38,86 @@ class ReminderProvider with ChangeNotifier {
   }
 
   // Auto-complete non-repeating reminders that have passed
+  // For repeating reminders, advance reminderTime to the next occurrence
   Future<void> _autoCompletePastReminders(String userId) async {
     final now = DateTime.now();
     for (var reminder in _reminders) {
       if (!reminder.isCompleted &&
           reminder.isActive &&
-          reminder.repeat == ReminderRepeat.none &&
           reminder.reminderTime.isBefore(now)) {
-        // Mark as completed automatically
-        await _reminderService.markAsCompleted(reminder.id);
-        await _cancelReminderNotification(reminder.id);
-
-        // Create in-app notification
-        await _createCompletionNotification(reminder);
+        if (reminder.repeat == ReminderRepeat.none) {
+          // One-time reminder: mark as completed
+          await _reminderService.markAsCompleted(reminder.id);
+          await _cancelReminderNotification(reminder.id);
+          await _createCompletionNotification(reminder);
+        } else {
+          // Repeating reminder: advance to next occurrence in Firestore
+          final nextTime = _getNextOccurrence(
+            reminder.reminderTime,
+            reminder.repeat,
+          );
+          if (nextTime != null) {
+            await _reminderService.updateReminder(
+              reminder.copyWith(
+                reminderTime: nextTime,
+                updatedAt: DateTime.now(),
+              ),
+            );
+          }
+        }
       }
     }
+  }
+
+  // Calculate the next occurrence for a repeating reminder
+  DateTime? _getNextOccurrence(DateTime current, ReminderRepeat repeat) {
+    final now = DateTime.now();
+    DateTime next = current;
+    // Advance until we find a future time
+    int safetyCounter = 0;
+    while (next.isBefore(now) && safetyCounter < 1000) {
+      switch (repeat) {
+        case ReminderRepeat.daily:
+          next = next.add(const Duration(days: 1));
+          break;
+        case ReminderRepeat.weekly:
+          next = next.add(const Duration(days: 7));
+          break;
+        case ReminderRepeat.monthly:
+          next = DateTime(
+            next.month == 12 ? next.year + 1 : next.year,
+            next.month == 12 ? 1 : next.month + 1,
+            next.day,
+            next.hour,
+            next.minute,
+          );
+          break;
+        case ReminderRepeat.yearly:
+          next = DateTime(
+            next.year + 1,
+            next.month,
+            next.day,
+            next.hour,
+            next.minute,
+          );
+          break;
+        case ReminderRepeat.none:
+          return null;
+      }
+      safetyCounter++;
+    }
+    return next;
   }
 
   // Schedule push notifications for all active reminders
   void _scheduleAllReminders() {
     for (var reminder in enabledReminders) {
-      if (reminder.reminderTime.isAfter(DateTime.now())) {
-        _scheduleReminderNotification(reminder);
-      }
+      _scheduleReminderNotification(reminder);
     }
   }
 
   // Schedule a single reminder notification
+  // Uses repeating schedule for daily/weekly/monthly/yearly
   Future<void> _scheduleReminderNotification(ReminderModel reminder) async {
     try {
       final notificationId = reminder.id.hashCode;
@@ -73,13 +127,51 @@ class ReminderProvider with ChangeNotifier {
         body = '${reminder.amount!.toStringAsFixed(0)}₫ - $body';
       }
 
-      await _pushNotificationService.scheduleNotification(
-        id: notificationId,
-        title: '⏰ ${reminder.title}',
-        body: body,
-        scheduledDate: reminder.reminderTime,
-        payload: 'reminder_${reminder.id}',
-      );
+      // Cancel existing first to avoid duplicates
+      await _pushNotificationService.cancelNotification(notificationId);
+
+      if (reminder.repeat == ReminderRepeat.none) {
+        // One-time reminder: only schedule if in the future
+        if (reminder.reminderTime.isAfter(DateTime.now())) {
+          await _pushNotificationService.scheduleNotification(
+            id: notificationId,
+            title: '⏰ ${reminder.title}',
+            body: body,
+            scheduledDate: reminder.reminderTime,
+            payload: 'reminder_${reminder.id}',
+          );
+        }
+      } else {
+        // Repeating reminder: use matchDateTimeComponents
+        // This tells Android AlarmManager to repeat at the matching time pattern
+        // Survives app kill AND device reboot (via ScheduledNotificationBootReceiver)
+        final DateTimeComponents matchComponents;
+        switch (reminder.repeat) {
+          case ReminderRepeat.daily:
+            matchComponents = DateTimeComponents.time;
+            break;
+          case ReminderRepeat.weekly:
+            matchComponents = DateTimeComponents.dayOfWeekAndTime;
+            break;
+          case ReminderRepeat.monthly:
+            matchComponents = DateTimeComponents.dayOfMonthAndTime;
+            break;
+          case ReminderRepeat.yearly:
+            matchComponents = DateTimeComponents.dateAndTime;
+            break;
+          case ReminderRepeat.none:
+            return; // Won't reach here
+        }
+
+        await _pushNotificationService.scheduleRepeatingNotification(
+          id: notificationId,
+          title: '⏰ ${reminder.title}',
+          body: body,
+          scheduledDate: reminder.reminderTime,
+          matchComponents: matchComponents,
+          payload: 'reminder_${reminder.id}',
+        );
+      }
     } catch (e) {
       debugPrint('Error scheduling reminder notification: $e');
     }
@@ -131,9 +223,8 @@ class ReminderProvider with ChangeNotifier {
       ReminderModel newReminder = await _reminderService.addReminder(reminder);
       // Don't manually insert - Firestore stream will handle it
 
-      // Schedule push notification if reminder is in the future
-      if (newReminder.isActive &&
-          newReminder.reminderTime.isAfter(DateTime.now())) {
+      // Schedule push notification
+      if (newReminder.isActive && !newReminder.isCompleted) {
         await _scheduleReminderNotification(newReminder);
       }
 
@@ -161,9 +252,7 @@ class ReminderProvider with ChangeNotifier {
 
       // Update push notification
       await _cancelReminderNotification(reminder.id);
-      if (reminder.isActive &&
-          !reminder.isCompleted &&
-          reminder.reminderTime.isAfter(DateTime.now())) {
+      if (reminder.isActive && !reminder.isCompleted) {
         await _scheduleReminderNotification(reminder);
       }
 
@@ -229,8 +318,7 @@ class ReminderProvider with ChangeNotifier {
         );
 
         // Update push notification based on new state
-        if (newActiveState &&
-            _reminders[index].reminderTime.isAfter(DateTime.now())) {
+        if (newActiveState && !_reminders[index].isCompleted) {
           await _scheduleReminderNotification(_reminders[index]);
         } else {
           await _cancelReminderNotification(reminderId);
@@ -258,5 +346,12 @@ class ReminderProvider with ChangeNotifier {
 
   void _clearError() {
     _error = null;
+  }
+
+  /// Clear all local data (used when user deletes all data)
+  void clearAllData() {
+    _reminders.clear();
+    _upcomingReminders.clear();
+    notifyListeners();
   }
 }

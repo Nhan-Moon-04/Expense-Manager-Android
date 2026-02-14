@@ -311,25 +311,39 @@ class PushNotificationService {
     debugPrint('Notification scheduled successfully: id=$id');
   }
 
-  /// Schedule a recurring daily notification
-  Future<void> scheduleDailyNotification({
+  /// Schedule a repeating notification
+  /// Uses matchDateTimeComponents to repeat at the same time/day/date
+  Future<void> scheduleRepeatingNotification({
     required int id,
     required String title,
     required String body,
-    required int hour,
-    required int minute,
+    required DateTime scheduledDate,
+    required DateTimeComponents matchComponents,
     String? payload,
   }) async {
+    final tz.TZDateTime scheduledTZ = _nextInstanceOf(
+      scheduledDate,
+      matchComponents,
+    );
+
+    debugPrint(
+      'Scheduling repeating notification: id=$id, title=$title, '
+      'time=$scheduledTZ, repeat=$matchComponents',
+    );
+
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-          'daily_channel',
-          'Nhắc nhở hàng ngày',
-          channelDescription: 'Nhắc nhở hàng ngày về chi tiêu',
-          importance: Importance.high,
-          priority: Priority.high,
+          'reminder_channel',
+          'Nhắc nhở',
+          channelDescription: 'Thông báo nhắc nhở chi tiêu',
+          importance: Importance.max,
+          priority: Priority.max,
           icon: '@mipmap/ic_launcher',
+          largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
           playSound: true,
           enableVibration: true,
+          category: AndroidNotificationCategory.reminder,
+          visibility: NotificationVisibility.public,
         );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
@@ -347,30 +361,104 @@ class PushNotificationService {
       id,
       title,
       body,
-      _nextInstanceOfTime(hour, minute),
+      scheduledTZ,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
+      matchDateTimeComponents: matchComponents,
       payload: payload,
     );
+
+    debugPrint('Repeating notification scheduled: id=$id');
   }
 
-  tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
+  /// Find the next valid instance based on repeat type
+  tz.TZDateTime _nextInstanceOf(
+    DateTime scheduledDate,
+    DateTimeComponents matchComponents,
+  ) {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
-    );
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
+
+    switch (matchComponents) {
+      case DateTimeComponents.time:
+        // Daily: match hour:minute every day
+        tz.TZDateTime next = tz.TZDateTime(
+          tz.local,
+          now.year,
+          now.month,
+          now.day,
+          scheduledDate.hour,
+          scheduledDate.minute,
+        );
+        if (next.isBefore(now)) {
+          next = next.add(const Duration(days: 1));
+        }
+        return next;
+
+      case DateTimeComponents.dayOfWeekAndTime:
+        // Weekly: match dayOfWeek + hour:minute
+        tz.TZDateTime next = tz.TZDateTime(
+          tz.local,
+          now.year,
+          now.month,
+          now.day,
+          scheduledDate.hour,
+          scheduledDate.minute,
+        );
+        // Advance to the correct weekday
+        while (next.weekday != scheduledDate.weekday || next.isBefore(now)) {
+          next = next.add(const Duration(days: 1));
+        }
+        return next;
+
+      case DateTimeComponents.dayOfMonthAndTime:
+        // Monthly: match day-of-month + hour:minute
+        tz.TZDateTime next = tz.TZDateTime(
+          tz.local,
+          now.year,
+          now.month,
+          scheduledDate.day,
+          scheduledDate.hour,
+          scheduledDate.minute,
+        );
+        // If this month's date has passed, go to next month
+        while (next.isBefore(now)) {
+          final nextMonth = next.month == 12 ? 1 : next.month + 1;
+          final nextYear = next.month == 12 ? next.year + 1 : next.year;
+          next = tz.TZDateTime(
+            tz.local,
+            nextYear,
+            nextMonth,
+            scheduledDate.day,
+            scheduledDate.hour,
+            scheduledDate.minute,
+          );
+        }
+        return next;
+
+      case DateTimeComponents.dateAndTime:
+        // Yearly: match month+day+hour:minute
+        tz.TZDateTime next = tz.TZDateTime(
+          tz.local,
+          now.year,
+          scheduledDate.month,
+          scheduledDate.day,
+          scheduledDate.hour,
+          scheduledDate.minute,
+        );
+        if (next.isBefore(now)) {
+          next = tz.TZDateTime(
+            tz.local,
+            now.year + 1,
+            scheduledDate.month,
+            scheduledDate.day,
+            scheduledDate.hour,
+            scheduledDate.minute,
+          );
+        }
+        return next;
     }
-    return scheduledDate;
   }
 
   /// Cancel a notification by ID

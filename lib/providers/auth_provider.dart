@@ -180,6 +180,18 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // Reset balance to zero
+  Future<void> resetBalance() async {
+    if (_user == null) return;
+    try {
+      await _authService.updateBalance(_user!.uid, -_user!.totalBalance);
+      _user = _user!.copyWith(totalBalance: 0);
+      notifyListeners();
+    } catch (e) {
+      _setError('Đã có lỗi xảy ra khi đặt lại số dư.');
+    }
+  }
+
   // Reset password
   Future<bool> resetPassword(String email) async {
     _setLoading(true);

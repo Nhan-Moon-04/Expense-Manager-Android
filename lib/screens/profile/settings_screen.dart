@@ -10,6 +10,10 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/auto_expense_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/expense_provider.dart';
+import '../../providers/note_provider.dart';
+import '../../providers/reminder_provider.dart';
+import '../../providers/notification_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../services/cloudinary_service.dart';
 import '../../services/push_notification_service.dart';
@@ -31,6 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isBackingUp = false;
   bool _isRestoring = false;
   bool _isExporting = false;
+  bool _isDeletingAll = false;
   String _currentVersion = '';
   final CloudinaryService _cloudinaryService = CloudinaryService();
   final BackupService _backupService = BackupService();
@@ -1076,7 +1081,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: 'Xóa vĩnh viễn tất cả dữ liệu',
             iconColor: AppColors.error,
             titleColor: AppColors.error,
-            onTap: _showDeleteDataDialog,
+            onTap: _isDeletingAll ? () {} : _showDeleteDataDialog,
           ),
         ]),
       ],
@@ -1239,24 +1244,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _showComingSoon() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.info_outline, color: Colors.white),
-            SizedBox(width: 12),
-            Expanded(child: Text('Tính năng đang phát triển')),
-          ],
-        ),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
       ),
     );
   }
@@ -1631,7 +1618,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showDeleteDataDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
@@ -1644,21 +1631,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: const Icon(Icons.warning_rounded, color: AppColors.error),
             ),
             const SizedBox(width: 12),
-            const Text(
-              'Xóa dữ liệu',
-              style: TextStyle(
-                color: AppColors.error,
-                fontWeight: FontWeight.bold,
+            const Expanded(
+              child: Text(
+                'Xóa tất cả dữ liệu',
+                style: TextStyle(
+                  color: AppColors.error,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
         ),
         content: const Text(
-          'Hành động này sẽ xóa vĩnh viễn tất cả dữ liệu của bạn và không thể khôi phục. Bạn có chắc chắn?',
+          'Hệ thống sẽ tự động sao lưu dữ liệu ra file trước khi xóa.\n\n'
+          'Tất cả chi tiêu, ghi chú, nhắc nhở và thông báo sẽ bị xóa vĩnh viễn. Bạn có chắc chắn?',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(ctx),
             style: TextButton.styleFrom(
               foregroundColor: AppColors.textSecondary,
             ),
@@ -1666,8 +1656,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
-              _showComingSoon();
+              Navigator.pop(ctx);
+              _performDeleteAllData();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
@@ -1676,11 +1666,128 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Xóa'),
+            child: const Text('Xóa tất cả'),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _performDeleteAllData() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.user;
+    if (user == null) return;
+
+    setState(() => _isDeletingAll = true);
+
+    try {
+      // Step 1: Backup to local file first
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(child: Text('Đang sao lưu dữ liệu trước khi xóa...')),
+            ],
+          ),
+          backgroundColor: AppColors.warning,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 30),
+        ),
+      );
+
+      final backupPath = await _backupService.backupToLocalFile(user.uid);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      // Step 2: Share the backup file
+      await SharePlus.instance.share(ShareParams(files: [XFile(backupPath)]));
+
+      if (!mounted) return;
+
+      // Step 3: Show loading and delete all data
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(child: Text('Đang xóa tất cả dữ liệu...')),
+            ],
+          ),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 30),
+        ),
+      );
+
+      final result = await _backupService.deleteAllUserData(user.uid);
+
+      if (!mounted) return;
+
+      // Clear all local provider data so the UI updates immediately
+      Provider.of<ExpenseProvider>(context, listen: false).clearAllData();
+      Provider.of<NoteProvider>(context, listen: false).clearAllData();
+      Provider.of<ReminderProvider>(context, listen: false).clearAllData();
+      Provider.of<NotificationProvider>(context, listen: false).clearAllData();
+      await Provider.of<AuthProvider>(context, listen: false).resetBalance();
+
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Đã xóa ${result['expenses']} chi tiêu, '
+                  '${result['notes']} ghi chú, '
+                  '${result['reminders']} nhắc nhở.\n'
+                  'File backup đã được lưu.',
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    } catch (e) {
+      _showErrorSnackBar('Lỗi xóa dữ liệu: $e');
+    } finally {
+      if (mounted) setState(() => _isDeletingAll = false);
+    }
   }
 
   Widget _buildAboutSection() {

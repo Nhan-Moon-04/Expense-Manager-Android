@@ -157,9 +157,10 @@ class ExpenseProvider with ChangeNotifier {
 
     try {
       ExpenseModel newExpense = await _expenseService.addExpense(expense);
-      _expenses.insert(0, newExpense);
 
-      // Update today/month expenses if applicable
+      // Don't insert into _expenses here — the Firestore stream listener
+      // (listenToExpenses) already handles that automatically.
+      // Only update _todayExpenses and _monthExpenses which have no stream.
       DateTime now = DateTime.now();
       if (expense.date.year == now.year &&
           expense.date.month == now.month &&
@@ -251,5 +252,16 @@ class ExpenseProvider with ChangeNotifier {
 
   void _clearError() {
     _error = null;
+  }
+
+  /// Clear all local data (used when user deletes all data)
+  void clearAllData() {
+    _expenses.clear();
+    _todayExpenses.clear();
+    _monthExpenses.clear();
+    _previousMonthExpenses.clear();
+    _categoryExpenses.clear();
+    _dailySummary.clear();
+    notifyListeners();
   }
 }

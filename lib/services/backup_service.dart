@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -189,6 +190,179 @@ class BackupService {
     await file.writeAsString(csvBuffer.toString());
 
     return file.path;
+  }
+
+  /// Backup all user data to a local JSON file and return file path
+  Future<String> backupToLocalFile(String userId) async {
+    // Fetch all expenses
+    final expensesSnap = await _firestore
+        .collection('expenses')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    final expenses = expensesSnap.docs.map((doc) {
+      final data = doc.data();
+      data['_docId'] = doc.id;
+      // Convert Timestamps to ISO strings for JSON serialization
+      data.forEach((key, value) {
+        if (value is Timestamp) {
+          data[key] = value.toDate().toIso8601String();
+        }
+      });
+      return data;
+    }).toList();
+
+    // Fetch all notes
+    final notesSnap = await _firestore
+        .collection('notes')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    final notes = notesSnap.docs.map((doc) {
+      final data = doc.data();
+      data['_docId'] = doc.id;
+      data.forEach((key, value) {
+        if (value is Timestamp) {
+          data[key] = value.toDate().toIso8601String();
+        }
+      });
+      return data;
+    }).toList();
+
+    // Fetch all reminders
+    final remindersSnap = await _firestore
+        .collection('reminders')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    final reminders = remindersSnap.docs.map((doc) {
+      final data = doc.data();
+      data['_docId'] = doc.id;
+      data.forEach((key, value) {
+        if (value is Timestamp) {
+          data[key] = value.toDate().toIso8601String();
+        }
+      });
+      return data;
+    }).toList();
+
+    // Fetch user document
+    final userDoc = await _firestore.collection('users').doc(userId).get();
+    final userData = userDoc.data();
+    if (userData != null) {
+      userData.forEach((key, value) {
+        if (value is Timestamp) {
+          userData[key] = value.toDate().toIso8601String();
+        }
+      });
+    }
+
+    final backupData = {
+      'userId': userId,
+      'backupAt': DateTime.now().toIso8601String(),
+      'user': userData,
+      'expenses': expenses,
+      'notes': notes,
+      'reminders': reminders,
+      'expenseCount': expenses.length,
+      'noteCount': notes.length,
+      'reminderCount': reminders.length,
+    };
+
+    // Save to local file
+    final dir = await getApplicationDocumentsDirectory();
+    final fileName =
+        'backup_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.json';
+    final file = File('${dir.path}/$fileName');
+    await file.writeAsString(
+      const JsonEncoder.withIndent('  ').convert(backupData),
+    );
+
+    return file.path;
+  }
+
+  /// Delete all user data from Firestore
+  Future<Map<String, int>> deleteAllUserData(String userId) async {
+    int deletedExpenses = 0;
+    int deletedNotes = 0;
+    int deletedReminders = 0;
+
+    // Delete expenses in batches (Firestore limit: 500 per batch)
+    final expensesSnap = await _firestore
+        .collection('expenses')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    for (var i = 0; i < expensesSnap.docs.length; i += 400) {
+      final batch = _firestore.batch();
+      final end = (i + 400 < expensesSnap.docs.length)
+          ? i + 400
+          : expensesSnap.docs.length;
+      for (var j = i; j < end; j++) {
+        batch.delete(expensesSnap.docs[j].reference);
+        deletedExpenses++;
+      }
+      await batch.commit();
+    }
+
+    // Delete notes
+    final notesSnap = await _firestore
+        .collection('notes')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    for (var i = 0; i < notesSnap.docs.length; i += 400) {
+      final batch = _firestore.batch();
+      final end = (i + 400 < notesSnap.docs.length)
+          ? i + 400
+          : notesSnap.docs.length;
+      for (var j = i; j < end; j++) {
+        batch.delete(notesSnap.docs[j].reference);
+        deletedNotes++;
+      }
+      await batch.commit();
+    }
+
+    // Delete reminders
+    final remindersSnap = await _firestore
+        .collection('reminders')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    for (var i = 0; i < remindersSnap.docs.length; i += 400) {
+      final batch = _firestore.batch();
+      final end = (i + 400 < remindersSnap.docs.length)
+          ? i + 400
+          : remindersSnap.docs.length;
+      for (var j = i; j < end; j++) {
+        batch.delete(remindersSnap.docs[j].reference);
+        deletedReminders++;
+      }
+      await batch.commit();
+    }
+
+    // Delete notifications
+    final notificationsSnap = await _firestore
+        .collection('notifications')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    for (var i = 0; i < notificationsSnap.docs.length; i += 400) {
+      final batch = _firestore.batch();
+      final end = (i + 400 < notificationsSnap.docs.length)
+          ? i + 400
+          : notificationsSnap.docs.length;
+      for (var j = i; j < end; j++) {
+        batch.delete(notificationsSnap.docs[j].reference);
+      }
+      await batch.commit();
+    }
+
+    return {
+      'expenses': deletedExpenses,
+      'notes': deletedNotes,
+      'reminders': deletedReminders,
+    };
   }
 
   String _getCategoryName(ExpenseCategory category) {
