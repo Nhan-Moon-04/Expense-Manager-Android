@@ -1,5 +1,9 @@
 package com.example.expense_manager_android
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -10,6 +14,7 @@ import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import io.flutter.plugin.common.EventChannel
 import org.json.JSONArray
 import org.json.JSONObject
@@ -27,6 +32,13 @@ class BankNotificationService : NotificationListenerService() {
         private const val PREF_RULES_VERSION = "cached_rules_version"
         private const val REFRESH_INTERVAL_MS = 6 * 60 * 60 * 1000L // 6 hours
         private const val PREF_LAST_FETCH = "last_fetch_time"
+        
+        // Foreground service notification
+        private const val NOTIFICATION_CHANNEL_ID = "bank_listener_service"
+        private const val NOTIFICATION_ID = 1001
+        private const val NOTIFICATION_CHANNEL_NAME = "Lắng nghe thông báo ngân hàng"
+        
+        private var transactionCount = 0
         
         // Pending notifications storage
         private const val PENDING_PREFS_NAME = "pending_notifications"
@@ -281,6 +293,9 @@ class BankNotificationService : NotificationListenerService() {
         super.onCreate()
         instance = this
 
+        // Start as foreground service to prevent being killed
+        startForegroundService()
+
         // Load cached rules first (instant), then fetch fresh in background
         val hasCached = loadCachedRules(this)
         if (!hasCached || shouldRefresh(this)) {
@@ -295,6 +310,89 @@ class BankNotificationService : NotificationListenerService() {
         super.onDestroy()
         instance = null
         handler.removeCallbacksAndMessages(null)
+        
+        // Stop foreground service
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
+    }
+
+    private fun startForegroundService() {
+        try {
+            // Create notification channel for Android O and above
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    NOTIFICATION_CHANNEL_ID,
+                    NOTIFICATION_CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_LOW
+                ).apply {
+                    description = "Duy trì dịch vụ lắng nghe thông báo ngân hàng"
+                    setShowBadge(false)
+                }
+                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            // Create intent to open app when tapping notification
+            val intent = Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            val pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
+
+            // Build foreground notification
+            val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                .setContentTitle("Đang lắng nghe thông báo")
+                .setContentText("Tự động ghi nhận giao dịch từ ngân hàng")
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setContentIntent(pendingIntent)
+                .build()
+
+            // Start foreground
+            startForeground(NOTIFICATION_ID, notification)
+            Log.d(TAG, "✅ Started as foreground service")
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error starting foreground service: ${e.message}")
+        }
+    }
+
+    private fun updateForegroundNotification() {
+        try {
+            // Create intent to open app
+            val intent = Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            val pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
+
+            // Update notification with transaction count
+            val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                .setContentTitle("Đang lắng nghe thông báo")
+                .setContentText("Đã ghi nhận $transactionCount giao dịch")
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setContentIntent(pendingIntent)
+                .build()
+
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify(NOTIFICATION_ID, notification)
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error updating notification: ${e.message}")
+        }
     }
 
     private fun scheduleRefresh() {
@@ -337,6 +435,10 @@ class BankNotificationService : NotificationListenerService() {
                 if (result != null) {
                     Log.d(TAG, "Matched rule '${rule.name}' for ${bankRule.name}: $result")
                     Log.d(TAG, "EventSink status: ${if (eventSink != null) "CONNECTED" else "NULL"}")
+                    
+                    // Increment transaction count
+                    transactionCount++
+                    updateForegroundNotification()
                     
                     // Try to send to Flutter immediately
                     if (eventSink != null) {
