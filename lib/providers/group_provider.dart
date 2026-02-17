@@ -237,6 +237,15 @@ class GroupProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Clear all group data (used when deleting all user data)
+  void clearAllData() {
+    _groups = [];
+    _selectedGroup = null;
+    _groupExpenses = [];
+    _error = null;
+    notifyListeners();
+  }
+
   // Calculate split
   Map<String, double> calculateSplit() {
     if (_selectedGroup == null) return {};

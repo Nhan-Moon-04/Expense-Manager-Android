@@ -15,6 +15,7 @@ import '../../providers/note_provider.dart';
 import '../../providers/reminder_provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../../providers/group_provider.dart';
 import '../../services/cloudinary_service.dart';
 import '../../services/push_notification_service.dart';
 import '../../services/backup_service.dart';
@@ -1644,7 +1645,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         content: const Text(
           'Hệ thống sẽ tự động sao lưu dữ liệu ra file trước khi xóa.\n\n'
-          'Tất cả chi tiêu, ghi chú, nhắc nhở và thông báo sẽ bị xóa vĩnh viễn. Bạn có chắc chắn?',
+          'Tất cả chi tiêu, ghi chú, nhắc nhở, thông báo và nhóm sẽ bị xóa vĩnh viễn. '
+          'Tài khoản đăng nhập sẽ được giữ lại. Bạn có chắc chắn?',
         ),
         actions: [
           TextButton(
@@ -1754,6 +1756,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       Provider.of<NoteProvider>(context, listen: false).clearAllData();
       Provider.of<ReminderProvider>(context, listen: false).clearAllData();
       Provider.of<NotificationProvider>(context, listen: false).clearAllData();
+      Provider.of<GroupProvider>(context, listen: false).clearAllData();
       await Provider.of<AuthProvider>(context, listen: false).resetBalance();
 
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -1768,7 +1771,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Text(
                   'Đã xóa ${result['expenses']} chi tiêu, '
                   '${result['notes']} ghi chú, '
-                  '${result['reminders']} nhắc nhở.\n'
+                  '${result['reminders']} nhắc nhở, '
+                  '${result['groups']} nhóm.\n'
                   'File backup đã được lưu.',
                 ),
               ),

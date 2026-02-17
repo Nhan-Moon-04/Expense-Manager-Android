@@ -27,34 +27,42 @@ class AuthProvider with ChangeNotifier {
   void _init() {
     _authService.authStateChanges.listen((User? firebaseUser) async {
       if (firebaseUser != null) {
+        // Tạo fallback UserModel từ Firebase User phòng trường hợp Firestore lỗi
+        final fallbackUser = UserModel(
+          uid: firebaseUser.uid,
+          email: firebaseUser.email ?? '',
+          fullName:
+              firebaseUser.displayName ??
+              firebaseUser.email?.split('@')[0] ??
+              'User',
+          phone: firebaseUser.phoneNumber,
+          avatarUrl: firebaseUser.photoURL,
+          totalBalance: 0,
+          role: 'user',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
         try {
           _user = await _authService.getUserData(firebaseUser.uid);
 
           // Nếu user document chưa tồn tại, tạo mới
           if (_user == null) {
-            _user = UserModel(
-              uid: firebaseUser.uid,
-              email: firebaseUser.email ?? '',
-              fullName:
-                  firebaseUser.displayName ??
-                  firebaseUser.email?.split('@')[0] ??
-                  'User',
-              phone: firebaseUser.phoneNumber,
-              avatarUrl: firebaseUser.photoURL,
-              totalBalance: 0,
-              role: 'user',
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            );
+            _user = fallbackUser;
             await _authService.createUserDocument(_user!);
           }
-
-          // Save FCM token so server can send push notifications
-          // This is what makes notifications work even when app is killed
-          await _fcmService.saveTokenForUser(firebaseUser.uid);
         } catch (e) {
           debugPrint('Error getting/creating user data: $e');
-          _user = null;
+          // Firestore lỗi nhưng Firebase Auth vẫn có session hợp lệ
+          // → dùng fallback thay vì set null để không bị đá ra login
+          _user = fallbackUser;
+        }
+
+        // Save FCM token - không để lỗi ảnh hưởng auth state
+        try {
+          await _fcmService.saveTokenForUser(firebaseUser.uid);
+        } catch (e) {
+          debugPrint('Error saving FCM token: $e');
         }
       } else {
         _user = null;

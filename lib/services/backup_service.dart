@@ -46,6 +46,24 @@ class BackupService {
       return data;
     }).toList();
 
+    // Fetch all groups (owned by or member of)
+    final groupsSnap = await _firestore
+        .collection('groups')
+        .where('isActive', isEqualTo: true)
+        .get();
+
+    final groups = groupsSnap.docs
+        .where((doc) {
+          final members = (doc.data()['members'] as List<dynamic>?) ?? [];
+          return members.any((m) => (m as Map)['userId'] == userId);
+        })
+        .map((doc) {
+          final data = doc.data();
+          data['_docId'] = doc.id;
+          return data;
+        })
+        .toList();
+
     // Fetch user document
     final userDoc = await _firestore.collection('users').doc(userId).get();
 
@@ -55,10 +73,12 @@ class BackupService {
       'expenses': expenses,
       'notes': notes,
       'reminders': reminders,
+      'groups': groups,
       'backupAt': FieldValue.serverTimestamp(),
       'expenseCount': expenses.length,
       'noteCount': notes.length,
       'reminderCount': reminders.length,
+      'groupCount': groups.length,
     });
   }
 
@@ -246,6 +266,42 @@ class BackupService {
       return data;
     }).toList();
 
+    // Fetch all groups (owned by or member of)
+    final groupsSnap = await _firestore
+        .collection('groups')
+        .where('isActive', isEqualTo: true)
+        .get();
+
+    final groups = groupsSnap.docs
+        .where((doc) {
+          final members = (doc.data()['members'] as List<dynamic>?) ?? [];
+          return members.any((m) => (m as Map)['userId'] == userId);
+        })
+        .map((doc) {
+          final data = doc.data();
+          data['_docId'] = doc.id;
+          // Convert Timestamps in top-level fields
+          data.forEach((key, value) {
+            if (value is Timestamp) {
+              data[key] = value.toDate().toIso8601String();
+            }
+          });
+          // Convert Timestamps in members list
+          if (data['members'] != null) {
+            data['members'] = (data['members'] as List).map((m) {
+              final member = Map<String, dynamic>.from(m as Map);
+              member.forEach((key, value) {
+                if (value is Timestamp) {
+                  member[key] = value.toDate().toIso8601String();
+                }
+              });
+              return member;
+            }).toList();
+          }
+          return data;
+        })
+        .toList();
+
     // Fetch user document
     final userDoc = await _firestore.collection('users').doc(userId).get();
     final userData = userDoc.data();
@@ -264,9 +320,11 @@ class BackupService {
       'expenses': expenses,
       'notes': notes,
       'reminders': reminders,
+      'groups': groups,
       'expenseCount': expenses.length,
       'noteCount': notes.length,
       'reminderCount': reminders.length,
+      'groupCount': groups.length,
     };
 
     // Save to local file
@@ -281,11 +339,12 @@ class BackupService {
     return file.path;
   }
 
-  /// Delete all user data from Firestore
+  /// Delete all user data from Firestore (keeps user document for login)
   Future<Map<String, int>> deleteAllUserData(String userId) async {
     int deletedExpenses = 0;
     int deletedNotes = 0;
     int deletedReminders = 0;
+    int deletedGroups = 0;
 
     // Delete expenses in batches (Firestore limit: 500 per batch)
     final expensesSnap = await _firestore
@@ -358,10 +417,63 @@ class BackupService {
       await batch.commit();
     }
 
+    // Delete/leave groups
+    final groupsSnap = await _firestore
+        .collection('groups')
+        .where('isActive', isEqualTo: true)
+        .get();
+
+    for (final doc in groupsSnap.docs) {
+      final data = doc.data();
+      final members = (data['members'] as List<dynamic>?) ?? [];
+      final isMember = members.any((m) => (m as Map)['userId'] == userId);
+      if (!isMember) continue;
+
+      if (data['ownerId'] == userId) {
+        // User owns this group → hard delete
+        await doc.reference.delete();
+        deletedGroups++;
+
+        // Also delete all expenses belonging to this group
+        final groupExpensesSnap = await _firestore
+            .collection('expenses')
+            .where('groupId', isEqualTo: doc.id)
+            .get();
+
+        for (var i = 0; i < groupExpensesSnap.docs.length; i += 400) {
+          final batch = _firestore.batch();
+          final end = (i + 400 < groupExpensesSnap.docs.length)
+              ? i + 400
+              : groupExpensesSnap.docs.length;
+          for (var j = i; j < end; j++) {
+            batch.delete(groupExpensesSnap.docs[j].reference);
+          }
+          await batch.commit();
+        }
+      } else {
+        // User is a member → remove from group
+        final updatedMembers = members
+            .where((m) => (m as Map)['userId'] != userId)
+            .toList();
+        await doc.reference.update({
+          'members': updatedMembers,
+          'updatedAt': Timestamp.now(),
+        });
+        deletedGroups++;
+      }
+    }
+
+    // Reset user balance to 0 (keep user document for login)
+    await _firestore.collection('users').doc(userId).update({
+      'totalBalance': 0,
+      'updatedAt': Timestamp.now(),
+    });
+
     return {
       'expenses': deletedExpenses,
       'notes': deletedNotes,
       'reminders': deletedReminders,
+      'groups': deletedGroups,
     };
   }
 
