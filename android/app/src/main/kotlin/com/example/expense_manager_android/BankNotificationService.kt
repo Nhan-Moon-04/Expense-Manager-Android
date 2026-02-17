@@ -27,6 +27,10 @@ class BankNotificationService : NotificationListenerService() {
         private const val PREF_RULES_VERSION = "cached_rules_version"
         private const val REFRESH_INTERVAL_MS = 6 * 60 * 60 * 1000L // 6 hours
         private const val PREF_LAST_FETCH = "last_fetch_time"
+        
+        // Pending notifications storage
+        private const val PENDING_PREFS_NAME = "pending_notifications"
+        private const val PREF_PENDING_NOTIFICATIONS = "pending_list"
 
         private var eventSink: EventChannel.EventSink? = null
         private var instance: BankNotificationService? = null
@@ -69,6 +73,55 @@ class BankNotificationService : NotificationListenerService() {
                     Log.e(TAG, "Error refreshing rules: ${e.message}")
                 }
             }.start()
+        }
+        
+        // Save notification to pending queue when app is not running
+        private fun savePendingNotification(context: Context, notification: Map<String, Any>) {
+            try {
+                val prefs = context.getSharedPreferences(PENDING_PREFS_NAME, Context.MODE_PRIVATE)
+                val currentList = getPendingNotifications(context).toMutableList()
+                
+                // Convert map to JSON string
+                val jsonObj = JSONObject(notification)
+                currentList.add(jsonObj.toString())
+                
+                // Save back to preferences
+                val jsonArray = JSONArray(currentList)
+                prefs.edit().putString(PREF_PENDING_NOTIFICATIONS, jsonArray.toString()).apply()
+                
+                Log.d(TAG, "Saved pending notification. Queue size: ${currentList.size}")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error saving pending notification: ${e.message}")
+            }
+        }
+        
+        // Get all pending notifications
+        fun getPendingNotifications(context: Context): List<String> {
+            try {
+                val prefs = context.getSharedPreferences(PENDING_PREFS_NAME, Context.MODE_PRIVATE)
+                val jsonString = prefs.getString(PREF_PENDING_NOTIFICATIONS, null) ?: return emptyList()
+                
+                val jsonArray = JSONArray(jsonString)
+                val list = mutableListOf<String>()
+                for (i in 0 until jsonArray.length()) {
+                    list.add(jsonArray.getString(i))
+                }
+                return list
+            } catch (e: Exception) {
+                Log.e(TAG, "Error getting pending notifications: ${e.message}")
+                return emptyList()
+            }
+        }
+        
+        // Clear all pending notifications
+        fun clearPendingNotifications(context: Context) {
+            try {
+                val prefs = context.getSharedPreferences(PENDING_PREFS_NAME, Context.MODE_PRIVATE)
+                prefs.edit().remove(PREF_PENDING_NOTIFICATIONS).apply()
+                Log.d(TAG, "Cleared pending notifications")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error clearing pending notifications: ${e.message}")
+            }
         }
 
         private fun fetchAndCacheRules(context: Context) {
@@ -278,7 +331,16 @@ class BankNotificationService : NotificationListenerService() {
                 val result = applyRule(bankRule, rule, title, text)
                 if (result != null) {
                     Log.d(TAG, "Matched rule '${rule.name}' for ${bankRule.name}: $result")
-                    eventSink?.success(result)
+                    
+                    // Try to send to Flutter immediately
+                    if (eventSink != null) {
+                        eventSink?.success(result)
+                        Log.d(TAG, "✅ Sent notification to Flutter app")
+                    } else {
+                        // App is not running, save to pending queue
+                        savePendingNotification(this, result)
+                        Log.d(TAG, "💾 App not running, saved notification to queue")
+                    }
                     return
                 }
             }

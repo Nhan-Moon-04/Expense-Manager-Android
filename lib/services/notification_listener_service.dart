@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -140,6 +141,57 @@ class NotificationListenerService {
     } on PlatformException catch (e) {
       debugPrint('Error refreshing bank rules: ${e.message}');
       return false;
+    }
+  }
+
+  /// Get pending notifications that were saved when app was killed
+  Future<List<BankNotification>> getPendingNotifications() async {
+    try {
+      final result = await _methodChannel.invokeMethod<List<dynamic>>(
+        'getPendingNotifications',
+      );
+      if (result == null || result.isEmpty) {
+        return [];
+      }
+      
+      final notifications = <BankNotification>[];
+      for (final jsonString in result) {
+        try {
+          // Parse JSON string back to Map
+          final map = _parseJsonString(jsonString as String);
+          if (map != null) {
+            notifications.add(BankNotification.fromMap(map));
+          }
+        } catch (e) {
+          debugPrint('Error parsing pending notification: $e');
+        }
+      }
+      
+      debugPrint('📥 Retrieved ${notifications.length} pending notifications');
+      return notifications;
+    } on PlatformException catch (e) {
+      debugPrint('Error getting pending notifications: ${e.message}');
+      return [];
+    }
+  }
+
+  /// Clear all pending notifications
+  Future<void> clearPendingNotifications() async {
+    try {
+      await _methodChannel.invokeMethod('clearPendingNotifications');
+      debugPrint('🗑️ Cleared pending notifications');
+    } on PlatformException catch (e) {
+      debugPrint('Error clearing pending notifications: ${e.message}');
+    }
+  }
+
+  /// Parse JSON string to Map
+  Map<String, dynamic>? _parseJsonString(String jsonString) {
+    try {
+      return json.decode(jsonString) as Map<String, dynamic>;
+    } catch (e) {
+      debugPrint('Error parsing JSON string: $e');
+      return null;
     }
   }
 

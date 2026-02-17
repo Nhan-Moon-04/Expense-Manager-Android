@@ -31,6 +31,14 @@ class MainActivity : FlutterActivity() {
                     BankNotificationService.refreshRules(this)
                     result.success(true)
                 }
+                "getPendingNotifications" -> {
+                    val pending = BankNotificationService.getPendingNotifications(this)
+                    result.success(pending)
+                }
+                "clearPendingNotifications" -> {
+                    BankNotificationService.clearPendingNotifications(this)
+                    result.success(true)
+                }
                 else -> {
                     result.notImplemented()
                 }

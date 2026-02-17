@@ -135,7 +135,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => GroupProvider()),
         ChangeNotifierProvider(create: (_) => ReminderProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
-        ChangeNotifierProvider(create: (_) => AutoExpenseProvider()),
+        ChangeNotifierProxyProvider<ExpenseProvider, AutoExpenseProvider>(
+          create: (_) => AutoExpenseProvider(),
+          update: (_, expenseProvider, autoExpenseProvider) {
+            autoExpenseProvider!.setExpenseProvider(expenseProvider);
+            return autoExpenseProvider;
+          },
+        ),
       ],
       child: MaterialApp(
         title: AppStrings.appName,

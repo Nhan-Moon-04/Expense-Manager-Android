@@ -684,13 +684,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: provider.autoAddIncome,
                   onChanged: provider.setAutoAddIncome,
                 ),
-                const Divider(height: 1, indent: 16, endIndent: 16),
-                _buildAutoExpenseOption(
-                  title: 'Yêu cầu xác nhận',
-                  subtitle: 'Hiển thị xác nhận trước khi thêm',
-                  value: provider.showConfirmation,
-                  onChanged: provider.setShowConfirmation,
-                ),
               ],
             ]),
             if (!provider.isNotificationAccessGranted && provider.isEnabled)
@@ -1758,6 +1751,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       Provider.of<NotificationProvider>(context, listen: false).clearAllData();
       Provider.of<GroupProvider>(context, listen: false).clearAllData();
       await Provider.of<AuthProvider>(context, listen: false).resetBalance();
+
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
