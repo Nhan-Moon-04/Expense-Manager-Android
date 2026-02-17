@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -80,35 +81,35 @@ class VersionService {
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version; // vd: "1.0.0"
 
-      print('🔍 Checking for updates...');
-      print('📱 Current version: $currentVersion');
-      print('🌐 Fetching from: $versionUrl');
+      debugPrint('🔍 Checking for updates...');
+      debugPrint('📱 Current version: $currentVersion');
+      debugPrint('🌐 Fetching from: $versionUrl');
 
       // Fetch version info từ Armbian server
       final response = await http
           .get(Uri.parse(versionUrl))
           .timeout(const Duration(seconds: 10));
 
-      print('📡 Response status: ${response.statusCode}');
+      debugPrint('📡 Response status: ${response.statusCode}');
 
       if (response.statusCode != 200) {
-        print('❌ Server returned ${response.statusCode}');
+        debugPrint('❌ Server returned ${response.statusCode}');
         return VersionCheckResult(
           status: UpdateStatus.upToDate,
           currentVersion: currentVersion,
         );
       }
 
-      print('📄 Response body: ${response.body}');
+      debugPrint('📄 Response body: ${response.body}');
       final data = json.decode(response.body) as Map<String, dynamic>;
       final versionInfo = VersionInfo.fromMap(data);
 
-      print('🆕 Latest version: ${versionInfo.latestVersion}');
-      print('⚙️  Min version: ${versionInfo.minVersion}');
+      debugPrint('🆕 Latest version: ${versionInfo.latestVersion}');
+      debugPrint('⚙️  Min version: ${versionInfo.minVersion}');
 
       // Nếu version hiện tại < minVersion → bắt buộc cập nhật
       if (_compareVersions(currentVersion, versionInfo.minVersion) < 0) {
-        print('⚠️  Force update required (current < min)');
+        debugPrint('⚠️  Force update required (current < min)');
         return VersionCheckResult(
           status: UpdateStatus.forceUpdate,
           versionInfo: versionInfo,
@@ -118,7 +119,7 @@ class VersionService {
 
       // Nếu version hiện tại < latestVersion → có bản mới (tùy chọn hoặc force)
       if (_compareVersions(currentVersion, versionInfo.latestVersion) < 0) {
-        print(
+        debugPrint(
           '✨ Update available: $currentVersion → ${versionInfo.latestVersion}',
         );
         return VersionCheckResult(
@@ -131,7 +132,7 @@ class VersionService {
       }
 
       // Đã mới nhất
-      print('✅ Already up to date');
+      debugPrint('✅ Already up to date');
       return VersionCheckResult(
         status: UpdateStatus.upToDate,
         versionInfo: versionInfo,
@@ -139,8 +140,8 @@ class VersionService {
       );
     } catch (e, stackTrace) {
       // Nếu lỗi (offline, etc.) → bỏ qua, cho dùng app bình thường
-      print('❌ Error checking for updates: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('❌ Error checking for updates: $e');
+      debugPrint('Stack trace: $stackTrace');
       return VersionCheckResult(
         status: UpdateStatus.upToDate,
         currentVersion: '?.?.?',

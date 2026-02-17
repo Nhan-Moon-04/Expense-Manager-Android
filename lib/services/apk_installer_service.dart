@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class ApkInstallerService {
   final Dio _dio = Dio();
@@ -16,10 +17,9 @@ class ApkInstallerService {
     Function(double)? onProgress,
   }) async {
     try {
-      // 1. Request storage permission (Android 10+)
-      if (await _requestPermission()) {
-        debugPrint('✅ Storage permission granted');
-      } else {
+      // 1. Check Android version và request permission nếu cần
+      final hasPermission = await _requestPermission();
+      if (!hasPermission) {
         debugPrint('❌ Storage permission denied');
         return false;
       }
@@ -58,33 +58,101 @@ class ApkInstallerService {
         },
       );
 
-      debugPrint('✅ Download completed');
+      debugPrint('✅ Download completed: $filePath');
 
-      // 5. Install APK
-      final result = await OpenFile.open(filePath);
-      debugPrint('📱 Install result: ${result.message}');
+      // 5. Verify file exists
+      if (!await file.exists()) {
+        debugPrint('❌ Downloaded file not found!');
+        return false;
+      }
+
+      final fileSize = await file.length();
+      debugPrint(
+        '📦 APK size: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB',
+      );
+
+      // 6. Install APK
+      debugPrint('📱 Opening APK installer...');
+      final result = await OpenFile.open(
+        filePath,
+        type: 'application/vnd.android.package-archive',
+      );
+      debugPrint('📱 Install result: ${result.type} - ${result.message}');
 
       return result.type == ResultType.done;
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('❌ Error downloading/installing APK: $e');
+      debugPrint('Stack trace: $stackTrace');
       return false;
     }
   }
 
-  /// Request install packages permission (Android 8+)
+  /// Request storage permission (chỉ cho Android < 13)
   Future<bool> _requestPermission() async {
-    if (Platform.isAndroid) {
-      // Android 10+ cần REQUEST_INSTALL_PACKAGES permission
-      // Được handle tự động bởi open_file package
+    if (!Platform.isAndroid) {
+      return false;
+    }
 
-      // Nếu cần storage permission (Android < 13)
-      if (await Permission.storage.isDenied) {
-        final status = await Permission.storage.request();
-        return status.isGranted;
+    try {
+      final deviceInfo = DeviceInfoPlugin();
+      final androidInfo = await deviceInfo.androidInfo;
+      final sdkInt = androidInfo.version.sdkInt;
+
+      debugPrint('📱 Android SDK: $sdkInt');
+
+      // Android 13+ (API 33+): Không cần storage permission cho app-specific directory
+      if (sdkInt >= 33) {
+        debugPrint('✅ Android 13+: No storage permission needed');
+        return true;
       }
+
+      // Android 10-12 (API 29-32): Cần WRITE_EXTERNAL_STORAGE
+      if (sdkInt >= 29) {
+        if (await Permission.storage.isGranted) {
+          debugPrint('✅ Storage permission already granted');
+          return true;
+        }
+
+        debugPrint('📋 Requesting storage permission...');
+        final status = await Permission.storage.request();
+
+        if (status.isGranted) {
+          debugPrint('✅ Storage permission granted');
+          return true;
+        } else if (status.isPermanentlyDenied) {
+          debugPrint(
+            '⚠️ Storage permission permanently denied, opening settings...',
+          );
+          await openAppSettings();
+          return false;
+        } else {
+          debugPrint('❌ Storage permission denied');
+          return false;
+        }
+      }
+
+      // Android < 10: Cần WRITE_EXTERNAL_STORAGE
+      if (await Permission.storage.isGranted) {
+        debugPrint('✅ Storage permission already granted');
+        return true;
+      }
+
+      final status = await Permission.storage.request();
+      debugPrint('📋 Storage permission status: $status');
+
+      if (status.isPermanentlyDenied) {
+        debugPrint(
+          '⚠️ Storage permission permanently denied, opening settings...',
+        );
+        await openAppSettings();
+      }
+
+      return status.isGranted;
+    } catch (e) {
+      debugPrint('❌ Error requesting permission: $e');
+      // Nếu lỗi, cho phép tiếp tục (có thể vẫn work trên Android 13+)
       return true;
     }
-    return false;
   }
 
   /// Cancel download (nếu cần)
