@@ -614,6 +614,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 gradientColors: AppColors.incomeGradient,
                 iconBgColor: AppColors.success.withValues(alpha: 0.15),
                 iconColor: AppColors.success,
+                isVisible: _isBalanceVisible,
               ),
             ),
             const SizedBox(width: 14),
@@ -625,6 +626,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 gradientColors: AppColors.expenseGradient,
                 iconBgColor: AppColors.error.withValues(alpha: 0.15),
                 iconColor: AppColors.error,
+                isVisible: _isBalanceVisible,
               ),
             ),
           ],
@@ -640,6 +642,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     required List<Color> gradientColors,
     required Color iconBgColor,
     required Color iconColor,
+    required bool isVisible,
   }) {
     return Container(
       padding: const EdgeInsets.all(18),
@@ -688,16 +691,33 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            currencyFormat.format(amount),
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-              letterSpacing: -0.5,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            child: isVisible
+                ? Text(
+                    currencyFormat.format(amount),
+                    key: const ValueKey('visible'),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                      letterSpacing: -0.5,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )
+                : Text(
+                    '••••••',
+                    key: const ValueKey('hidden'),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                      letterSpacing: 2,
+                    ),
+                  ),
           ),
         ],
       ),
