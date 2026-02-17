@@ -153,7 +153,7 @@ class NotificationListenerService {
       if (result == null || result.isEmpty) {
         return [];
       }
-      
+
       final notifications = <BankNotification>[];
       for (final jsonString in result) {
         try {
@@ -166,7 +166,7 @@ class NotificationListenerService {
           debugPrint('Error parsing pending notification: $e');
         }
       }
-      
+
       debugPrint('📥 Retrieved ${notifications.length} pending notifications');
       return notifications;
     } on PlatformException catch (e) {
@@ -197,12 +197,15 @@ class NotificationListenerService {
 
   /// Start listening for notifications
   void startListening() {
+    debugPrint('🎧 Starting EventChannel stream...');
     _subscription?.cancel();
     _subscription = _eventChannel.receiveBroadcastStream().listen(
       (event) {
+        debugPrint('📨 Received event from native: $event');
         if (event is Map) {
           try {
             final notification = BankNotification.fromMap(event);
+            debugPrint('✅ Parsed notification, adding to stream');
             _notificationController.add(notification);
           } catch (e) {
             debugPrint('Error parsing notification: $e');
@@ -210,15 +213,21 @@ class NotificationListenerService {
         }
       },
       onError: (error) {
-        debugPrint('Notification stream error: $error');
+        debugPrint('❌ Notification stream error: $error');
+      },
+      onDone: () {
+        debugPrint('⚠️ Notification stream closed');
       },
     );
+    debugPrint('✅ EventChannel stream started');
   }
 
   /// Stop listening for notifications
   void stopListening() {
+    debugPrint('🔇 Stopping EventChannel stream...');
     _subscription?.cancel();
     _subscription = null;
+    debugPrint('✅ EventChannel stream stopped');
   }
 
   /// Dispose the service

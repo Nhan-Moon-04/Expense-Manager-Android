@@ -323,7 +323,8 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget _buildBalanceCard() {
     return Consumer2<AuthProvider, ExpenseProvider>(
       builder: (context, authProvider, expenseProvider, child) {
-        final balance = authProvider.user?.totalBalance ?? 0;
+        final balance =
+            expenseProvider.totalBalance; // Total balance from all transactions
         final growthPercent = expenseProvider.monthGrowthPercent;
         final isGrowthPositive = growthPercent >= 0;
 
@@ -381,7 +382,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'Số dư hiện tại',
+                          'Tổng số dư',
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.white.withValues(alpha: 0.9),

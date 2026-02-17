@@ -42,6 +42,11 @@ class BankNotificationService : NotificationListenerService() {
 
         fun setEventSink(sink: EventChannel.EventSink?) {
             eventSink = sink
+            if (sink != null) {
+                Log.d(TAG, "🔌 EventSink CONNECTED - Flutter app is listening")
+            } else {
+                Log.d(TAG, "🔌 EventSink DISCONNECTED - Flutter app stopped listening")
+            }
         }
 
         fun isNotificationAccessEnabled(context: Context): Boolean {
@@ -331,11 +336,17 @@ class BankNotificationService : NotificationListenerService() {
                 val result = applyRule(bankRule, rule, title, text)
                 if (result != null) {
                     Log.d(TAG, "Matched rule '${rule.name}' for ${bankRule.name}: $result")
+                    Log.d(TAG, "EventSink status: ${if (eventSink != null) "CONNECTED" else "NULL"}")
                     
                     // Try to send to Flutter immediately
                     if (eventSink != null) {
-                        eventSink?.success(result)
-                        Log.d(TAG, "✅ Sent notification to Flutter app")
+                        try {
+                            eventSink?.success(result)
+                            Log.d(TAG, "✅ Sent notification to Flutter app")
+                        } catch (e: Exception) {
+                            Log.e(TAG, "❌ Error sending to EventSink: ${e.message}")
+                            savePendingNotification(this, result)
+                        }
                     } else {
                         // App is not running, save to pending queue
                         savePendingNotification(this, result)

@@ -15,6 +15,8 @@ class AutoExpenseProvider with ChangeNotifier {
   bool _autoAddExpense = true;
   bool _autoAddIncome = true;
   bool _showConfirmation = false; // Always auto-add without confirmation
+  bool _hasProcessedPendingNotifications =
+      false; // Track if we've already processed pending notifications
 
   final List<BankNotification> _pendingNotifications = [];
   final List<BankNotification> _processedNotifications = [];
@@ -58,10 +60,10 @@ class AutoExpenseProvider with ChangeNotifier {
     debugPrint(
       '   - ExpenseProvider: ${_expenseProvider != null ? "Ready" : "NULL"}',
     );
-    
+
     // Process pending notifications first
     _processPendingNotifications();
-    
+
     // Auto-start listening if enabled
     if (_isEnabled && _subscription == null) {
       debugPrint('   - Starting notification listener...');
@@ -145,8 +147,10 @@ class AutoExpenseProvider with ChangeNotifier {
 
   void _handleNotification(BankNotification notification) {
     debugPrint(
-      '📱 Received bank notification: ${notification.sourceName} - ${notification.amount}',
+      '📱 Received bank notification: ${notification.sourceName} - ${notification.amount} (${notification.type})',
     );
+    debugPrint('   Time: ${notification.timestamp}');
+    debugPrint('   Description: ${notification.description}');
 
     if (!_isEnabled) {
       debugPrint('⚠️ Auto expense is disabled');
@@ -310,26 +314,42 @@ class AutoExpenseProvider with ChangeNotifier {
   }
 
   Future<void> _processPendingNotifications() async {
-    if (_userId == null || _expenseProvider == null) {
-      debugPrint('⚠️ Cannot process pending notifications: userId or ExpenseProvider not ready');
+    // Only process pending notifications once when app starts
+    if (_hasProcessedPendingNotifications) {
+      debugPrint('⏭️ Pending notifications already processed, skipping');
       return;
     }
 
-    debugPrint('🔍 Checking for pending notifications from when app was killed...');
-    
+    if (_userId == null || _expenseProvider == null) {
+      debugPrint(
+        '⚠️ Cannot process pending notifications: userId or ExpenseProvider not ready',
+      );
+      return;
+    }
+
+    debugPrint(
+      '🔍 Checking for pending notifications from when app was killed...',
+    );
+
     try {
-      final pendingNotifications = await _notificationService.getPendingNotifications();
-      
+      final pendingNotifications = await _notificationService
+          .getPendingNotifications();
+
       if (pendingNotifications.isEmpty) {
         debugPrint('✅ No pending notifications to process');
+        _hasProcessedPendingNotifications = true;
         return;
       }
 
-      debugPrint('📥 Processing ${pendingNotifications.length} pending notifications...');
-      
+      debugPrint(
+        '📥 Processing ${pendingNotifications.length} pending notifications...',
+      );
+
       for (final notification in pendingNotifications) {
-        debugPrint('   - Processing: ${notification.bankName} ${notification.amount}');
-        
+        debugPrint(
+          '   - Processing: ${notification.bankName} ${notification.amount}',
+        );
+
         // Check if we should process based on type
         if (notification.isExpense && !_autoAddExpense) {
           debugPrint('     ⏭️ Skipped (auto-add expense disabled)');
@@ -346,8 +366,8 @@ class AutoExpenseProvider with ChangeNotifier {
 
       // Clear pending notifications after processing
       await _notificationService.clearPendingNotifications();
+      _hasProcessedPendingNotifications = true;
       debugPrint('✅ Processed all pending notifications and cleared queue');
-      
     } catch (e) {
       debugPrint('❌ Error processing pending notifications: $e');
     }

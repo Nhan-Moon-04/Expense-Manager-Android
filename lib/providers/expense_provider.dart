@@ -41,6 +41,17 @@ class ExpenseProvider with ChangeNotifier {
         .fold(0, (sum, e) => sum + e.amount);
   }
 
+  /// Total balance of all time (all income - all expense)
+  double get totalBalance {
+    final totalIncome = _expenses
+        .where((e) => e.type == ExpenseType.income)
+        .fold(0.0, (sum, e) => sum + e.amount);
+    final totalExpense = _expenses
+        .where((e) => e.type == ExpenseType.expense)
+        .fold(0.0, (sum, e) => sum + e.amount);
+    return totalIncome - totalExpense;
+  }
+
   /// Net balance of this month (income - expense)
   double get monthNet => monthIncome - monthTotal;
 
