@@ -626,7 +626,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 gradientColors: AppColors.expenseGradient,
                 iconBgColor: AppColors.error.withValues(alpha: 0.15),
                 iconColor: AppColors.error,
-                isVisible: _isBalanceVisible,
+                isVisible: false, // Luôn ẩn số tiền chi tiêu
               ),
             ),
           ],
@@ -700,10 +700,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               layoutBuilder: (currentChild, previousChildren) {
                 return Stack(
                   alignment: Alignment.centerLeft,
-                  children: [
-                    ...previousChildren,
-                    if (currentChild != null) currentChild,
-                  ],
+                  children: [...previousChildren, ?currentChild],
                 );
               },
               child: isVisible

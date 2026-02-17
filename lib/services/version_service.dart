@@ -1,4 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 
 class VersionInfo {
@@ -46,7 +47,10 @@ class VersionCheckResult {
 }
 
 class VersionService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // URL tới file version.json trên Armbian server
+  static const String versionUrl =
+      'http://nthiennhan.ddns.net:90/app/version.json';
+  static const String apkBaseUrl = 'http://nthiennhan.ddns.net:90/app/';
 
   /// So sánh 2 version string (vd: "1.2.3" vs "1.3.0")
   /// Trả về: -1 nếu v1 < v2, 0 nếu bằng, 1 nếu v1 > v2
@@ -69,29 +73,42 @@ class VersionService {
     return 0;
   }
 
-  /// Kiểm tra phiên bản từ Firestore
-  /// Document path: app_config/version
+  /// Kiểm tra phiên bản từ Armbian server
+  /// Fetch từ: http://nthiennhan.ddns.net:90/app/version.json
   Future<VersionCheckResult> checkForUpdate() async {
     try {
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version; // vd: "1.0.0"
 
-      final doc = await _firestore
-          .collection('app_config')
-          .doc('version')
-          .get();
+      print('🔍 Checking for updates...');
+      print('📱 Current version: $currentVersion');
+      print('🌐 Fetching from: $versionUrl');
 
-      if (!doc.exists || doc.data() == null) {
+      // Fetch version info từ Armbian server
+      final response = await http
+          .get(Uri.parse(versionUrl))
+          .timeout(const Duration(seconds: 10));
+
+      print('📡 Response status: ${response.statusCode}');
+
+      if (response.statusCode != 200) {
+        print('❌ Server returned ${response.statusCode}');
         return VersionCheckResult(
           status: UpdateStatus.upToDate,
           currentVersion: currentVersion,
         );
       }
 
-      final versionInfo = VersionInfo.fromMap(doc.data()!);
+      print('📄 Response body: ${response.body}');
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final versionInfo = VersionInfo.fromMap(data);
+
+      print('🆕 Latest version: ${versionInfo.latestVersion}');
+      print('⚙️  Min version: ${versionInfo.minVersion}');
 
       // Nếu version hiện tại < minVersion → bắt buộc cập nhật
       if (_compareVersions(currentVersion, versionInfo.minVersion) < 0) {
+        print('⚠️  Force update required (current < min)');
         return VersionCheckResult(
           status: UpdateStatus.forceUpdate,
           versionInfo: versionInfo,
@@ -101,6 +118,9 @@ class VersionService {
 
       // Nếu version hiện tại < latestVersion → có bản mới (tùy chọn hoặc force)
       if (_compareVersions(currentVersion, versionInfo.latestVersion) < 0) {
+        print(
+          '✨ Update available: $currentVersion → ${versionInfo.latestVersion}',
+        );
         return VersionCheckResult(
           status: versionInfo.forceUpdate
               ? UpdateStatus.forceUpdate
@@ -111,13 +131,16 @@ class VersionService {
       }
 
       // Đã mới nhất
+      print('✅ Already up to date');
       return VersionCheckResult(
         status: UpdateStatus.upToDate,
         versionInfo: versionInfo,
         currentVersion: currentVersion,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
       // Nếu lỗi (offline, etc.) → bỏ qua, cho dùng app bình thường
+      print('❌ Error checking for updates: $e');
+      print('Stack trace: $stackTrace');
       return VersionCheckResult(
         status: UpdateStatus.upToDate,
         currentVersion: '?.?.?',

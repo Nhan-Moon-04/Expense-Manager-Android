@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../constants/app_colors.dart';
 import '../../services/version_service.dart';
+import '../../services/apk_installer_service.dart';
 
-class UpdateDialog extends StatelessWidget {
+class UpdateDialog extends StatefulWidget {
   final VersionCheckResult result;
 
   const UpdateDialog({super.key, required this.result});
+
+  @override
+  State<UpdateDialog> createState() => _UpdateDialogState();
 
   /// Gọi method này để kiểm tra và hiện dialog nếu cần
   static Future<void> checkAndShow(BuildContext context) async {
@@ -27,11 +30,17 @@ class UpdateDialog extends StatelessWidget {
       );
     }
   }
+}
+
+class _UpdateDialogState extends State<UpdateDialog> {
+  final ApkInstallerService _installer = ApkInstallerService();
+  bool _isDownloading = false;
+  double _downloadProgress = 0.0;
 
   @override
   Widget build(BuildContext context) {
-    final info = result.versionInfo!;
-    final isForce = result.status == UpdateStatus.forceUpdate;
+    final info = widget.result.versionInfo!;
+    final isForce = widget.result.status == UpdateStatus.forceUpdate;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -86,7 +95,7 @@ class UpdateDialog extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'v${result.currentVersion} → v${info.latestVersion}',
+                'v${widget.result.currentVersion} → v${info.latestVersion}',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -179,7 +188,9 @@ class UpdateDialog extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => _openDownloadUrl(info.downloadUrl),
+                onPressed: _isDownloading
+                    ? null
+                    : () => _downloadAndInstall(info.downloadUrl),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -188,21 +199,47 @@ class UpdateDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                   ),
                   elevation: 0,
+                  disabledBackgroundColor: AppColors.primary.withValues(
+                    alpha: 0.6,
+                  ),
                 ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.download_rounded, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      'Cập nhật ngay',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                child: _isDownloading
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                              value: _downloadProgress,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Đang tải... ${(_downloadProgress * 100).toStringAsFixed(0)}%',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      )
+                    : const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.download_rounded, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Cập nhật ngay',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
             ),
 
@@ -223,11 +260,38 @@ class UpdateDialog extends StatelessWidget {
     );
   }
 
-  Future<void> _openDownloadUrl(String url) async {
+  Future<void> _downloadAndInstall(String url) async {
     if (url.isEmpty) return;
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    setState(() {
+      _isDownloading = true;
+      _downloadProgress = 0.0;
+    });
+
+    final success = await _installer.downloadAndInstallApk(
+      url,
+      onProgress: (progress) {
+        if (mounted) {
+          setState(() {
+            _downloadProgress = progress;
+          });
+        }
+      },
+    );
+
+    if (mounted) {
+      setState(() {
+        _isDownloading = false;
+      });
+
+      if (!success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Không thể tải hoặc cài đặt bản cập nhật'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 }

@@ -1841,13 +1841,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
     if (result.status == UpdateStatus.upToDate) {
+      // Debug: Hiển thị thêm thông tin version
+      final currentVer = result.currentVersion;
+      final latestVer = result.versionInfo?.latestVersion ?? 'N/A';
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Row(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 12),
-              Expanded(child: Text('Bạn đang dùng phiên bản mới nhất!')),
+              const Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 12),
+                  Expanded(child: Text('Bạn đang dùng phiên bản mới nhất!')),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Hiện tại: $currentVer | Server: $latestVer',
+                style: const TextStyle(fontSize: 11, color: Colors.white70),
+              ),
             ],
           ),
           backgroundColor: AppColors.success,
@@ -1856,6 +1871,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 4),
         ),
       );
     } else {
