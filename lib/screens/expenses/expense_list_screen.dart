@@ -25,6 +25,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
   String _filterType = 'all';
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  bool _isBalanceVisible = false;
 
   @override
   void initState() {
@@ -319,6 +320,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -348,16 +350,68 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                           ],
                         ),
                       ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isBalanceVisible = !_isBalanceVisible;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            _isBalanceVisible
+                                ? Icons.visibility_rounded
+                                : Icons.visibility_off_rounded,
+                            color: Colors.white.withValues(alpha: 0.9),
+                            size: 20,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    currencyFormat.format(balance),
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: -1,
+                  SizedBox(
+                    height: 38,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeOut,
+                      switchOutCurve: Curves.easeIn,
+                      layoutBuilder: (currentChild, previousChildren) {
+                        return Stack(
+                          alignment: Alignment.centerLeft,
+                          children: [
+                            ...previousChildren,
+                            if (currentChild != null) currentChild,
+                          ],
+                        );
+                      },
+                      child: _isBalanceVisible
+                          ? Text(
+                              currencyFormat.format(balance),
+                              key: const ValueKey('visible'),
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: -1,
+                                height: 1.1,
+                              ),
+                            )
+                          : const Text(
+                              '••••••••',
+                              key: ValueKey('hidden'),
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 4,
+                                height: 1.1,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 4),

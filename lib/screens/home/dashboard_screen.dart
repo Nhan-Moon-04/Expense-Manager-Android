@@ -614,7 +614,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 gradientColors: AppColors.incomeGradient,
                 iconBgColor: AppColors.success.withValues(alpha: 0.15),
                 iconColor: AppColors.success,
-                isVisible: _isBalanceVisible,
+                isVisible: _isBalanceVisible, // Đồng bộ với tổng số dư
               ),
             ),
             const SizedBox(width: 14),
@@ -626,7 +626,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 gradientColors: AppColors.expenseGradient,
                 iconBgColor: AppColors.error.withValues(alpha: 0.15),
                 iconColor: AppColors.error,
-                isVisible: false, // Luôn ẩn số tiền chi tiêu
+                isVisible: _isBalanceVisible, // Đồng bộ với tổng số dư
               ),
             ),
           ],
