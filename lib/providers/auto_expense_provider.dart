@@ -61,8 +61,14 @@ class AutoExpenseProvider with ChangeNotifier {
       '   - ExpenseProvider: ${_expenseProvider != null ? "Ready" : "NULL"}',
     );
 
-    // Process pending notifications first
-    _processPendingNotifications();
+    // Try to process pending notifications if ExpenseProvider is ready
+    if (_expenseProvider != null) {
+      _processPendingNotifications();
+    } else {
+      debugPrint(
+        '⏳ Waiting for ExpenseProvider before processing pending notifications...',
+      );
+    }
 
     // Auto-start listening if enabled
     if (_isEnabled && _subscription == null) {
@@ -74,6 +80,14 @@ class AutoExpenseProvider with ChangeNotifier {
   void setExpenseProvider(ExpenseProvider provider) {
     _expenseProvider = provider;
     debugPrint('✅ ExpenseProvider injected into AutoExpenseProvider');
+
+    // Process pending notifications if userId is ready
+    if (_userId != null && !_hasProcessedPendingNotifications) {
+      debugPrint(
+        '🔄 Both userId and ExpenseProvider ready, processing pending notifications...',
+      );
+      _processPendingNotifications();
+    }
   }
 
   Future<void> checkNotificationAccess() async {
@@ -205,12 +219,16 @@ class AutoExpenseProvider with ChangeNotifier {
   ) async {
     if (_userId == null || _expenseProvider == null) {
       debugPrint(
-        '❌ Cannot create expense: userId=${_userId != null}, expenseProvider=${_expenseProvider != null}',
+        '❌ Cannot create expense: userId=${_userId != null ? "OK" : "NULL"}, expenseProvider=${_expenseProvider != null ? "OK" : "NULL"}',
       );
       return;
     }
 
-    debugPrint('💰 Creating expense from notification...');
+    debugPrint('💰 Creating ${notification.type} from notification...');
+    debugPrint('   Source: ${notification.sourceName}');
+    debugPrint('   Amount: ${notification.amount}');
+    debugPrint('   Date: ${notification.timestamp}');
+
     final expense = ExpenseModel(
       id: '',
       userId: _userId!,
@@ -225,12 +243,14 @@ class AutoExpenseProvider with ChangeNotifier {
     try {
       // Use ExpenseProvider instead of ExpenseService directly
       // This ensures UI updates immediately
+      debugPrint('   📤 Adding to ExpenseProvider...');
       await _expenseProvider!.addExpense(expense);
       debugPrint(
-        '✅ Auto-added ${notification.isExpense ? "expense" : "income"}: ${notification.sourceName} - ${notification.amount}',
+        '✅ Auto-added ${notification.isExpense ? "expense" : "income"}: ${notification.sourceName} - ${notification.amount}đ',
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('❌ Error auto-adding expense: $e');
+      debugPrint('   Stack trace: $stackTrace');
     }
   }
 
@@ -320,9 +340,14 @@ class AutoExpenseProvider with ChangeNotifier {
       return;
     }
 
-    if (_userId == null || _expenseProvider == null) {
+    if (_userId == null) {
+      debugPrint('⚠️ Cannot process pending notifications: userId is NULL');
+      return;
+    }
+
+    if (_expenseProvider == null) {
       debugPrint(
-        '⚠️ Cannot process pending notifications: userId or ExpenseProvider not ready',
+        '⚠️ Cannot process pending notifications: ExpenseProvider is NULL',
       );
       return;
     }
@@ -330,6 +355,8 @@ class AutoExpenseProvider with ChangeNotifier {
     debugPrint(
       '🔍 Checking for pending notifications from when app was killed...',
     );
+    debugPrint('   ✅ userId: $_userId');
+    debugPrint('   ✅ ExpenseProvider: Ready');
 
     try {
       final pendingNotifications = await _notificationService
@@ -345,31 +372,42 @@ class AutoExpenseProvider with ChangeNotifier {
         '📥 Processing ${pendingNotifications.length} pending notifications...',
       );
 
+      int successCount = 0;
+      int skipCount = 0;
+
       for (final notification in pendingNotifications) {
         debugPrint(
-          '   - Processing: ${notification.bankName} ${notification.amount}',
+          '   - Processing: ${notification.bankName} ${notification.amount} ${notification.type}',
         );
 
         // Check if we should process based on type
         if (notification.isExpense && !_autoAddExpense) {
           debugPrint('     ⏭️ Skipped (auto-add expense disabled)');
+          skipCount++;
           continue;
         }
         if (notification.isIncome && !_autoAddIncome) {
           debugPrint('     ⏭️ Skipped (auto-add income disabled)');
+          skipCount++;
           continue;
         }
 
         // Create expense from pending notification
         await _createExpenseFromNotification(notification);
+        successCount++;
+        debugPrint('     ✅ Added successfully');
       }
 
       // Clear pending notifications after processing
       await _notificationService.clearPendingNotifications();
       _hasProcessedPendingNotifications = true;
-      debugPrint('✅ Processed all pending notifications and cleared queue');
+      debugPrint('🎉 Processed all pending notifications:');
+      debugPrint('   ✅ Successfully added: $successCount');
+      debugPrint('   ⏭️ Skipped: $skipCount');
+      debugPrint('   🗑️ Cleared pending queue');
     } catch (e) {
       debugPrint('❌ Error processing pending notifications: $e');
+      debugPrint('   Stack trace: ${StackTrace.current}');
     }
   }
 
