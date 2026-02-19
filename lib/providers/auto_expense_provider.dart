@@ -197,8 +197,11 @@ class AutoExpenseProvider with ChangeNotifier {
       _pendingNotifications.insert(0, notification);
       notifyListeners();
     } else {
-      // Auto-add directly
-      _createExpenseFromNotification(notification);
+      // Auto-add directly (duplicate check is inside _createExpenseFromNotification)
+      _createExpenseFromNotification(notification).then((_) {
+        // Notify after expense is added to update UI
+        notifyListeners();
+      });
     }
   }
 
@@ -229,6 +232,16 @@ class AutoExpenseProvider with ChangeNotifier {
     debugPrint('   Amount: ${notification.amount}');
     debugPrint('   Date: ${notification.timestamp}');
 
+    // Check for duplicates to avoid adding the same transaction multiple times
+    final isDuplicate = await _checkDuplicate(notification);
+    if (isDuplicate) {
+      debugPrint('⚠️ Duplicate transaction detected, skipping...');
+      debugPrint(
+        '   Already exists: ${notification.sourceName} - ${notification.amount}đ',
+      );
+      return;
+    }
+
     final expense = ExpenseModel(
       id: '',
       userId: _userId!,
@@ -244,10 +257,23 @@ class AutoExpenseProvider with ChangeNotifier {
       // Use ExpenseProvider instead of ExpenseService directly
       // This ensures UI updates immediately
       debugPrint('   📤 Adding to ExpenseProvider...');
-      await _expenseProvider!.addExpense(expense);
-      debugPrint(
-        '✅ Auto-added ${notification.isExpense ? "expense" : "income"}: ${notification.sourceName} - ${notification.amount}đ',
-      );
+      final success = await _expenseProvider!.addExpense(expense);
+
+      if (success) {
+        debugPrint(
+          '✅ Auto-added ${notification.isExpense ? "expense" : "income"}: ${notification.sourceName} - ${notification.amount}đ',
+        );
+        // Add to processed list to track successful additions
+        _processedNotifications.insert(0, notification);
+        if (_processedNotifications.length > 50) {
+          _processedNotifications.removeRange(
+            50,
+            _processedNotifications.length,
+          );
+        }
+      } else {
+        debugPrint('❌ Failed to add expense: addExpense returned false');
+      }
     } catch (e, stackTrace) {
       debugPrint('❌ Error auto-adding expense: $e');
       debugPrint('   Stack trace: $stackTrace');
@@ -333,12 +359,86 @@ class AutoExpenseProvider with ChangeNotifier {
     return ExpenseCategory.other;
   }
 
+  /// Check if a similar transaction already exists to prevent duplicates
+  /// Returns true if duplicate found, false otherwise
+  Future<bool> _checkDuplicate(BankNotification notification) async {
+    if (_userId == null || _expenseProvider == null) {
+      return false;
+    }
+
+    try {
+      // Check in recently processed notifications first (faster)
+      for (final processed in _processedNotifications) {
+        if (_isSameNotification(processed, notification)) {
+          debugPrint('   🔍 Found duplicate in processed list');
+          return true;
+        }
+      }
+
+      // Check in database for recent transactions (within last 2 minutes)
+      final now = notification.timestamp;
+      final startTime = now.subtract(const Duration(minutes: 2));
+      final endTime = now.add(const Duration(minutes: 2));
+
+      final recentExpenses = await _expenseProvider!.getExpensesByDateRange(
+        _userId!,
+        startTime,
+        endTime,
+      );
+
+      for (final expense in recentExpenses) {
+        // Check if it's a very similar transaction
+        if (expense.isAutoAdded &&
+            expense.amount == notification.amount &&
+            expense.type ==
+                (notification.isExpense
+                    ? ExpenseType.expense
+                    : ExpenseType.income)) {
+          // Check if timestamps are within 30 seconds
+          final timeDiff = expense.date
+              .difference(notification.timestamp)
+              .abs();
+          if (timeDiff.inSeconds < 30) {
+            debugPrint('   🔍 Found duplicate in database');
+            debugPrint(
+              '      Existing: ${expense.description} at ${expense.date}',
+            );
+            debugPrint(
+              '      New: ${notification.description} at ${notification.timestamp}',
+            );
+            return true;
+          }
+        }
+      }
+
+      return false;
+    } catch (e) {
+      debugPrint('⚠️ Error checking duplicate: $e');
+      // If error checking duplicates, allow the transaction to prevent data loss
+      return false;
+    }
+  }
+
+  /// Check if two notifications are the same
+  bool _isSameNotification(BankNotification n1, BankNotification n2) {
+    // Same if amount, type match and timestamps are within 30 seconds
+    if (n1.amount != n2.amount || n1.type != n2.type) {
+      return false;
+    }
+    final timeDiff = n1.timestamp.difference(n2.timestamp).abs();
+    return timeDiff.inSeconds < 30;
+  }
+
   Future<void> _processPendingNotifications() async {
     // Only process pending notifications once when app starts
     if (_hasProcessedPendingNotifications) {
       debugPrint('⏭️ Pending notifications already processed, skipping');
       return;
     }
+
+    // Set flag IMMEDIATELY to prevent race condition
+    // (setExpenseProvider is called multiple times by different screens)
+    _hasProcessedPendingNotifications = true;
 
     if (_userId == null) {
       debugPrint('⚠️ Cannot process pending notifications: userId is NULL');
@@ -362,9 +462,11 @@ class AutoExpenseProvider with ChangeNotifier {
       final pendingNotifications = await _notificationService
           .getPendingNotifications();
 
+      // Clear pending queue immediately so new notifications won't be mixed in
+      await _notificationService.clearPendingNotifications();
+
       if (pendingNotifications.isEmpty) {
         debugPrint('✅ No pending notifications to process');
-        _hasProcessedPendingNotifications = true;
         return;
       }
 
@@ -374,6 +476,7 @@ class AutoExpenseProvider with ChangeNotifier {
 
       int successCount = 0;
       int skipCount = 0;
+      int duplicateCount = 0;
 
       for (final notification in pendingNotifications) {
         debugPrint(
@@ -392,19 +495,15 @@ class AutoExpenseProvider with ChangeNotifier {
           continue;
         }
 
-        // Create expense from pending notification
+        // Create expense from pending notification (duplicate check is inside)
         await _createExpenseFromNotification(notification);
         successCount++;
-        debugPrint('     ✅ Added successfully');
       }
 
-      // Clear pending notifications after processing
-      await _notificationService.clearPendingNotifications();
-      _hasProcessedPendingNotifications = true;
       debugPrint('🎉 Processed all pending notifications:');
       debugPrint('   ✅ Successfully added: $successCount');
-      debugPrint('   ⏭️ Skipped: $skipCount');
-      debugPrint('   🗑️ Cleared pending queue');
+      debugPrint('   🔍 Duplicates skipped: $duplicateCount');
+      debugPrint('   ⏭️ Other skipped: $skipCount');
     } catch (e) {
       debugPrint('❌ Error processing pending notifications: $e');
       debugPrint('   Stack trace: ${StackTrace.current}');

@@ -440,19 +440,20 @@ class BankNotificationService : NotificationListenerService() {
                     transactionCount++
                     updateForegroundNotification()
                     
-                    // Try to send to Flutter immediately
+                    // Always save to pending queue first to guarantee no data loss
+                    // Flutter side handles duplicate detection
+                    savePendingNotification(this, result)
+                    
+                    // Also try to send to Flutter for real-time processing
                     if (eventSink != null) {
                         try {
                             eventSink?.success(result)
-                            Log.d(TAG, "✅ Sent notification to Flutter app")
+                            Log.d(TAG, "✅ Sent to Flutter + saved to pending")
                         } catch (e: Exception) {
-                            Log.e(TAG, "❌ Error sending to EventSink: ${e.message}")
-                            savePendingNotification(this, result)
+                            Log.e(TAG, "❌ Error sending to EventSink: ${e.message} (saved to pending)")
                         }
                     } else {
-                        // App is not running, save to pending queue
-                        savePendingNotification(this, result)
-                        Log.d(TAG, "💾 App not running, saved notification to queue")
+                        Log.d(TAG, "💾 App not running, saved to pending queue")
                     }
                     return
                 }
