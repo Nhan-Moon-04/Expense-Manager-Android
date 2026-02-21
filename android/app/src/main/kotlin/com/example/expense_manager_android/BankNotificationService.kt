@@ -327,10 +327,11 @@ class BankNotificationService : NotificationListenerService() {
                 val channel = NotificationChannel(
                     NOTIFICATION_CHANNEL_ID,
                     NOTIFICATION_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_LOW
+                    NotificationManager.IMPORTANCE_MIN
                 ).apply {
                     description = "Duy trì dịch vụ lắng nghe thông báo ngân hàng"
                     setShowBadge(false)
+                    lockscreenVisibility = android.app.Notification.VISIBILITY_SECRET
                 }
                 val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.createNotificationChannel(channel)
@@ -349,11 +350,12 @@ class BankNotificationService : NotificationListenerService() {
 
             // Build foreground notification
             val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle("Đang lắng nghe thông báo")
-                .setContentText("Tự động ghi nhận giao dịch từ ngân hàng")
+                .setContentTitle("Quản Lý Chi Tiêu")
+                .setContentText("Đang chạy")
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setVisibility(NotificationCompat.VISIBILITY_SECRET)
                 .setContentIntent(pendingIntent)
                 .build()
 
@@ -380,11 +382,12 @@ class BankNotificationService : NotificationListenerService() {
 
             // Update notification with transaction count
             val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle("Đang lắng nghe thông báo")
+                .setContentTitle("Quản Lý Chi Tiêu")
                 .setContentText("Đã ghi nhận $transactionCount giao dịch")
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setVisibility(NotificationCompat.VISIBILITY_SECRET)
                 .setContentIntent(pendingIntent)
                 .build()
 
