@@ -12,6 +12,7 @@ import '../../models/expense_model.dart';
 import '../expenses/add_expense_screen.dart';
 import '../expenses/expense_list_screen.dart';
 import '../reminders/reminders_screen.dart';
+import '../reminders/add_reminder_screen.dart';
 import '../notifications/notifications_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -908,88 +909,99 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
             const SizedBox(height: 14),
             ...reminders.map(
-              (reminder) => Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+              (reminder) => GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          AddReminderScreen(reminder: reminder),
                     ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            AppColors.warning.withValues(alpha: 0.2),
-                            AppColors.accent.withValues(alpha: 0.1),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(14),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                      child: Icon(
-                        Icons.alarm_rounded,
-                        color: AppColors.warning,
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            reminder.title,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.access_time_rounded,
-                                size: 14,
-                                color: AppColors.textHint,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                DateFormat(
-                                  'HH:mm - dd/MM',
-                                ).format(reminder.reminderTime),
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              AppColors.warning.withValues(alpha: 0.2),
+                              AppColors.accent.withValues(alpha: 0.1),
                             ],
                           ),
-                        ],
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          Icons.alarm_rounded,
+                          color: AppColors.warning,
+                          size: 22,
+                        ),
                       ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(10),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              reminder.title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time_rounded,
+                                  size: 14,
+                                  color: AppColors.textHint,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  DateFormat(
+                                    'HH:mm - dd/MM',
+                                  ).format(reminder.reminderTime),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      child: Icon(
-                        Icons.chevron_right_rounded,
-                        color: AppColors.textSecondary,
-                        size: 20,
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.chevron_right_rounded,
+                          color: AppColors.textSecondary,
+                          size: 20,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/expense_provider.dart';
 import '../../providers/settings_provider.dart';
 import 'about_screen.dart';
-import 'edit_profile_screen.dart';
 import 'help_screen.dart';
 import 'settings_screen.dart';
 
@@ -25,8 +25,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Consumer<AuthProvider>(
-        builder: (context, authProvider, child) {
+      body: Consumer2<AuthProvider, ExpenseProvider>(
+        builder: (context, authProvider, expenseProvider, child) {
           final user = authProvider.user;
 
           return CustomScrollView(
@@ -153,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: Text(
                                       _isBalanceVisible
                                           ? currencyFormat.format(
-                                              user?.totalBalance ?? 0,
+                                              expenseProvider.totalBalance,
                                             )
                                           : '••••••••',
                                       key: ValueKey(_isBalanceVisible),
@@ -187,31 +187,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 24),
 
                       // Menu items
-                      _buildMenuSection(
-                        title: 'Tài Khoản',
-                        items: [
-                          _buildMenuItem(
-                            icon: Icons.person_outline,
-                            title: AppStrings.editProfile,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const EditProfileScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          _buildMenuItem(
-                            icon: Icons.lock_outline,
-                            title: AppStrings.changePassword,
-                            onTap: () => _showChangePasswordDialog(context),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
                       _buildMenuSection(
                         title: 'Cài Đặt',
                         items: [
@@ -343,114 +318,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       trailing:
           trailing ?? Icon(Icons.chevron_right, color: AppColors.textSecondary),
       onTap: onTap,
-    );
-  }
-
-  void _showChangePasswordDialog(BuildContext context) {
-    final currentPasswordController = TextEditingController();
-    final newPasswordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppStrings.changePassword),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: currentPasswordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Mật khẩu hiện tại',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: newPasswordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Mật khẩu mới',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: confirmPasswordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: AppStrings.confirmPassword,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppStrings.cancel),
-          ),
-          Consumer<AuthProvider>(
-            builder: (context, authProvider, child) {
-              return ElevatedButton(
-                onPressed: authProvider.isLoading
-                    ? null
-                    : () async {
-                        if (newPasswordController.text !=
-                            confirmPasswordController.text) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(AppStrings.passwordNotMatch),
-                              backgroundColor: AppColors.error,
-                            ),
-                          );
-                          return;
-                        }
-
-                        bool success = await authProvider.changePassword(
-                          currentPasswordController.text,
-                          newPasswordController.text,
-                        );
-
-                        if (context.mounted) {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                success
-                                    ? 'Đổi mật khẩu thành công'
-                                    : authProvider.error ?? 'Đã có lỗi xảy ra',
-                              ),
-                              backgroundColor: success
-                                  ? AppColors.success
-                                  : AppColors.error,
-                            ),
-                          );
-                        }
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                ),
-                child: authProvider.isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(AppStrings.confirm),
-              );
-            },
-          ),
-        ],
-      ),
     );
   }
 

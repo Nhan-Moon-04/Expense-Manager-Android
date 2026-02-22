@@ -205,37 +205,7 @@ class _RemindersScreenState extends State<RemindersScreen>
             ),
             child: Row(
               children: [
-                // Checkbox
-                GestureDetector(
-                  onTap: () {
-                    if (!reminder.isCompleted) {
-                      Provider.of<ReminderProvider>(
-                        context,
-                        listen: false,
-                      ).markAsCompleted(reminder.id);
-                    }
-                  },
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: reminder.isCompleted
-                            ? AppColors.success
-                            : AppColors.textHint,
-                        width: 2,
-                      ),
-                      color: reminder.isCompleted
-                          ? AppColors.success
-                          : Colors.transparent,
-                    ),
-                    child: reminder.isCompleted
-                        ? const Icon(Icons.check, size: 16, color: Colors.white)
-                        : null,
-                  ),
-                ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 4),
 
                 // Content
                 Expanded(

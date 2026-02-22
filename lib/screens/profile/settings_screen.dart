@@ -974,7 +974,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _testNotification() async {
     try {
       await PushNotificationService().showReminderNotification(
-        id: DateTime.now().millisecondsSinceEpoch,
+        id: DateTime.now().millisecondsSinceEpoch % 100000,
         title: '🔔 Test thông báo',
         body: 'Nếu bạn thấy thông báo này, push notification đang hoạt động!',
         payload: 'test',
@@ -1035,15 +1035,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _buildSettingsCard([
           _buildListTile(
             icon: Icons.cloud_upload_rounded,
-            title: 'Sao lưu dữ liệu',
-            subtitle: 'Sao lưu lên đám mây',
+            title: 'Sao lưu toàn bộ',
+            subtitle: 'Sao lưu giao dịch, ghi chú, nhắc nhở, nhóm',
             onTap: _isBackingUp ? () {} : _performBackup,
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _buildListTile(
             icon: Icons.cloud_download_rounded,
-            title: 'Khôi phục dữ liệu',
-            subtitle: 'Khôi phục từ bản sao lưu',
+            title: 'Khôi phục toàn bộ',
+            subtitle: 'Khôi phục tất cả dữ liệu từ bản sao lưu',
             onTap: _isRestoring ? () {} : _showRestoreDialog,
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
@@ -1072,7 +1072,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildListTile(
             icon: Icons.delete_forever_rounded,
             title: 'Xóa tất cả dữ liệu',
-            subtitle: 'Xóa vĩnh viễn tất cả dữ liệu',
+            subtitle: 'Xóa giao dịch, ghi chú, nhắc nhở, nhóm (giữ tài khoản)',
             iconColor: AppColors.error,
             titleColor: AppColors.error,
             onTap: _isDeletingAll ? () {} : _showDeleteDataDialog,
@@ -1407,14 +1407,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _isBackingUp = true);
     try {
       await _backupService.backupToCloud(user.uid);
+      // Get backup info to show counts
+      final info = await _backupService.getBackupInfo(user.uid);
       if (mounted) {
+        final msg = info != null
+            ? 'Đã sao lưu: ${info['expenseCount']} giao dịch, '
+                  '${info['noteCount']} ghi chú, '
+                  '${info['reminderCount']} nhắc nhở, '
+                  '${info['groupCount']} nhóm'
+            : 'Đã sao lưu dữ liệu thành công';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 12),
-                Expanded(child: Text('Đã sao lưu dữ liệu thành công')),
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text(msg)),
               ],
             ),
             backgroundColor: AppColors.success,
@@ -1438,58 +1446,136 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final user = authProvider.user;
     if (user == null) return;
 
+    // Show loading first, then fetch backup info
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.restore_rounded,
-                color: AppColors.warning,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text(
-              'Khôi phục dữ liệu',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ],
-        ),
-        content: const Text(
-          'Dữ liệu hiện tại sẽ được gộp với bản sao lưu. Bạn có muốn tiếp tục?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.textSecondary,
-            ),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              _performRestore();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
+      barrierDismissible: false,
+      builder: (ctx) => const Center(child: CircularProgressIndicator()),
+    );
+
+    _backupService
+        .getBackupInfo(user.uid)
+        .then((info) {
+          if (!mounted) return;
+          Navigator.pop(context); // close loading
+
+          if (info == null) {
+            _showErrorSnackBar('Không tìm thấy bản sao lưu');
+            return;
+          }
+
+          final backupAt = info['backupAt'] as DateTime?;
+          final timeStr = backupAt != null
+              ? '${backupAt.day}/${backupAt.month}/${backupAt.year} ${backupAt.hour}:${backupAt.minute.toString().padLeft(2, '0')}'
+              : 'Không rõ';
+
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(20),
               ),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.warning.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.restore_rounded,
+                      color: AppColors.warning,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'Khôi phục dữ liệu',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Bản sao lưu lúc: $timeStr',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildRestoreInfoRow(
+                    Icons.receipt_long_rounded,
+                    '${info['expenseCount']} giao dịch',
+                  ),
+                  _buildRestoreInfoRow(
+                    Icons.note_rounded,
+                    '${info['noteCount']} ghi chú',
+                  ),
+                  _buildRestoreInfoRow(
+                    Icons.alarm_rounded,
+                    '${info['reminderCount']} nhắc nhở',
+                  ),
+                  _buildRestoreInfoRow(
+                    Icons.group_rounded,
+                    '${info['groupCount']} nhóm',
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Dữ liệu hiện tại sẽ được gộp với bản sao lưu. Bạn có muốn tiếp tục?',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.textSecondary,
+                  ),
+                  child: const Text('Hủy'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _performRestore();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text('Khôi phục'),
+                ),
+              ],
             ),
-            child: const Text('Khôi phục'),
-          ),
+          );
+        })
+        .catchError((e) {
+          if (!mounted) return;
+          Navigator.pop(context);
+          _showErrorSnackBar('Lỗi kiểm tra bản sao lưu: $e');
+        });
+  }
+
+  Widget _buildRestoreInfoRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: AppColors.primary),
+          const SizedBox(width: 10),
+          Text(text, style: const TextStyle(fontSize: 14)),
         ],
       ),
     );
@@ -1503,6 +1589,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _isRestoring = true);
     try {
       final result = await _backupService.restoreFromCloud(user.uid);
+
+      // Reload expense data (stream-based providers auto-update)
+      if (mounted) {
+        await Provider.of<ExpenseProvider>(
+          context,
+          listen: false,
+        ).loadMonthExpenses(user.uid);
+        await authProvider.refreshUser();
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1512,9 +1608,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Đã khôi phục ${result['expenses']} chi tiêu, '
+                    'Đã khôi phục ${result['expenses']} giao dịch, '
                     '${result['notes']} ghi chú, '
-                    '${result['reminders']} nhắc nhở',
+                    '${result['reminders']} nhắc nhở, '
+                    '${result['groups']} nhóm',
                   ),
                 ),
               ],
@@ -1636,10 +1733,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ],
         ),
-        content: const Text(
-          'Hệ thống sẽ tự động sao lưu dữ liệu ra file trước khi xóa.\n\n'
-          'Tất cả chi tiêu, ghi chú, nhắc nhở, thông báo và nhóm sẽ bị xóa vĩnh viễn. '
-          'Tài khoản đăng nhập sẽ được giữ lại. Bạn có chắc chắn?',
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Sẽ xóa vĩnh viễn:',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            _buildDeleteInfoRow(Icons.receipt_long_rounded, 'Tất cả giao dịch'),
+            _buildDeleteInfoRow(Icons.note_rounded, 'Tất cả ghi chú'),
+            _buildDeleteInfoRow(Icons.alarm_rounded, 'Tất cả nhắc nhở'),
+            _buildDeleteInfoRow(
+              Icons.notifications_rounded,
+              'Tất cả thông báo',
+            ),
+            _buildDeleteInfoRow(Icons.group_rounded, 'Tất cả nhóm'),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.success.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Row(
+                children: [
+                  Icon(
+                    Icons.shield_rounded,
+                    color: AppColors.success,
+                    size: 18,
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Tài khoản đăng nhập sẽ được giữ lại',
+                      style: TextStyle(
+                        color: AppColors.success,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Hệ thống sẽ tự động sao lưu ra file trước khi xóa.',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -1662,6 +1809,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             child: const Text('Xóa tất cả'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeleteInfoRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: AppColors.error),
+          const SizedBox(width: 10),
+          Text(
+            text,
+            style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
           ),
         ],
       ),

@@ -82,7 +82,32 @@ class BackupService {
     });
   }
 
-  /// Restore data from cloud backup
+  /// Helper to write docs in batches of 400 (Firestore limit: 500)
+  Future<void> _batchSet(
+    List<dynamic> items,
+    String collection,
+    _Counter counter,
+  ) async {
+    for (var i = 0; i < items.length; i += 400) {
+      final batch = _firestore.batch();
+      final end = (i + 400 < items.length) ? i + 400 : items.length;
+      for (var j = i; j < end; j++) {
+        final map = Map<String, dynamic>.from(items[j] as Map);
+        final docId = map.remove('_docId') as String?;
+        if (docId != null) {
+          batch.set(
+            _firestore.collection(collection).doc(docId),
+            map,
+            SetOptions(merge: true),
+          );
+          counter.value++;
+        }
+      }
+      await batch.commit();
+    }
+  }
+
+  /// Restore all data from cloud backup
   Future<Map<String, int>> restoreFromCloud(String userId) async {
     final backupDoc = await _firestore.collection('backups').doc(userId).get();
 
@@ -91,62 +116,53 @@ class BackupService {
     }
 
     final data = backupDoc.data()!;
-    final batch = _firestore.batch();
-    int restoredExpenses = 0;
-    int restoredNotes = 0;
-    int restoredReminders = 0;
+    final restoredExpenses = _Counter();
+    final restoredNotes = _Counter();
+    final restoredReminders = _Counter();
+    final restoredGroups = _Counter();
 
     // Restore expenses
-    final expenses = (data['expenses'] as List<dynamic>?) ?? [];
-    for (final expense in expenses) {
-      final map = Map<String, dynamic>.from(expense as Map);
-      final docId = map.remove('_docId') as String?;
-      if (docId != null) {
-        batch.set(
-          _firestore.collection('expenses').doc(docId),
-          map,
-          SetOptions(merge: true),
-        );
-        restoredExpenses++;
-      }
-    }
+    await _batchSet(
+      (data['expenses'] as List<dynamic>?) ?? [],
+      'expenses',
+      restoredExpenses,
+    );
 
     // Restore notes
-    final notes = (data['notes'] as List<dynamic>?) ?? [];
-    for (final note in notes) {
-      final map = Map<String, dynamic>.from(note as Map);
-      final docId = map.remove('_docId') as String?;
-      if (docId != null) {
-        batch.set(
-          _firestore.collection('notes').doc(docId),
-          map,
-          SetOptions(merge: true),
-        );
-        restoredNotes++;
-      }
-    }
+    await _batchSet(
+      (data['notes'] as List<dynamic>?) ?? [],
+      'notes',
+      restoredNotes,
+    );
 
     // Restore reminders
-    final reminders = (data['reminders'] as List<dynamic>?) ?? [];
-    for (final reminder in reminders) {
-      final map = Map<String, dynamic>.from(reminder as Map);
-      final docId = map.remove('_docId') as String?;
-      if (docId != null) {
-        batch.set(
-          _firestore.collection('reminders').doc(docId),
-          map,
-          SetOptions(merge: true),
-        );
-        restoredReminders++;
-      }
+    await _batchSet(
+      (data['reminders'] as List<dynamic>?) ?? [],
+      'reminders',
+      restoredReminders,
+    );
+
+    // Restore groups
+    await _batchSet(
+      (data['groups'] as List<dynamic>?) ?? [],
+      'groups',
+      restoredGroups,
+    );
+
+    // Restore user document (merge to keep login info)
+    final userData = data['user'] as Map<String, dynamic>?;
+    if (userData != null) {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .set(userData, SetOptions(merge: true));
     }
 
-    await batch.commit();
-
     return {
-      'expenses': restoredExpenses,
-      'notes': restoredNotes,
-      'reminders': restoredReminders,
+      'expenses': restoredExpenses.value,
+      'notes': restoredNotes.value,
+      'reminders': restoredReminders.value,
+      'groups': restoredGroups.value,
     };
   }
 
@@ -162,6 +178,7 @@ class BackupService {
       'expenseCount': data['expenseCount'] ?? 0,
       'noteCount': data['noteCount'] ?? 0,
       'reminderCount': data['reminderCount'] ?? 0,
+      'groupCount': data['groupCount'] ?? 0,
     };
   }
 
@@ -501,4 +518,8 @@ class BackupService {
         return 'Khác';
     }
   }
+}
+
+class _Counter {
+  int value = 0;
 }
