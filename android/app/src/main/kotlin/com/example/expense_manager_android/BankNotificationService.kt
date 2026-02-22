@@ -34,9 +34,10 @@ class BankNotificationService : NotificationListenerService() {
         private const val PREF_LAST_FETCH = "last_fetch_time"
         
         // Foreground service notification
-        private const val NOTIFICATION_CHANNEL_ID = "bank_listener_service"
+        private const val NOTIFICATION_CHANNEL_ID_PREFIX = "bank_listener_service"
         private const val NOTIFICATION_ID = 1001
         private const val NOTIFICATION_CHANNEL_NAME = "Lắng nghe thông báo ngân hàng"
+        private const val PREF_CHANNEL_VERSION = "notification_channel_version"
         
         private var transactionCount = 0
         
@@ -320,22 +321,47 @@ class BankNotificationService : NotificationListenerService() {
         }
     }
 
+    private fun getActiveChannelId(): String {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            var version = prefs.getInt(PREF_CHANNEL_VERSION, 1)
+            
+            // Clean up legacy channel from older versions (without _v suffix)
+            notificationManager.deleteNotificationChannel("bank_listener_service")
+            
+            var channelId = "${NOTIFICATION_CHANNEL_ID_PREFIX}_v$version"
+            
+            val existingChannel = notificationManager.getNotificationChannel(channelId)
+            if (existingChannel != null && existingChannel.importance == NotificationManager.IMPORTANCE_NONE) {
+                // Channel was disabled by user in system settings → delete and create new version
+                Log.d(TAG, "⚠️ Channel $channelId was disabled by user, creating new channel")
+                notificationManager.deleteNotificationChannel(channelId)
+                version++
+                prefs.edit().putInt(PREF_CHANNEL_VERSION, version).apply()
+                channelId = "${NOTIFICATION_CHANNEL_ID_PREFIX}_v$version"
+            }
+            
+            // Create or ensure channel exists
+            val channel = NotificationChannel(
+                channelId,
+                NOTIFICATION_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_MIN
+            ).apply {
+                description = "Duy trì dịch vụ lắng nghe thông báo ngân hàng"
+                setShowBadge(false)
+                lockscreenVisibility = android.app.Notification.VISIBILITY_SECRET
+            }
+            notificationManager.createNotificationChannel(channel)
+            
+            return channelId
+        }
+        return "${NOTIFICATION_CHANNEL_ID_PREFIX}_v1"
+    }
+
     private fun startForegroundService() {
         try {
-            // Create notification channel for Android O and above
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    NOTIFICATION_CHANNEL_ID,
-                    NOTIFICATION_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_MIN
-                ).apply {
-                    description = "Duy trì dịch vụ lắng nghe thông báo ngân hàng"
-                    setShowBadge(false)
-                    lockscreenVisibility = android.app.Notification.VISIBILITY_SECRET
-                }
-                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.createNotificationChannel(channel)
-            }
+            val channelId = getActiveChannelId()
 
             // Create intent to open app when tapping notification
             val intent = Intent(this, MainActivity::class.java).apply {
@@ -349,7 +375,7 @@ class BankNotificationService : NotificationListenerService() {
             )
 
             // Build foreground notification
-            val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            val notification = NotificationCompat.Builder(this, channelId)
                 .setContentTitle("Quản Lý Chi Tiêu")
                 .setContentText("Đang chạy")
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
@@ -361,7 +387,7 @@ class BankNotificationService : NotificationListenerService() {
 
             // Start foreground
             startForeground(NOTIFICATION_ID, notification)
-            Log.d(TAG, "✅ Started as foreground service")
+            Log.d(TAG, "✅ Started as foreground service with channel: $channelId")
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error starting foreground service: ${e.message}")
         }
@@ -369,6 +395,8 @@ class BankNotificationService : NotificationListenerService() {
 
     private fun updateForegroundNotification() {
         try {
+            val channelId = getActiveChannelId()
+
             // Create intent to open app
             val intent = Intent(this, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -381,7 +409,7 @@ class BankNotificationService : NotificationListenerService() {
             )
 
             // Update notification with transaction count
-            val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            val notification = NotificationCompat.Builder(this, channelId)
                 .setContentTitle("Quản Lý Chi Tiêu")
                 .setContentText("Đã ghi nhận $transactionCount giao dịch")
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
