@@ -145,4 +145,20 @@ class ExpenseModel {
         return 'Khác';
     }
   }
+
+  /// Get the bank source identifier from metadata
+  String? get bankSource => metadata?['bankSource'] as String?;
+
+  /// Get the display name of the bank from metadata
+  String? get bankName => metadata?['bankName'] as String?;
+
+  /// Check if this expense has bank source info
+  bool get hasBankSource =>
+      isAutoAdded && bankSource != null && bankSource!.isNotEmpty;
+
+  /// Get display name: bank name for auto-added, category name otherwise
+  String get displayName {
+    if (hasBankSource) return bankName!;
+    return getCategoryName(category);
+  }
 }

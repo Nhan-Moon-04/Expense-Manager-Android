@@ -23,7 +23,7 @@ class AppStrings {
   static const String expenses = 'Chi Tiêu';
   static const String notes = 'Ghi Chú';
   static const String groups = 'Nhóm';
-  static const String profile = 'Cá Nhân';
+  static const String profile = 'Tôi';
 
   // Expense
   static const String addExpense = 'Thêm Chi Tiêu';

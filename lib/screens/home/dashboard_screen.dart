@@ -1128,27 +1128,66 @@ class _DashboardScreenState extends State<DashboardScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: categoryColor.withValues(alpha: 0.12),
+              color:
+                  (expense.hasBankSource
+                          ? _getBankColor(expense.bankSource!)
+                          : categoryColor)
+                      .withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(
-              _getCategoryIcon(expense.category),
-              color: categoryColor,
-              size: 22,
-            ),
+            child: expense.hasBankSource
+                ? Icon(
+                    _getBankIcon(expense.bankSource!),
+                    color: _getBankColor(expense.bankSource!),
+                    size: 22,
+                  )
+                : Icon(
+                    _getCategoryIcon(expense.category),
+                    color: categoryColor,
+                    size: 22,
+                  ),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  ExpenseModel.getCategoryName(expense.category),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                    color: AppColors.textPrimary,
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        expense.displayName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          color: AppColors.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (expense.isAutoAdded) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'T\u1ef1 \u0111\u1ed9ng',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -1250,6 +1289,43 @@ class _DashboardScreenState extends State<DashboardScreen>
         return Icons.card_giftcard_rounded;
       case ExpenseCategory.other:
         return Icons.more_horiz_rounded;
+    }
+  }
+
+  IconData _getBankIcon(String bankSource) {
+    switch (bankSource.toLowerCase()) {
+      case 'momo':
+        return Icons.account_balance_wallet_rounded;
+      default:
+        return Icons.account_balance_rounded;
+    }
+  }
+
+  Color _getBankColor(String bankSource) {
+    switch (bankSource.toLowerCase()) {
+      case 'momo':
+        return const Color(0xFFAE2070);
+      case 'vcb':
+      case 'vietcombank':
+        return const Color(0xFF1B6E37);
+      case 'mbbank':
+        return const Color(0xFF1E4DB7);
+      case 'techcombank':
+        return const Color(0xFFED1C24);
+      case 'bidv':
+        return const Color(0xFF2E3192);
+      case 'vietinbank':
+        return const Color(0xFF1D4A94);
+      case 'tpbank':
+        return const Color(0xFF652D86);
+      case 'acb':
+        return const Color(0xFF1A2B6D);
+      case 'sacombank':
+        return const Color(0xFF003087);
+      case 'agribank':
+        return const Color(0xFFE31837);
+      default:
+        return AppColors.primary;
     }
   }
 }

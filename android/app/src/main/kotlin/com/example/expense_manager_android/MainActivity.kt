@@ -39,6 +39,14 @@ class MainActivity : FlutterActivity() {
                     BankNotificationService.clearPendingNotifications(this)
                     result.success(true)
                 }
+                "stopForegroundService" -> {
+                    BankNotificationService.stopForegroundServiceFromFlutter()
+                    result.success(true)
+                }
+                "startForegroundService" -> {
+                    BankNotificationService.startForegroundServiceFromFlutter()
+                    result.success(true)
+                }
                 else -> {
                     result.notImplemented()
                 }

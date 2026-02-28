@@ -65,10 +65,33 @@ class ExpenseDetailScreen extends StatelessWidget {
               child: Column(
                 children: [
                   Icon(
-                    _getCategoryIcon(expense.category),
+                    expense.hasBankSource
+                        ? Icons.account_balance_rounded
+                        : _getCategoryIcon(expense.category),
                     color: Colors.white,
                     size: 48,
                   ),
+                  if (expense.hasBankSource) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        expense.bankName!,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withValues(alpha: 0.95),
+                        ),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   Text(
                     '${isExpense ? "-" : "+"}${currencyFormat.format(expense.amount)}',
@@ -99,8 +122,14 @@ class ExpenseDetailScreen extends StatelessWidget {
                     _buildDetailItem(
                       icon: Icons.category,
                       label: 'Danh mục',
-                      value: ExpenseModel.getCategoryName(expense.category),
+                      value: expense.displayName,
                     ),
+                    if (expense.hasBankSource)
+                      _buildDetailItem(
+                        icon: Icons.account_balance_rounded,
+                        label: 'Nguồn',
+                        value: 'Tự động từ ${expense.bankName}',
+                      ),
                     _buildDetailItem(
                       icon: Icons.calendar_today,
                       label: 'Ngày',
@@ -203,17 +232,17 @@ class ExpenseDetailScreen extends StatelessWidget {
   void _showDeleteDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Xóa giao dịch'),
         content: const Text('Bạn có chắc muốn xóa giao dịch này?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Hủy'),
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(dialogContext); // Close dialog
 
               final expenseProvider = Provider.of<ExpenseProvider>(
                 context,
@@ -234,7 +263,7 @@ class ExpenseDetailScreen extends StatelessWidget {
                 await authProvider.updateBalance(balanceChange);
 
                 if (context.mounted) {
-                  Navigator.pop(context); // Go back
+                  Navigator.pop(context); // Go back to list screen
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Text('Đã xóa giao dịch'),

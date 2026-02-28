@@ -195,6 +195,26 @@ class NotificationListenerService {
     }
   }
 
+  /// Stop the native foreground service notification
+  Future<void> stopForegroundService() async {
+    try {
+      await _methodChannel.invokeMethod('stopForegroundService');
+      debugPrint('✅ Native foreground service stopped');
+    } on PlatformException catch (e) {
+      debugPrint('Error stopping foreground service: ${e.message}');
+    }
+  }
+
+  /// Start the native foreground service notification
+  Future<void> startForegroundService() async {
+    try {
+      await _methodChannel.invokeMethod('startForegroundService');
+      debugPrint('✅ Native foreground service started');
+    } on PlatformException catch (e) {
+      debugPrint('Error starting foreground service: ${e.message}');
+    }
+  }
+
   /// Start listening for notifications
   void startListening() {
     debugPrint('🎧 Starting EventChannel stream...');

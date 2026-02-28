@@ -62,6 +62,31 @@ class BankNotificationService : NotificationListenerService() {
             }
         }
 
+        fun stopForegroundServiceFromFlutter() {
+            instance?.let {
+                Log.d(TAG, "🔇 Stopping foreground service from Flutter...")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    it.stopForeground(STOP_FOREGROUND_REMOVE)
+                } else {
+                    @Suppress("DEPRECATION")
+                    it.stopForeground(true)
+                }
+                // Also cancel the notification explicitly
+                val notificationManager = it.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.cancel(NOTIFICATION_ID)
+                transactionCount = 0
+                Log.d(TAG, "✅ Foreground service notification removed")
+            } ?: Log.d(TAG, "⚠️ No active service instance to stop")
+        }
+
+        fun startForegroundServiceFromFlutter() {
+            instance?.let {
+                Log.d(TAG, "🎧 Starting foreground service from Flutter...")
+                it.startForegroundService()
+                Log.d(TAG, "✅ Foreground service notification started")
+            } ?: Log.d(TAG, "⚠️ No active service instance to start")
+        }
+
         fun isNotificationAccessEnabled(context: Context): Boolean {
             val enabledListeners = Settings.Secure.getString(
                 context.contentResolver,

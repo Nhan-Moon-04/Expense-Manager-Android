@@ -142,8 +142,9 @@ class AutoExpenseProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void _startListening() {
+  void _startListening() async {
     debugPrint('🎧 Starting notification listener...');
+    await _notificationService.startForegroundService();
     _notificationService.startListening();
     _subscription = _notificationService.notificationStream.listen(
       _handleNotification,
@@ -151,11 +152,12 @@ class AutoExpenseProvider with ChangeNotifier {
     debugPrint('✅ Notification listener started');
   }
 
-  void _stopListening() {
+  void _stopListening() async {
     debugPrint('🔇 Stopping notification listener...');
     _subscription?.cancel();
     _subscription = null;
     _notificationService.stopListening();
+    await _notificationService.stopForegroundService();
     debugPrint('✅ Notification listener stopped');
   }
 
@@ -251,6 +253,11 @@ class AutoExpenseProvider with ChangeNotifier {
       date: notification.timestamp,
       description: '${notification.sourceName}: ${notification.description}',
       isAutoAdded: true,
+      metadata: {
+        'bankSource': notification.source,
+        'bankName': notification.sourceName,
+        'ruleName': notification.ruleName,
+      },
     );
 
     try {
