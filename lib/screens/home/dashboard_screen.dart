@@ -23,12 +23,17 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   NumberFormat get currencyFormat =>
       context.read<SettingsProvider>().currencyFormat;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   bool _isBalanceVisible = false;
+
+  // FAB expansion
+  late AnimationController _fabAnimationController;
+  late Animation<double> _fabExpandAnimation;
+  bool _isFabExpanded = false;
 
   @override
   void initState() {
@@ -43,6 +48,15 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
     _animationController.forward();
 
+    _fabAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+    _fabExpandAnimation = CurvedAnimation(
+      parent: _fabAnimationController,
+      curve: Curves.easeOut,
+    );
+
     // Delay _loadData to after the build phase to avoid setState during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
@@ -52,6 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _fabAnimationController.dispose();
     super.dispose();
   }
 
@@ -121,36 +136,179 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
           ),
         ),
-        floatingActionButton: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: AppColors.primaryGradient,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
+        floatingActionButton: _buildExpandableFAB(),
+      ),
+    );
+  }
+
+  void _toggleFab() {
+    setState(() {
+      _isFabExpanded = !_isFabExpanded;
+    });
+    if (_isFabExpanded) {
+      _fabAnimationController.forward();
+    } else {
+      _fabAnimationController.reverse();
+    }
+  }
+
+  Widget _buildExpandableFAB() {
+    return SizedBox(
+      width: 160,
+      height: 160,
+      child: Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          // Overlay to close when tapping outside
+          if (_isFabExpanded)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: _toggleFab,
+                behavior: HitTestBehavior.opaque,
               ),
-            ],
-          ),
-          child: FloatingActionButton(
-            heroTag: 'dashboard_fab',
-            onPressed: () {
+            ),
+          // Income button (top-left of FAB)
+          _buildMiniFab(
+            icon: Icons.arrow_downward_rounded,
+            label: 'Thu nhập',
+            color: AppColors.success,
+            offset: const Offset(-70, -70),
+            onTap: () {
+              _toggleFab();
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const AddExpenseScreen(),
+                  builder: (context) => const AddExpenseScreen(isIncome: true),
                 ),
               );
             },
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
           ),
+          // Expense button (directly above FAB)
+          _buildMiniFab(
+            icon: Icons.arrow_upward_rounded,
+            label: 'Chi tiêu',
+            color: AppColors.error,
+            offset: const Offset(0, -95),
+            onTap: () {
+              _toggleFab();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AddExpenseScreen(isIncome: false),
+                ),
+              );
+            },
+          ),
+          // Main FAB button
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: AppColors.primaryGradient,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: FloatingActionButton(
+              heroTag: 'dashboard_fab',
+              onPressed: _toggleFab,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: AnimatedBuilder(
+                animation: _fabExpandAnimation,
+                builder: (context, child) {
+                  return Transform.rotate(
+                    angle: _fabExpandAnimation.value * 0.785, // 45 degrees
+                    child: const Icon(
+                      Icons.add_rounded,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniFab({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required Offset offset,
+    required VoidCallback onTap,
+  }) {
+    return AnimatedBuilder(
+      animation: _fabExpandAnimation,
+      builder: (context, child) {
+        final dx = offset.dx * _fabExpandAnimation.value;
+        final dy = offset.dy * _fabExpandAnimation.value;
+        return Positioned(
+          right: -dx,
+          bottom: -dy,
+          child: Opacity(
+            opacity: _fabExpandAnimation.value,
+            child: Transform.scale(
+              scale: _fabExpandAnimation.value,
+              child: child,
+            ),
+          ),
+        );
+      },
+      child: GestureDetector(
+        onTap: onTap,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

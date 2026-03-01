@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/expense_model.dart';
 import '../services/notification_listener_service.dart';
 import 'expense_provider.dart';
 
-class AutoExpenseProvider with ChangeNotifier {
+class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
   final NotificationListenerService _notificationService =
       NotificationListenerService();
   ExpenseProvider? _expenseProvider;
@@ -15,14 +16,14 @@ class AutoExpenseProvider with ChangeNotifier {
   bool _autoAddExpense = true;
   bool _autoAddIncome = true;
   bool _showConfirmation = false; // Always auto-add without confirmation
-  bool _hasProcessedPendingNotifications =
-      false; // Track if we've already processed pending notifications
 
   final List<BankNotification> _pendingNotifications = [];
   final List<BankNotification> _processedNotifications = [];
 
   StreamSubscription? _subscription;
   String? _userId;
+  Timer? _pendingPollTimer;
+  bool _isProcessingPending = false;
 
   bool get isEnabled => _isEnabled;
   bool get isNotificationAccessGranted => _isNotificationAccessGranted;
@@ -34,6 +35,7 @@ class AutoExpenseProvider with ChangeNotifier {
 
   AutoExpenseProvider() {
     _loadSettings();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   Future<void> _loadSettings() async {
@@ -61,6 +63,12 @@ class AutoExpenseProvider with ChangeNotifier {
       '   - ExpenseProvider: ${_expenseProvider != null ? "Ready" : "NULL"}',
     );
 
+    // Always re-establish the stream listener (old subscription may be dead)
+    if (_isEnabled) {
+      debugPrint('   - Re-establishing notification listener...');
+      _restartListening();
+    }
+
     // Try to process pending notifications if ExpenseProvider is ready
     if (_expenseProvider != null) {
       _processPendingNotifications();
@@ -70,11 +78,8 @@ class AutoExpenseProvider with ChangeNotifier {
       );
     }
 
-    // Auto-start listening if enabled
-    if (_isEnabled && _subscription == null) {
-      debugPrint('   - Starting notification listener...');
-      _startListening();
-    }
+    // Start periodic polling for pending notifications
+    _startPendingPollTimer();
   }
 
   void setExpenseProvider(ExpenseProvider provider) {
@@ -82,11 +87,27 @@ class AutoExpenseProvider with ChangeNotifier {
     debugPrint('✅ ExpenseProvider injected into AutoExpenseProvider');
 
     // Process pending notifications if userId is ready
-    if (_userId != null && !_hasProcessedPendingNotifications) {
+    if (_userId != null) {
       debugPrint(
         '🔄 Both userId and ExpenseProvider ready, processing pending notifications...',
       );
       _processPendingNotifications();
+    }
+  }
+
+  /// Called when app lifecycle changes
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      debugPrint('📱 App resumed - re-establishing notification listener');
+      // Re-establish EventChannel stream (may have died when Activity was destroyed)
+      if (_isEnabled) {
+        _restartListening();
+      }
+      // Process any pending notifications accumulated while app was in background
+      if (_userId != null && _expenseProvider != null) {
+        _processPendingNotifications();
+      }
     }
   }
 
@@ -150,6 +171,26 @@ class AutoExpenseProvider with ChangeNotifier {
       _handleNotification,
     );
     debugPrint('✅ Notification listener started');
+  }
+
+  /// Cancel old subscription and re-create it (fixes dead EventChannel after Activity recreation)
+  void _restartListening() {
+    debugPrint('🔄 Restarting notification listener...');
+    _subscription?.cancel();
+    _subscription = null;
+    _notificationService.stopListening();
+    _startListening();
+  }
+
+  /// Periodically poll pending queue to catch notifications missed by dead EventSink
+  void _startPendingPollTimer() {
+    _pendingPollTimer?.cancel();
+    _pendingPollTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (_userId != null && _expenseProvider != null && _isEnabled) {
+        _processPendingNotifications();
+      }
+    });
+    debugPrint('⏱️ Pending notification poll timer started (every 30s)');
   }
 
   void _stopListening() async {
@@ -437,15 +478,12 @@ class AutoExpenseProvider with ChangeNotifier {
   }
 
   Future<void> _processPendingNotifications() async {
-    // Only process pending notifications once when app starts
-    if (_hasProcessedPendingNotifications) {
-      debugPrint('⏭️ Pending notifications already processed, skipping');
+    // Prevent concurrent processing
+    if (_isProcessingPending) {
+      debugPrint('⏭️ Already processing pending notifications, skipping');
       return;
     }
-
-    // Set flag IMMEDIATELY to prevent race condition
-    // (setExpenseProvider is called multiple times by different screens)
-    _hasProcessedPendingNotifications = true;
+    _isProcessingPending = true;
 
     if (_userId == null) {
       debugPrint('⚠️ Cannot process pending notifications: userId is NULL');
@@ -514,11 +552,15 @@ class AutoExpenseProvider with ChangeNotifier {
     } catch (e) {
       debugPrint('❌ Error processing pending notifications: $e');
       debugPrint('   Stack trace: ${StackTrace.current}');
+    } finally {
+      _isProcessingPending = false;
     }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _pendingPollTimer?.cancel();
     _stopListening();
     _notificationService.dispose();
     super.dispose();
