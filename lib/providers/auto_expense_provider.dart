@@ -16,6 +16,8 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
   bool _autoAddExpense = true;
   bool _autoAddIncome = true;
   bool _showConfirmation = false; // Always auto-add without confirmation
+  bool _pendingEnable =
+      false; // Track if user tried to enable but needs permission first
 
   final List<BankNotification> _pendingNotifications = [];
   final List<BankNotification> _processedNotifications = [];
@@ -44,6 +46,20 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
     _autoAddExpense = prefs.getBool('auto_add_expense') ?? true;
     _autoAddIncome = prefs.getBool('auto_add_income') ?? true;
     _showConfirmation = false; // Always auto-add without confirmation
+
+    // Validate: if enabled but permission was revoked (e.g. after app update), disable
+    if (_isEnabled) {
+      _isNotificationAccessGranted = await _notificationService
+          .isNotificationAccessEnabled();
+      if (!_isNotificationAccessGranted) {
+        debugPrint(
+          '⚠️ Auto expense was enabled but permission is revoked - disabling',
+        );
+        _isEnabled = false;
+        await prefs.setBool('auto_expense_enabled', false);
+      }
+    }
+
     notifyListeners();
   }
 
@@ -99,7 +115,11 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      debugPrint('📱 App resumed - re-establishing notification listener');
+      debugPrint('📱 App resumed - re-checking notification access & listener');
+
+      // Re-check notification access permission (may have changed while away)
+      _recheckPermissionOnResume();
+
       // Re-establish EventChannel stream (may have died when Activity was destroyed)
       if (_isEnabled) {
         _restartListening();
@@ -109,6 +129,41 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
         _processPendingNotifications();
       }
     }
+  }
+
+  /// Re-check permission when returning to app (e.g. after granting in system settings)
+  Future<void> _recheckPermissionOnResume() async {
+    final wasGranted = _isNotificationAccessGranted;
+    _isNotificationAccessGranted = await _notificationService
+        .isNotificationAccessEnabled();
+
+    if (_isNotificationAccessGranted != wasGranted) {
+      debugPrint(
+        '🔑 Notification access changed: $wasGranted → $_isNotificationAccessGranted',
+      );
+    }
+
+    // User just granted permission after trying to enable
+    if (_pendingEnable && _isNotificationAccessGranted) {
+      debugPrint('✅ Permission granted after pending enable - activating now');
+      _pendingEnable = false;
+      _isEnabled = true;
+      _startListening();
+      _startPendingPollTimer();
+      await _saveSettings();
+    }
+
+    // Permission was revoked (e.g. after app update) but toggle still ON → disable
+    if (_isEnabled && !_isNotificationAccessGranted) {
+      debugPrint(
+        '⚠️ Permission revoked but toggle was ON - disabling auto expense',
+      );
+      _isEnabled = false;
+      _stopListening();
+      await _saveSettings();
+    }
+
+    notifyListeners();
   }
 
   Future<void> checkNotificationAccess() async {
@@ -124,12 +179,23 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
   Future<void> setEnabled(bool value) async {
     debugPrint('🔄 Auto expense ${value ? "ENABLED" : "DISABLED"}');
 
-    if (value && !_isNotificationAccessGranted) {
-      debugPrint('⚠️ Requesting notification access permission...');
-      await requestNotificationAccess();
-      return;
+    if (value) {
+      // First check current permission status (fresh check)
+      _isNotificationAccessGranted = await _notificationService
+          .isNotificationAccessEnabled();
+
+      if (!_isNotificationAccessGranted) {
+        debugPrint(
+          '⚠️ No notification access - opening settings, will auto-enable on return',
+        );
+        _pendingEnable = true;
+        notifyListeners();
+        await requestNotificationAccess();
+        return;
+      }
     }
 
+    _pendingEnable = false;
     _isEnabled = value;
     debugPrint('   - userId: ${_userId != null ? "Set" : "NULL"}');
     debugPrint(
@@ -138,8 +204,10 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
 
     if (value) {
       _startListening();
+      _startPendingPollTimer();
     } else {
       _stopListening();
+      _pendingPollTimer?.cancel();
     }
     await _saveSettings();
     notifyListeners();

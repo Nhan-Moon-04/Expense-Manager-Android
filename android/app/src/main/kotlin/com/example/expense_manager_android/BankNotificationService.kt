@@ -314,10 +314,12 @@ class BankNotificationService : NotificationListenerService() {
     }
 
     private val handler = Handler(Looper.getMainLooper())
+    private var isListenerConnected = false
 
     override fun onCreate() {
         super.onCreate()
         instance = this
+        Log.d(TAG, "\uD83D\uDE80 BankNotificationService onCreate")
 
         // Start as foreground service to prevent being killed
         startForegroundService()
@@ -332,9 +334,47 @@ class BankNotificationService : NotificationListenerService() {
         scheduleRefresh()
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "\uD83D\uDD04 onStartCommand called")
+        // START_STICKY tells Android to restart this service if it gets killed
+        return START_STICKY
+    }
+
+    override fun onListenerConnected() {
+        super.onListenerConnected()
+        isListenerConnected = true
+        instance = this
+        Log.d(TAG, "\u2705 NotificationListener CONNECTED - actively listening for bank notifications")
+
+        // Ensure foreground service is running
+        startForegroundService()
+
+        // Ensure rules are loaded
+        if (bankRules.isEmpty()) {
+            val hasCached = loadCachedRules(this)
+            if (!hasCached) {
+                refreshRules(this)
+            }
+        }
+    }
+
+    override fun onListenerDisconnected() {
+        super.onListenerDisconnected()
+        isListenerConnected = false
+        Log.w(TAG, "\u26A0\uFE0F NotificationListener DISCONNECTED - requesting rebind...")
+
+        // Request rebind to reconnect the listener (API 24+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            requestRebind(ComponentName(this, BankNotificationService::class.java))
+            Log.d(TAG, "\uD83D\uDD04 requestRebind() called, waiting for system to reconnect...")
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        Log.w(TAG, "\u274C BankNotificationService onDestroy")
         instance = null
+        isListenerConnected = false
         handler.removeCallbacksAndMessages(null)
         
         // Stop foreground service
@@ -343,6 +383,16 @@ class BankNotificationService : NotificationListenerService() {
         } else {
             @Suppress("DEPRECATION")
             stopForeground(true)
+        }
+
+        // Request rebind even on destroy (API 24+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            try {
+                requestRebind(ComponentName(this, BankNotificationService::class.java))
+                Log.d(TAG, "\uD83D\uDD04 requestRebind() called from onDestroy")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error requesting rebind: ${e.message}")
+            }
         }
     }
 
