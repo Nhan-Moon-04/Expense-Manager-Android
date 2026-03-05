@@ -473,7 +473,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             ),
             child: Text(
               AppStrings.primaryWallet,
-              style: const TextStyle(fontSize: 16, color: AppColors.textPrimary),
+              style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
             ),
           );
         }

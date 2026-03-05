@@ -140,7 +140,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
@@ -305,7 +305,7 @@ class _GroupsScreenState extends State<GroupsScreen>
     required bool isPrimary,
   }) {
     return Material(
-      color: isPrimary ? AppColors.primary : Colors.white,
+      color: isPrimary ? AppColors.primary : AppColors.cardBackground,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -435,7 +435,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         child: Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
@@ -773,8 +773,8 @@ class _GroupsScreenState extends State<GroupsScreen>
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Padding(

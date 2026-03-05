@@ -97,7 +97,7 @@ class _NotesScreenState extends State<NotesScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: AppColors.inputFillColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -328,7 +328,10 @@ class _NotesScreenState extends State<NotesScreen> {
               ),
               ListTile(
                 leading: Icon(Icons.delete, color: AppColors.error),
-                title: Text(AppStrings.delete, style: TextStyle(color: AppColors.error)),
+                title: Text(
+                  AppStrings.delete,
+                  style: TextStyle(color: AppColors.error),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   _showDeleteDialog(note);

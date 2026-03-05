@@ -190,7 +190,10 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   children: [
                     Icon(Icons.exit_to_app_rounded, color: AppColors.error),
                     const SizedBox(width: 12),
-                    Text(AppStrings.leaveGroup, style: TextStyle(color: AppColors.error)),
+                    Text(
+                      AppStrings.leaveGroup,
+                      style: TextStyle(color: AppColors.error),
+                    ),
                   ],
                 ),
               ),
@@ -201,7 +204,10 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   children: [
                     Icon(Icons.delete_forever_rounded, color: AppColors.error),
                     const SizedBox(width: 12),
-                    Text(AppStrings.deleteGroup, style: TextStyle(color: AppColors.error)),
+                    Text(
+                      AppStrings.deleteGroup,
+                      style: TextStyle(color: AppColors.error),
+                    ),
                   ],
                 ),
               ),
@@ -500,7 +506,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
 
   Widget _buildTabBar() {
     return Container(
-      color: Colors.white,
+      color: AppColors.cardBackground,
       child: TabBar(
         controller: _tabController,
         labelColor: AppColors.primary,
@@ -540,7 +546,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -709,7 +715,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -874,7 +880,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -959,7 +965,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -1024,7 +1030,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          isOwner ? AppStrings.groupOwner : AppStrings.adminRole,
+                          isOwner
+                              ? AppStrings.groupOwner
+                              : AppStrings.adminRole,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -1171,7 +1179,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -1319,8 +1327,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           final group = provider.selectedGroup ?? widget.group;
           return Container(
             padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
             child: Column(
@@ -1414,8 +1422,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: Padding(

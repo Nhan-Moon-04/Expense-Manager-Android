@@ -289,7 +289,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.cardBackground,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -305,7 +305,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
@@ -423,7 +423,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   const SizedBox(height: 2),
                   Text(
                     user?.fullName ?? AppStrings.defaultUserName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -443,7 +443,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget _buildNotificationButton() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
@@ -483,7 +483,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                     decoration: BoxDecoration(
                       color: AppColors.error,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 1.5),
+                      border: Border.all(
+                        color: AppColors.cardBackground,
+                        width: 1.5,
+                      ),
                     ),
                   ),
                 ),
@@ -669,7 +672,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         Icons.more_horiz_rounded,
         color: Colors.white.withValues(alpha: 0.7),
       ),
-      color: Colors.white,
+      color: AppColors.cardBackground,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       offset: const Offset(0, 40),
       onSelected: (value) {
@@ -706,7 +709,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                 color: AppColors.textSecondary,
               ),
               const SizedBox(width: 12),
-              Text(_isBalanceVisible ? AppStrings.hideBalance : AppStrings.showBalance),
+              Text(
+                _isBalanceVisible
+                    ? AppStrings.hideBalance
+                    : AppStrings.showBalance,
+              ),
             ],
           ),
         ),
@@ -823,7 +830,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -884,7 +891,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       currencyFormat.format(amount),
                       key: const ValueKey('visible'),
                       textAlign: TextAlign.left,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -897,7 +904,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       '••••••',
                       key: const ValueKey('hidden'),
                       textAlign: TextAlign.left,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -917,7 +924,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       children: [
         Text(
           AppStrings.quickActions,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -1006,7 +1013,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
@@ -1065,7 +1072,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               children: [
                 Text(
                   AppStrings.upcomingReminders,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -1089,7 +1096,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ),
                   child: Text(
                     AppStrings.viewAll,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ],
@@ -1110,7 +1120,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   margin: const EdgeInsets.only(bottom: 10),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.cardBackground,
                     borderRadius: BorderRadius.circular(18),
                     boxShadow: [
                       BoxShadow(
@@ -1146,7 +1156,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           children: [
                             Text(
                               reminder.title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
                                 color: AppColors.textPrimary,
@@ -1208,7 +1218,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           children: [
             Text(
               AppStrings.recentTransactions,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -1220,7 +1230,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 40),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.cardBackground,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -1269,7 +1279,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             else
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.cardBackground,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -1344,7 +1354,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     Flexible(
                       child: Text(
                         expense.displayName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
                           color: AppColors.textPrimary,

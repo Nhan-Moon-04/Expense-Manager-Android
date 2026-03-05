@@ -1,6 +1,11 @@
 ﻿import 'package:flutter/material.dart';
 
 class AppColors {
+  // ─── Dark mode flag (updated by SettingsProvider) ───
+  static bool _isDark = false;
+  static void setDarkMode(bool value) => _isDark = value;
+  static bool get isDark => _isDark;
+
   // Primary Colors - Modern Deep Blue/Purple Gradient
   static const Color primary = Color(0xFF6366F1); // Indigo
   static const Color primaryLight = Color(0xFF818CF8); // Light Indigo
@@ -14,19 +19,39 @@ class AppColors {
   static const Color accent = Color(0xFFF97316);
   static const Color accentLight = Color(0xFFFB923C);
 
-  // Background Colors - Clean modern grey
-  static const Color background = Color(0xFFF8FAFC);
-  static const Color surface = Colors.white;
-  static const Color cardBackground = Colors.white;
-  static const Color scaffoldDark = Color(0xFF0F172A); // Dark mode scaffold
+  // ─── Theme-aware colors (auto-switch light/dark) ───
+
+  // Background Colors
+  static Color get background =>
+      _isDark ? const Color(0xFF0F0F1A) : const Color(0xFFF8FAFC);
+  static Color get surface => _isDark ? const Color(0xFF1E1E2E) : Colors.white;
+  static Color get cardBackground =>
+      _isDark ? const Color(0xFF1E1E2E) : Colors.white;
+  static const Color scaffoldDark = Color(0xFF0F172A); // legacy
 
   // Text Colors
-  static const Color textPrimary = Color(0xFF1E293B); // Slate 800
-  static const Color textSecondary = Color(0xFF64748B); // Slate 500
-  static const Color textHint = Color(0xFF94A3B8); // Slate 400
-  static const Color textLight = Color(0xFFE2E8F0); // Slate 200
+  static Color get textPrimary =>
+      _isDark ? const Color(0xFFE2E8F0) : const Color(0xFF1E293B);
+  static Color get textSecondary =>
+      _isDark ? const Color(0xFFA0AEC0) : const Color(0xFF64748B);
+  static Color get textHint =>
+      _isDark ? const Color(0xFF6B7280) : const Color(0xFF94A3B8);
+  static Color get textLight =>
+      _isDark ? const Color(0xFF4A5568) : const Color(0xFFE2E8F0);
 
-  // Status Colors
+  // Divider / border color
+  static Color get dividerColor =>
+      _isDark ? const Color(0xFF2D2D44) : const Color(0xFFE2E8F0);
+
+  // Input fill color
+  static Color get inputFillColor =>
+      _isDark ? const Color(0xFF2A2A3E) : Colors.white;
+
+  // Bottom nav / bottom sheet background
+  static Color get bottomBarBackground =>
+      _isDark ? const Color(0xFF1E1E2E) : Colors.white;
+
+  // Status Colors (same in both themes)
   static const Color success = Color(0xFF22C55E); // Green 500
   static const Color error = Color(0xFFEF4444); // Red 500
   static const Color warning = Color(0xFFF59E0B); // Amber 500
@@ -63,5 +88,7 @@ class AppColors {
   ];
 
   // Card shadow color
-  static Color shadowColor = const Color(0xFF6366F1).withValues(alpha: 0.08);
+  static Color get shadowColor => _isDark
+      ? const Color(0xFF000000).withValues(alpha: 0.3)
+      : const Color(0xFF6366F1).withValues(alpha: 0.08);
 }

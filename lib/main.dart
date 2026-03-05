@@ -152,7 +152,13 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer<SettingsProvider>(
         builder: (context, settingsProvider, _) {
+          // Sync dark mode flag so AppColors returns correct colors
+          AppColors.setDarkMode(settingsProvider.isDarkMode);
           return MaterialApp(
+            // Force full rebuild when language or theme changes
+            key: ValueKey(
+              '${settingsProvider.language}_${settingsProvider.themeMode}',
+            ),
             title: AppStrings.appName,
             debugShowCheckedModeBanner: false,
             themeMode: settingsProvider.themeMode,
@@ -291,14 +297,14 @@ class MyApp extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              dialogTheme: const DialogThemeData(
-                backgroundColor: Color(0xFF1E1E2E),
-              ),
               bottomSheetTheme: const BottomSheetThemeData(
                 backgroundColor: Color(0xFF1E1E2E),
               ),
               popupMenuTheme: const PopupMenuThemeData(
                 color: Color(0xFF1E1E2E),
+              ),
+              dialogTheme: DialogThemeData(
+                backgroundColor: const Color(0xFF1E1E2E),
               ),
             ),
             home: const AuthWrapper(),

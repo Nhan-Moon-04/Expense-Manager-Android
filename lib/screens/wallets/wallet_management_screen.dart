@@ -92,7 +92,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
@@ -107,8 +107,8 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
             child: InkWell(
               onTap: () => Navigator.pop(context),
               borderRadius: BorderRadius.circular(14),
-              child: const Padding(
-                padding: EdgeInsets.all(12),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
                 child: Icon(
                   Icons.arrow_back_ios_new_rounded,
                   color: AppColors.textPrimary,
@@ -121,7 +121,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
         const SizedBox(width: 16),
         Text(
           AppStrings.walletManagement,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -210,7 +210,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
         color: AppColors.textPrimary,
@@ -226,7 +226,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -281,7 +281,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                           Flexible(
                             child: Text(
                               wallet.name,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
@@ -328,7 +328,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
                             '${wallet.linkedBankIds.length} ${AppStrings.linkedBanks}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
                             ),
@@ -337,7 +337,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                     ],
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.chevron_right_rounded,
                   color: AppColors.textSecondary,
                 ),
@@ -362,7 +362,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
           const SizedBox(height: 16),
           Text(
             AppStrings.noWalletsYet,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
@@ -371,7 +371,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
           const SizedBox(height: 8),
           Text(
             AppStrings.noWalletsSubtitle,
-            style: const TextStyle(fontSize: 14, color: AppColors.textHint),
+            style: TextStyle(fontSize: 14, color: AppColors.textHint),
           ),
         ],
       ),

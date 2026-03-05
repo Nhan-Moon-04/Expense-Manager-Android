@@ -77,7 +77,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -329,7 +329,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -357,7 +357,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: AppColors.inputFillColor,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 16,
@@ -382,7 +382,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 colorScheme: ColorScheme.light(
                   primary: AppColors.primary,
                   onPrimary: Colors.white,
-                  surface: Colors.white,
+                  surface: AppColors.cardBackground,
                   onSurface: AppColors.textPrimary,
                 ),
               ),
@@ -399,7 +399,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -509,8 +509,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
@@ -731,9 +731,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(AppStrings.deleteGroup),
-        content: Text(
-          AppStrings.deleteGroupConfirm,
-        ),
+        content: Text(AppStrings.deleteGroupConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),

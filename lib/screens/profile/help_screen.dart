@@ -157,7 +157,7 @@ class HelpScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
@@ -208,7 +208,7 @@ class HelpScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: Colors.white,
+      color: AppColors.cardBackground,
       borderRadius: BorderRadius.circular(14),
       elevation: 0,
       child: InkWell(

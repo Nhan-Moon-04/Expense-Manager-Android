@@ -121,7 +121,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.cardBackground,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
@@ -131,7 +131,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                     ),
                   ],
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back_ios_new_rounded,
                   color: AppColors.textPrimary,
                   size: 20,
@@ -144,7 +144,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
               children: [
                 Text(
                   AppStrings.notifications,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -154,7 +154,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 const SizedBox(height: 4),
                 Text(
                   unreadCount > 0 ? '$unreadCount ${AppStrings.unreadSuffix}' : AppStrings.allRead,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textSecondary,
                   ),
@@ -165,7 +165,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
@@ -201,8 +201,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(12),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
                 child: Icon(
                   Icons.more_horiz_rounded,
                   color: AppColors.textPrimary,
@@ -372,7 +372,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           const SizedBox(height: 24),
           Text(
             AppStrings.noNotifications,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -382,7 +382,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           Text(
             AppStrings.noNotificationsSubtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
               height: 1.5,
@@ -440,7 +440,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 ),
                 child: Text(
                   key,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textSecondary,
@@ -521,7 +521,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: notification.isRead
-                ? Colors.white
+                ? AppColors.cardBackground
                 : AppColors.primary.withValues(alpha: 0.04),
             borderRadius: BorderRadius.circular(20),
             border: !notification.isRead
@@ -620,7 +620,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                         const SizedBox(width: 4),
                         Text(
                           _formatTime(notification.createdAt),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textHint,
                             fontWeight: FontWeight.w500,
@@ -713,7 +713,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         ),
         content: Text(
           AppStrings.deleteAllNotificationsConfirm,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.textSecondary,
             fontSize: 14,
             height: 1.4,
@@ -730,7 +730,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             ),
             child: Text(
               AppStrings.cancel,
-              style: const TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: AppColors.textSecondary),
             ),
           ),
           ElevatedButton(

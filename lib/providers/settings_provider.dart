@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import '../constants/app_colors.dart';
 import '../l10n/app_localizations.dart';
 
 class SettingsProvider extends ChangeNotifier {
@@ -73,6 +74,7 @@ class SettingsProvider extends ChangeNotifier {
     AppLocalizations.setLanguage(_language);
     final themeStr = prefs.getString(_keyThemeMode) ?? 'light';
     _themeMode = _themeModeFromString(themeStr);
+    AppColors.setDarkMode(_themeMode == ThemeMode.dark);
     _isLoaded = true;
     notifyListeners();
   }
@@ -90,6 +92,7 @@ class SettingsProvider extends ChangeNotifier {
     if (settings.containsKey('themeMode')) {
       _themeMode = _themeModeFromString(settings['themeMode'] as String);
     }
+    AppColors.setDarkMode(_themeMode == ThemeMode.dark);
     _isLoaded = true;
     _persistLocally();
     notifyListeners();
@@ -116,6 +119,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setThemeMode(ThemeMode mode) async {
     if (_themeMode == mode) return;
     _themeMode = mode;
+    AppColors.setDarkMode(mode == ThemeMode.dark);
     await _persistLocally();
     notifyListeners();
   }

@@ -114,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.inputFillColor,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -136,7 +136,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.inputFillColor,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -157,13 +157,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    labelText: '${AppStrings.phone} ${AppStrings.optionalLabel}',
+                    labelText:
+                        '${AppStrings.phone} ${AppStrings.optionalLabel}',
                     prefixIcon: const Icon(Icons.phone_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.inputFillColor,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -191,7 +192,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.inputFillColor,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -228,7 +229,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.inputFillColor,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {

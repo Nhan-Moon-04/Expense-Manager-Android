@@ -174,7 +174,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
@@ -189,8 +189,8 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
             child: InkWell(
               onTap: () => Navigator.pop(context),
               borderRadius: BorderRadius.circular(14),
-              child: const Padding(
-                padding: EdgeInsets.all(12),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
                 child: Icon(
                   Icons.arrow_back_ios_new_rounded,
                   color: AppColors.textPrimary,
@@ -204,7 +204,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
         Expanded(
           child: Text(
             _wallet.name,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -214,10 +214,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
           ),
         ),
         PopupMenuButton<String>(
-          icon: const Icon(
-            Icons.more_vert_rounded,
-            color: AppColors.textPrimary,
-          ),
+          icon: Icon(Icons.more_vert_rounded, color: AppColors.textPrimary),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -233,7 +230,11 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
               value: 'edit',
               child: Row(
                 children: [
-                  const Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
+                  const Icon(
+                    Icons.edit_rounded,
+                    size: 20,
+                    color: AppColors.primary,
+                  ),
                   const SizedBox(width: 8),
                   Text(AppStrings.editWallet),
                 ],
@@ -250,7 +251,10 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                       color: AppColors.error,
                     ),
                     const SizedBox(width: 8),
-                    Text(AppStrings.deleteWallet, style: const TextStyle(color: AppColors.error)),
+                    Text(
+                      AppStrings.deleteWallet,
+                      style: const TextStyle(color: AppColors.error),
+                    ),
                   ],
                 ),
               ),
@@ -389,7 +393,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
           children: [
             Text(
               AppStrings.linkedBanks,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -409,7 +413,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: AppColors.textHint.withValues(alpha: 0.3),
@@ -426,13 +430,13 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                 const SizedBox(height: 8),
                 Text(
                   AppStrings.noBanksAssigned,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Bấm "Thêm" để gán ngân hàng',
                   style: TextStyle(color: AppColors.textHint, fontSize: 12),
                 ),
@@ -445,7 +449,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
@@ -503,7 +507,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
       children: [
         Text(
           AppStrings.recentTransactions,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -515,7 +519,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -528,7 +532,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                 const SizedBox(height: 8),
                 Text(
                   AppStrings.noTransactions,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
@@ -552,7 +556,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -593,8 +597,11 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
-          DateFormat('dd/MM/yyyy', AppLocalizations.currentLanguage).format(expense.date),
-          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+          DateFormat(
+            'dd/MM/yyyy',
+            AppLocalizations.currentLanguage,
+          ).format(expense.date),
+          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
         trailing: Text(
           '${isExpense ? '-' : '+'}${currencyFormat.format(expense.amount)}',
@@ -668,8 +675,8 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
 
             return Container(
               height: MediaQuery.of(context).size.height * 0.7,
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: Column(
@@ -875,9 +882,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(AppStrings.deleteWallet),
-        content: Text(
-          '${AppStrings.confirmDelete} "${_wallet.name}"',
-        ),
+        content: Text('${AppStrings.confirmDelete} "${_wallet.name}"'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

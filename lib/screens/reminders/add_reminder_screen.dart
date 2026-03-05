@@ -197,7 +197,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
               decoration: InputDecoration(
                 hintText: AppStrings.reminderTitleHint,
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: AppColors.inputFillColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -222,7 +222,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.cardBackground,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.textHint),
                       ),
@@ -250,7 +250,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.cardBackground,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.textHint),
                       ),
@@ -287,7 +287,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.textHint),
               ),
@@ -327,7 +327,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                 hintText: AppStrings.relatedAmount,
                 suffixText: '₫',
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: AppColors.inputFillColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -350,7 +350,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
               decoration: InputDecoration(
                 hintText: AppStrings.enterDescription,
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: AppColors.inputFillColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

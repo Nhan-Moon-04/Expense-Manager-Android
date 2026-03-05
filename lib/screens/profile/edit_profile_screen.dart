@@ -101,7 +101,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                        backgroundColor: AppColors.primary.withValues(
+                          alpha: 0.1,
+                        ),
                         child: user?.avatarUrl != null
                             ? ClipOval(
                                 child: Image.network(
@@ -147,7 +149,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   labelText: AppStrings.fullName,
                   prefixIcon: const Icon(Icons.person_outlined),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppColors.inputFillColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -189,7 +191,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   labelText: AppStrings.phone,
                   prefixIcon: const Icon(Icons.phone_outlined),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppColors.inputFillColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

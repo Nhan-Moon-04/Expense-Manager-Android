@@ -188,7 +188,9 @@ class _RemindersScreenState extends State<RemindersScreen>
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDisabled ? Colors.grey.shade100 : Colors.white,
+              color: isDisabled
+                  ? Colors.grey.shade100
+                  : AppColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
               border: isDisabled
                   ? Border.all(color: Colors.grey.shade300)

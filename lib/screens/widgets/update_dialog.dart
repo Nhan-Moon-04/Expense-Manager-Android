@@ -79,7 +79,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
             // Title
             Text(
               isForce ? AppStrings.forceUpdate : AppStrings.newVersionAvailable,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -139,7 +139,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                     const SizedBox(height: 8),
                     Text(
                       info.releaseNotes,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
                         height: 1.5,
@@ -252,7 +252,10 @@ class _UpdateDialogState extends State<UpdateDialog> {
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.textSecondary,
                 ),
-                child: Text(AppStrings.later, style: const TextStyle(fontSize: 14)),
+                child: Text(
+                  AppStrings.later,
+                  style: const TextStyle(fontSize: 14),
+                ),
               ),
             ],
           ],

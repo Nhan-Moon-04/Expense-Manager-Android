@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: AppColors.inputFillColor,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: AppColors.inputFillColor,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -266,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       side: BorderSide(
                         color: AppColors.textSecondary.withValues(alpha: 0.3),
                       ),
-                      backgroundColor: Colors.white,
+                      backgroundColor: AppColors.cardBackground,
                     ),
                     child: _isGoogleLoading
                         ? const SizedBox(
