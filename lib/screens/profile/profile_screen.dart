@@ -5,6 +5,7 @@ import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../statistics/statistics_screen.dart';
 import '../wallets/wallet_management_screen.dart';
 import 'about_screen.dart';
 import 'help_screen.dart';
@@ -200,6 +201,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 MaterialPageRoute(
                                   builder: (context) =>
                                       const WalletManagementScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                          _buildMenuItem(
+                            icon: Icons.analytics_outlined,
+                            title: 'Thống kê',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const StatisticsScreen(),
                                 ),
                               );
                             },

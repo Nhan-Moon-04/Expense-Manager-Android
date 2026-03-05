@@ -21,7 +21,6 @@ import '../../services/push_notification_service.dart';
 import '../../services/backup_service.dart';
 import '../../services/version_service.dart';
 import '../widgets/update_dialog.dart';
-import '../statistics/statistics_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -85,8 +84,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _buildAutoExpenseSection(),
                       const SizedBox(height: 24),
                       _buildNotificationsSection(),
-                      const SizedBox(height: 24),
-                      _buildStatisticsSection(),
                       const SizedBox(height: 24),
                       _buildDisplaySection(),
                       const SizedBox(height: 24),
@@ -1045,31 +1042,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       }
     }
-  }
-
-  Widget _buildStatisticsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader('Thống kê', Icons.analytics_rounded),
-        const SizedBox(height: 12),
-        _buildSettingsCard([
-          _buildListTile(
-            icon: Icons.bar_chart_rounded,
-            title: 'Xem thống kê',
-            subtitle: 'Phân tích thu chi, danh mục, xu hướng',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const StatisticsScreen(),
-                ),
-              );
-            },
-          ),
-        ]),
-      ],
-    );
   }
 
   Widget _buildDisplaySection() {

@@ -401,31 +401,41 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                   ),
                 ),
                 const SizedBox(height: 16),
-                // "All" option
-                _buildWalletPickerOption(
-                  name: 'Tất cả ví',
-                  icon: Icons.all_inclusive_rounded,
-                  isSelected: walletProvider.selectedWalletId == null,
-                  onTap: () {
-                    walletProvider.setSelectedWallet(null);
-                    Navigator.pop(context);
-                  },
-                ),
-                ...walletProvider.wallets.map(
-                  (wallet) => _buildWalletPickerOption(
-                    name: wallet.name,
-                    icon: wallet.isPrimary
-                        ? Icons.account_balance_wallet_rounded
-                        : Icons.wallet_rounded,
-                    isSelected: walletProvider.selectedWalletId == wallet.id,
-                    isPrimary: wallet.isPrimary,
-                    onTap: () {
-                      walletProvider.setSelectedWallet(wallet.id);
-                      Navigator.pop(context);
-                    },
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // "All" option
+                        _buildWalletPickerOption(
+                          name: 'Tất cả ví',
+                          icon: Icons.all_inclusive_rounded,
+                          isSelected: walletProvider.selectedWalletId == null,
+                          onTap: () {
+                            walletProvider.setSelectedWallet(null);
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ...walletProvider.wallets.map(
+                          (wallet) => _buildWalletPickerOption(
+                            name: wallet.name,
+                            icon: wallet.isPrimary
+                                ? Icons.account_balance_wallet_rounded
+                                : Icons.wallet_rounded,
+                            isSelected:
+                                walletProvider.selectedWalletId == wallet.id,
+                            isPrimary: wallet.isPrimary,
+                            onTap: () {
+                              walletProvider.setSelectedWallet(wallet.id);
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
               ],
             ),
           ),
@@ -931,8 +941,8 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
   }
 
   Widget _buildExpenseList() {
-    return Consumer<ExpenseProvider>(
-      builder: (context, expenseProvider, child) {
+    return Consumer2<ExpenseProvider, WalletProvider>(
+      builder: (context, expenseProvider, walletProvider, child) {
         final expenses = _filterExpenses(expenseProvider.expenses);
 
         if (expenses.isEmpty) {
