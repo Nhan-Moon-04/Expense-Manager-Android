@@ -1,22 +1,30 @@
-PS D:\Expense Manager Android\expense_manager_android> flutter run
+PS D:\Expense Manager Android\expense_manager_android> flutter run      
 Launching lib\main.dart on 2201116SG in debug mode...
-Running Gradle task 'assembleDebug'...                             84.2s
+Running Gradle task 'assembleDebug'...                             86.5s
 √ Built build\app\outputs\flutter-apk\app-debug.apk
-Installing build\app\outputs\flutter-apk\app-debug.apk...           6.3s
-D/FlutterJNI(29096): Beginning load of flutter...
-D/FlutterJNI(29096): flutter (null) was loaded normally!
-I/flutter (29096): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(62)] Using the Impeller rendering backend (Vulkan).
-I/flutter (29096): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(62)] Using the Impeller rendering backend (Vulkan).
-I/manager_android(29096): Compiler allocated 4857KB to compile void android.view.ViewRootImpl.performTraversals()
-D/BankNotificationService(29096): Parsed 10 bank rules, 16 ignore patterns
-D/BankNotificationService(29096): Rules fetched and cached successfully. Banks: 10
-I/Choreographer(29096): Skipped 95 frames!  The application may be doing too much work on its main thread.
-W/Looper  (29096): PerfMonitor doFrame : time=1ms vsyncFrame=0 latency=799ms procState=-1 historyMsgCount=1 (msgIndex=1 wall=525ms seq=101 late=116ms h=android.os.Handler c=io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingBackgroundExecutor$$ExternalSyntheticLambda0)    
-I/FLTFireMsgService(29096): FlutterFirebaseMessagingBackgroundService started!
-I/flutter (29096): PushNotificationService initialized with timezone: Asia/Ho_Chi_Minh
-I/flutter (29096): FCM permission status: AuthorizationStatus.authorized
-I/flutter (29096): FCM Token: ft5qr1q3TI6puy9P_MkvKz:APA91bGJNA5InlIM4dNGfAPKwli9IFtWKrmz-IZEBiBNLWnu5zPqKSNG3rdDrKzK9aMZQyZVACO9ElwOxY2PzHWRmmqWa5eSjZek2WZixZ4wY9-SMuSQ1o8
-Syncing files to device 2201116SG...                               109ms
+Installing build\app\outputs\flutter-apk\app-debug.apk...           7.0s
+D/FlutterJNI(16691): Beginning load of flutter...
+D/FlutterJNI(16691): flutter (null) was loaded normally!
+I/flutter (16691): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(62)] Using the Impeller rendering backend (Vulkan).
+I/FLTFireBGExecutor(16691): Creating background FlutterEngine instance, with args: [--enable-dart-profiling]
+I/AdrenoVK-0(16691): QUALCOMM build          : 3e33337ce3, I07ee46fc66
+I/AdrenoVK-0(16691): Build Date              : 10/08/21
+I/AdrenoVK-0(16691): Shader Compiler Version : EV031.35.01.10
+I/AdrenoVK-0(16691): Local Branch            : 
+I/AdrenoVK-0(16691): Remote Branch           : 
+I/AdrenoVK-0(16691): Remote Branch           : 
+I/AdrenoVK-0(16691): Reconstruct Branch      : 
+I/AdrenoVK-0(16691): Build Config            : S P 10.0.7 AArch64
+I/AdrenoVK-0(16691): Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+I/flutter (16691): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(62)] Using the Impeller rendering backend (Vulkan).
+D/FLTFireContextHolder(16691): received application context.
+I/Choreographer(16691): Skipped 65 frames!  The application may be doing too much work on its main thread.
+W/Looper  (16691): PerfMonitor doFrame : time=1ms vsyncFrame=0 latency=544ms procState=-1 historyMsgCount=4
+I/FLTFireMsgService(16691): FlutterFirebaseMessagingBackgroundService started!
+I/flutter (16691): PushNotificationService initialized with timezone: Asia/Ho_Chi_Minh
+I/flutter (16691): FCM permission status: AuthorizationStatus.authorized
+I/flutter (16691): FCM Token: d0PmZS2-TXSPfGRmcq72AK:APA91bGkzB5xfPVcCyC3rA5cjGzlgOALHlUCnkYboRdz91tYOqfGpfxHw_QbJCceMbceDnooWsb4uy4VCLggqBkG71xRjY6OXG_pM_a-mM_VALkyNyql-kY
+Syncing files to device 2201116SG...                               182ms
 
 Flutter run key commands.
 r Hot reload.
@@ -26,191 +34,282 @@ d Detach (terminate "flutter run" but leave application running).
 c Clear the screen
 q Quit (terminate the application on the device).
 
-A Dart VM Service on 2201116SG is available at: http://127.0.0.1:56599/qxIcjTVPCvI=/
+A Dart VM Service on 2201116SG is available at: http://127.0.0.1:49330/-aJVspPOJpA=/
 The Flutter DevTools debugger and profiler on 2201116SG is available at:
-http://127.0.0.1:56599/qxIcjTVPCvI=/devtools/?uri=ws://127.0.0.1:56599/qxIcjTVPCvI=/ws
-I/flutter (29096): Subscribed to topic: all_users
-I/flutter (29096): Subscribed to topic: promotions
-I/flutter (29096): FCM Service initialized
-I/Choreographer(29096): Skipped 120 frames!  The application may be doing too much work on its main thread.
-W/Looper  (29096): PerfMonitor doFrame : time=1ms vsyncFrame=0 latency=1008ms procState=-1
-D/DecorView[](29096): getWindowModeFromSystem  windowmode is 1
-D/DecorView[](29096): updateDecorCaptionStatus windowMode is 1
-D/VRI[MainActivity](29096): vri.reportNextDraw android.view.ViewRootImpl.performTraversals:4013 android.view.ViewRootImpl.doTraversal:2725 android.view.ViewRootImpl$TraversalRunnable.run:9812 android.view.Choreographer$CallbackRecord.run:1505 android.view.Choreographer$CallbackRecord.run:1513
-D/VRI[MainActivity](29096): vri.Setup new sync id=0 syncSeqId=0
-D/manager_android(29096): MiuiProcessManagerServiceStub setSchedFifo
-I/MiuiProcessManagerImpl(29096): setSchedFifo pid:29096, mode:3
-E/libEGL  (29096): pre_cache appList: com.sina.weibo,com.ss.android.article.news,com.taobao.taobao,com.smile.gifmaker,com.ss.android.ugc.aweme,com.tencent.mm,tv.danmaku.bili,,
-E/perf_hint(29096): Session creation failed, mPreferredRateNanos: -1
-D/VRI[MainActivity](29096): vri.reportDrawFinished syncSeqId=0 android.view.ViewRootImpl.lambda$createSyncIfNeeded$4$android-view-ViewRootImpl:4081 android.view.ViewRootImpl$$ExternalSyntheticLambda2.run:6 android.os.Handler.handleCallback:942 android.os.Handler.dispatchMessage:99 android.os.Looper.loopOnce:211
-W/DynamiteModule(29096): Local module descriptor class for com.google.android.gms.providerinstaller.dynamite not found.
-D/DecorView[](29096): onWindowFocusChanged hasWindowFocus true
-I/HandWritingStubImpl(29096): refreshLastKeyboardType: 1
-I/HandWritingStubImpl(29096): getCurrentKeyboardType: 1
-I/DynamiteModule(29096): Considering local module com.google.android.gms.providerinstaller.dynamite:0 and remote module com.google.android.gms.providerinstaller.dynamite:0
-W/ProviderInstaller(29096): Failed to load providerinstaller module: No acceptable module com.google.android.gms.providerinstaller.dynamite found. Local version is 0 and remote version is 0.
-I/HandWritingStubImpl(29096): getCurrentKeyboardType: 1
-D/nativeloader(29096): Configuring clns-5 for other apk /system/framework/org.apache.http.legacy.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~DWD_FV6uM-b4WeBnDS-uDw==/com.google.android.gms-yL6BLWA2Pn8Mv4xCoIb1UQ==/lib/arm64:/data/app/~~DWD_FV6uM-b4WeBnDS-uDw==/com.google.android.gms-yL6BLWA2Pn8Mv4xCoIb1UQ==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
-D/nativeloader(29096): Extending system_exposed_libraries: libmisys_jni.xiaomi.so:libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libQOC.qti.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libQOC.qti.so:libdiag_system.qti.so:libqape.qti.so:liblistenjni.qti.so
-W/manager_android(29096): Loading /data/misc/apexdata/com.android.art/dalvik-cache/arm64/system@framework@com.android.location.provider.jar@classes.odex non-executable as it requires an image which we failed to load
-D/nativeloader(29096): Configuring clns-6 for other apk /system/framework/com.android.location.provider.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~DWD_FV6uM-b4WeBnDS-uDw==/com.google.android.gms-yL6BLWA2Pn8Mv4xCoIb1UQ==/lib/arm64:/data/app/~~DWD_FV6uM-b4WeBnDS-uDw==/com.google.android.gms-yL6BLWA2Pn8Mv4xCoIb1UQ==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
-D/nativeloader(29096): Extending system_exposed_libraries: libmisys_jni.xiaomi.so:libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libQOC.qti.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libQOC.qti.so:libdiag_system.qti.so:libqape.qti.so:liblistenjni.qti.so
-D/nativeloader(29096): Configuring clns-7 for other apk /system/framework/com.android.media.remotedisplay.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~DWD_FV6uM-b4WeBnDS-uDw==/com.google.android.gms-yL6BLWA2Pn8Mv4xCoIb1UQ==/lib/arm64:/data/app/~~DWD_FV6uM-b4WeBnDS-uDw==/com.google.android.gms-yL6BLWA2Pn8Mv4xCoIb1UQ==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
-D/nativeloader(29096): Extending system_exposed_libraries: libmisys_jni.xiaomi.so:libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libQOC.qti.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libQOC.qti.so:libdiag_system.qti.so:libqape.qti.so:liblistenjni.qti.so
-D/nativeloader(29096): Configuring clns-8 for other apk /data/app/~~DWD_FV6uM-b4WeBnDS-uDw==/com.google.android.gms-yL6BLWA2Pn8Mv4xCoIb1UQ==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~DWD_FV6uM-b4WeBnDS-uDw==/com.google.android.gms-yL6BLWA2Pn8Mv4xCoIb1UQ==/lib/arm64:/data/app/~~DWD_FV6uM-b4WeBnDS-uDw==/com.google.android.gms-yL6BLWA2Pn8Mv4xCoIb1UQ==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
-I/manager_android(29096): hiddenapi: Accessing hidden method Ldalvik/system/VMStack;->getStackClass2()Ljava/lang/Class; (runtime_flags=0, domain=core-platform, api=unsupported) from Lgrxz; (domain=app, TargetSdkVersion=36) using reflection: allowed
-E/GoogleApiManager(29096): Failed to get service from broker. 
-E/GoogleApiManager(29096): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
-E/GoogleApiManager(29096):      at android.os.Parcel.createExceptionOrNull(Parcel.java:3011)
-E/GoogleApiManager(29096):      at android.os.Parcel.createException(Parcel.java:2995)
-E/GoogleApiManager(29096):      at android.os.Parcel.readException(Parcel.java:2978)
-E/GoogleApiManager(29096):      at android.os.Parcel.readException(Parcel.java:2920)
-E/GoogleApiManager(29096):      at bepn.a(:com.google.android.gms@260534029@26.05.34 (190400-869443408):36)
-E/GoogleApiManager(29096):      at beno.z(:com.google.android.gms@260534029@26.05.34 (190400-869443408):143)
-E/GoogleApiManager(29096):      at bdts.run(:com.google.android.gms@260534029@26.05.34 (190400-869443408):42)
-E/GoogleApiManager(29096):      at android.os.Handler.handleCallback(Handler.java:942)
-E/GoogleApiManager(29096):      at android.os.Handler.dispatchMessage(Handler.java:99)
-E/GoogleApiManager(29096):      at csbj.ms(:com.google.android.gms@260534029@26.05.34 (190400-869443408):1)
-E/GoogleApiManager(29096):      at csbj.dispatchMessage(:com.google.android.gms@260534029@26.05.34 (190400-869443408):5)
-E/GoogleApiManager(29096):      at android.os.Looper.loopOnce(Looper.java:211)
-E/GoogleApiManager(29096):      at android.os.Looper.loop(Looper.java:300)
-E/GoogleApiManager(29096):      at android.os.HandlerThread.run(HandlerThread.java:67)
-W/GoogleApiManager(29096): Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
-W/FlagRegistrar(29096): Failed to register com.google.android.gms.providerinstaller#com.example.expense_manager_android
-W/FlagRegistrar(29096): fzac: 17: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
-W/FlagRegistrar(29096):         at fzae.a(:com.google.android.gms@260534029@26.05.34 (190400-869443408):13)
-W/FlagRegistrar(29096):         at gxig.d(:com.google.android.gms@260534029@26.05.34 (190400-869443408):3)
-W/FlagRegistrar(29096):         at gxii.run(:com.google.android.gms@260534029@26.05.34 (190400-869443408):130)
-W/FlagRegistrar(29096):         at gxkp.execute(:com.google.android.gms@260534029@26.05.34 (190400-869443408):1)
-W/FlagRegistrar(29096):         at gxiq.f(:com.google.android.gms@260534029@26.05.34 (190400-869443408):1)
-W/FlagRegistrar(29096):         at gxiq.m(:com.google.android.gms@260534029@26.05.34 (190400-869443408):99)
-W/FlagRegistrar(29096):         at gxiq.r(:com.google.android.gms@260534029@26.05.34 (190400-869443408):17)
-W/FlagRegistrar(29096):         at frof.hx(:com.google.android.gms@260534029@26.05.34 (190400-869443408):35)
-W/FlagRegistrar(29096):         at feqb.run(:com.google.android.gms@260534029@26.05.34 (190400-869443408):12)
-W/FlagRegistrar(29096):         at gxkp.execute(:com.google.android.gms@260534029@26.05.34 (190400-869443408):1)
-W/FlagRegistrar(29096):         at feqc.b(:com.google.android.gms@260534029@26.05.34 (190400-869443408):18)
-W/FlagRegistrar(29096):         at feqr.b(:com.google.android.gms@260534029@26.05.34 (190400-869443408):34)
-W/FlagRegistrar(29096):         at feqt.d(:com.google.android.gms@260534029@26.05.34 (190400-869443408):25)
-W/FlagRegistrar(29096):         at bdrb.c(:com.google.android.gms@260534029@26.05.34 (190400-869443408):9)
-W/FlagRegistrar(29096):         at bdtq.q(:com.google.android.gms@260534029@26.05.34 (190400-869443408):48)
-W/FlagRegistrar(29096):         at bdtq.d(:com.google.android.gms@260534029@26.05.34 (190400-869443408):10)
-W/FlagRegistrar(29096):         at bdtq.g(:com.google.android.gms@260534029@26.05.34 (190400-869443408):191)
-W/FlagRegistrar(29096):         at bdtq.onConnectionFailed(:com.google.android.gms@260534029@26.05.34 (190400-869443408):2)
-W/FlagRegistrar(29096):         at bdts.run(:com.google.android.gms@260534029@26.05.34 (190400-869443408):70)
-W/FlagRegistrar(29096):         at android.os.Handler.handleCallback(Handler.java:942)
-W/FlagRegistrar(29096):         at android.os.Handler.dispatchMessage(Handler.java:99)
-W/FlagRegistrar(29096):         at csbj.ms(:com.google.android.gms@260534029@26.05.34 (190400-869443408):1)
-W/FlagRegistrar(29096):         at csbj.dispatchMessage(:com.google.android.gms@260534029@26.05.34 (190400-869443408):5)
-W/FlagRegistrar(29096):         at android.os.Looper.loopOnce(Looper.java:211)
-W/FlagRegistrar(29096):         at android.os.Looper.loop(Looper.java:300)
-W/FlagRegistrar(29096):         at android.os.HandlerThread.run(HandlerThread.java:67)
-W/FlagRegistrar(29096): Caused by: bdpi: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
-W/FlagRegistrar(29096):         at bena.a(:com.google.android.gms@260534029@26.05.34 (190400-869443408):15)
-W/FlagRegistrar(29096):         at bdre.a(:com.google.android.gms@260534029@26.05.34 (190400-869443408):1)
-W/FlagRegistrar(29096):         at bdrb.c(:com.google.android.gms@260534029@26.05.34 (190400-869443408):5)
-W/FlagRegistrar(29096):         ... 12 more
-D/nativeloader(29096): Load /data/app/~~DWD_FV6uM-b4WeBnDS-uDw==/com.google.android.gms-yL6BLWA2Pn8Mv4xCoIb1UQ==/base.apk!/lib/arm64-v8a/libconscrypt_gmscore_jni.so using class loader ns clns-8 (caller=/data/app/~~DWD_FV6uM-b4WeBnDS-uDw==/com.google.android.gms-yL6BLWA2Pn8Mv4xCoIb1UQ==/base.apk): ok
-V/NativeCrypto(29096): Registering com/google/android/gms/org/conscrypt/NativeCrypto's 334 native methods...
-I/manager_android(29096): hiddenapi: Accessing hidden method Ljava/security/spec/ECParameterSpec;->getCurveName()Ljava/lang/String; (runtime_flags=0, domain=core-platform, api=unsupported) from Lcom/google/android/gms/org/conscrypt/Platform; (domain=app, TargetSdkVersion=36) using reflection: allowed
-I/ProviderInstaller(29096): Installed default security provider GmsCore_OpenSSL
-I/manager_android(29096): hiddenapi: Accessing hidden field Ljava/net/Socket;->impl:Ljava/net/SocketImpl; (runtime_flags=0, domain=core-platform, api=unsupported) from Lcom/google/android/gms/org/conscrypt/Platform; (domain=app, TargetSdkVersion=36) using reflection: allowed
-I/manager_android(29096): hiddenapi: Accessing hidden method Ljava/security/spec/ECParameterSpec;->setCurveName(Ljava/lang/String;)V (runtime_flags=0, domain=core-platform, api=unsupported) from Lcom/google/android/gms/org/conscrypt/Platform; (domain=app, TargetSdkVersion=36) using reflection: allowed
-D/ProfileInstaller(29096): Installing profile for com.example.expense_manager_android
-I/flutter (29096): FCM token saved for user: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter (29096): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (29096): ✅ User ID set: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter (29096):    - isEnabled: false
-I/flutter (29096):    - ExpenseProvider: Ready
-I/flutter (29096): 🔍 Checking for pending notifications from when app was killed...
-I/flutter (29096):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter (29096):    ✅ ExpenseProvider: Ready
-I/flutter (29096): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (29096): 🔍 Checking for updates...
-I/flutter (29096): 📱 Current version: 1.0.18
-I/flutter (29096): 🌐 Fetching from: http://nthiennhan.ddns.net:90/app/version.json
-I/flutter (29096): 📡 Response status: 200
-I/flutter (29096): 📄 Response body: {
-I/flutter (29096):     "latestVersion":  "1.0.18",
-I/flutter (29096):     "minVersion":  "1.0.0",
-I/flutter (29096):     "releaseNotes":  "- Sua loi nho\n- Cai thien hieu suat",
-I/flutter (29096):     "downloadUrl":  "http://nthiennhan.ddns.net:90/app/expense_manager_v1.0.18.apk",
-I/flutter (29096):     "releaseDate":  "2026-02-22",
-I/flutter (29096):     "forceUpdate":  false
-I/flutter (29096): }
-I/flutter (29096):
-I/flutter (29096): 🆕 Latest version: 1.0.18
-I/flutter (29096): ⚙️  Min version: 1.0.0
-I/flutter (29096): ✅ Already up to date
-D/BankNotificationService(29096): Cleared pending notifications
-I/flutter (29096): 🗑️ Cleared pending notifications
-I/flutter (29096): ✅ No pending notifications to process
-I/flutter (29096): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (29096): ✅ ExpenseProvider injected into AutoExpenseProvider
-W/MirrorManager(29096): this model don't Support
-W/InputTransport(29096): PerfMonitor: 207ms so far, channel '3061cbc com.example.expense_manager_android/com.example.expense_manager_android.MainActivity (client)' consumer ~ consumed montion event,seq=9668921
-I/flutter (29096): Scheduling repeating notification: id=605386173, title=⏰ Thêm chi tiêu cho ngày hôm nay, time=2026-02-22 20:00:00.000+0700, repeat=DateTimeComponents.time
-I/flutter (29096): Repeating notification scheduled: id=605386173
-I/flutter (29096): Scheduling repeating notification: id=605386173, title=⏰ Thêm chi tiêu cho ngày hôm nay, time=2026-02-22 20:00:00.000+0700, repeat=DateTimeComponents.time
-I/flutter (29096): Repeating notification scheduled: id=605386173
-D/DecorView[](29096): getWindowModeFromSystem  windowmode is 1
-D/DecorView[](29096): updateDecorCaptionStatus windowMode is 1
-I/flutter (29096): ✅ ExpenseProvider injected into AutoExpenseProvider
-W/OnBackInvokedCallback(29096): OnBackInvokedCallback is not enabled for the application.
-W/OnBackInvokedCallback(29096): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
-D/DecorView[](29096): getWindowModeFromSystem  windowmode is 1
-D/DecorView[](29096): updateDecorCaptionStatus windowMode is 1
-I/flutter (29096): 🔄 Auto expense DISABLED
-I/flutter (29096):    - userId: Set
-I/flutter (29096):    - ExpenseProvider: Ready
-I/flutter (29096): 🔇 Stopping notification listener...
-I/flutter (29096): 🔇 Stopping EventChannel stream...
-I/flutter (29096): ✅ EventChannel stream stopped
-I/flutter (29096): ✅ Notification listener stopped
-E/GoogleApiManager(29096): Failed to get service from broker. 
-E/GoogleApiManager(29096): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
-E/GoogleApiManager(29096):      at android.os.Parcel.createExceptionOrNull(Parcel.java:3011)
-E/GoogleApiManager(29096):      at android.os.Parcel.createException(Parcel.java:2995)
-E/GoogleApiManager(29096):      at android.os.Parcel.readException(Parcel.java:2978)
-E/GoogleApiManager(29096):      at android.os.Parcel.readException(Parcel.java:2920)
-E/GoogleApiManager(29096):      at bepn.a(:com.google.android.gms@260534029@26.05.34 (190400-869443408):36)
-E/GoogleApiManager(29096):      at beno.z(:com.google.android.gms@260534029@26.05.34 (190400-869443408):143)
-E/GoogleApiManager(29096):      at bdts.run(:com.google.android.gms@260534029@26.05.34 (190400-869443408):42)
-E/GoogleApiManager(29096):      at android.os.Handler.handleCallback(Handler.java:942)
-E/GoogleApiManager(29096):      at android.os.Handler.dispatchMessage(Handler.java:99)
-E/GoogleApiManager(29096):      at csbj.ms(:com.google.android.gms@260534029@26.05.34 (190400-869443408):1)
-E/GoogleApiManager(29096):      at csbj.dispatchMessage(:com.google.android.gms@260534029@26.05.34 (190400-869443408):5)
-E/GoogleApiManager(29096):      at android.os.Looper.loopOnce(Looper.java:211)
-E/GoogleApiManager(29096):      at android.os.Looper.loop(Looper.java:300)
-E/GoogleApiManager(29096):      at android.os.HandlerThread.run(HandlerThread.java:67)
-W/GoogleApiManager(29096): Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
-D/DecorView[](29096): onWindowFocusChanged hasWindowFocus false
-D/DecorView[](29096): onWindowFocusChanged hasWindowFocus true
-I/HandWritingStubImpl(29096): refreshLastKeyboardType: 1
-I/HandWritingStubImpl(29096): getCurrentKeyboardType: 1
-D/DecorView[](29096): onWindowFocusChanged hasWindowFocus false
-D/DecorView[](29096): onWindowFocusChanged hasWindowFocus true
-I/HandWritingStubImpl(29096): refreshLastKeyboardType: 1
-I/HandWritingStubImpl(29096): getCurrentKeyboardType: 1
-I/flutter (29096): 🔄 Auto expense ENABLED
-I/flutter (29096):    - userId: Set
-I/flutter (29096):    - ExpenseProvider: Ready
-I/flutter (29096): 🎧 Starting notification listener...
-I/flutter (29096): 🎧 Starting EventChannel stream...
-I/flutter (29096): ✅ EventChannel stream started
-I/flutter (29096): ✅ Notification listener started
-D/BankNotificationService(29096): 🔌 EventSink CONNECTED - Flutter app is listening
-D/MIUIInput(29096): [KeyEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_BACK, scanCode=0, metaState=0, flags=0x48, repeatCount=0, eventTime=196692091000000, downTime=196692091000000, deviceId=-1, source=0x101, displayId=-1 }, phoneEventTime=19:42:15.836
-D/MIUIInput(29096): [KeyEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', KeyEvent { action=ACTION_UP, keyCode=KEYCODE_BACK, scanCode=0, metaState=0, flags=0x48, repeatCount=0, eventTime=196692094000000, downTime=196692094000000, deviceId=-1, source=0x101, displayId=-1 }, phoneEventTime=19:42:15.839
-D/DecorView[](29096): getWindowModeFromSystem  windowmode is 1
-D/DecorView[](29096): updateDecorCaptionStatus windowMode is 1
-D/DecorView[](29096): getWindowModeFromSystem  windowmode is 1
-D/DecorView[](29096): updateDecorCaptionStatus windowMode is 1
-W/OnBackInvokedCallback(29096): OnBackInvokedCallback is not enabled for the application.
-W/OnBackInvokedCallback(29096): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
-D/MIUIInput(29096): [KeyEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_BACK, scanCode=0, metaState=0, flags=0x48, repeatCount=0, eventTime=196698912000000, downTime=196698912000000, deviceId=-1, source=0x101, displayId=-1 }, phoneEventTime=19:42:22.658
-D/MIUIInput(29096): [KeyEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', KeyEvent { action=ACTION_UP, keyCode=KEYCODE_BACK, scanCode=0, metaState=0, flags=0x48, repeatCount=0, eventTime=196698915000000, downTime=196698915000000, deviceId=-1, source=0x101, displayId=-1 }, phoneEventTime=19:42:22.661
-W/OnBackInvokedCallback(29096): OnBackInvokedCallback is not enabled for the application.
-W/OnBackInvokedCallback(29096): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
-I/flutter (29096): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (29096): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (29096): ✅ ExpenseProvider injected into AutoExpenseProvider
+http://127.0.0.1:49330/-aJVspPOJpA=/devtools/?uri=ws://127.0.0.1:49330/-aJVspPOJpA=/ws
+I/flutter (16691): Subscribed to topic: all_users
+I/flutter (16691): Subscribed to topic: promotions
+I/flutter (16691): FCM Service initialized
+I/Choreographer(16691): Skipped 124 frames!  The application may be doing too much work on its main thread.
+W/Looper  (16691): PerfMonitor doFrame : time=0ms vsyncFrame=0 latency=1044ms procState=-1
+D/DecorView[](16691): getWindowModeFromSystem  windowmode is 1
+D/DecorView[](16691): updateDecorCaptionStatus windowMode is 1
+D/VRI[MainActivity](16691): vri.reportNextDraw android.view.ViewRootImpl.performTraversals:4013 android.view.ViewRootImpl.doTraversal:2725 android.view.ViewRootImpl$TraversalRunnable.run:9812 android.view.Choreographer$CallbackRecord.run:1505 android.view.Choreographer$CallbackRecord.run:1513
+D/VRI[MainActivity](16691): vri.Setup new sync id=0 syncSeqId=0
+D/manager_android(16691): MiuiProcessManagerServiceStub setSchedFifo
+I/MiuiProcessManagerImpl(16691): setSchedFifo pid:16691, mode:3
+E/libEGL  (16691): pre_cache appList: com.sina.weibo,com.ss.android.article.news,com.taobao.taobao,com.smile.gifmaker,com.ss.android.ugc.aweme,com.tencent.mm,tv.danmaku.bili,,
+E/perf_hint(16691): Session creation failed, mPreferredRateNanos: -1
+D/VRI[MainActivity](16691): vri.reportDrawFinished syncSeqId=0 android.view.ViewRootImpl.lambda$createSyncIfNeeded$4$android-view-ViewRootImpl:4081 android.view.ViewRootImpl$$ExternalSyntheticLambda2.run:6 android.os.Handler.handleCallback:942 android.os.Handler.dispatchMessage:99 android.os.Looper.loopOnce:211  
+W/DynamiteModule(16691): Local module descriptor class for com.google.android.gms.providerinstaller.dynamite not found.
+D/DecorView[](16691): onWindowFocusChanged hasWindowFocus true
+I/HandWritingStubImpl(16691): refreshLastKeyboardType: 1
+I/HandWritingStubImpl(16691): getCurrentKeyboardType: 1
+I/HandWritingStubImpl(16691): getCurrentKeyboardType: 1
+I/DynamiteModule(16691): Considering local module com.google.android.gms.providerinstaller.dynamite:0 and remote module com.google.android.gms.providerinstaller.dynamite:0
+W/ProviderInstaller(16691): Failed to load providerinstaller module: No acceptable module com.google.android.gms.providerinstaller.dynamite found. Local version is 0 and remote version is 0.
+D/nativeloader(16691): Configuring clns-5 for other apk /system/framework/org.apache.http.legacy.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/lib/arm64:/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(16691): Extending system_exposed_libraries: libmisys_jni.xiaomi.so:libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libQOC.qti.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libQOC.qti.so:libdiag_system.qti.so:libqape.qti.so:liblistenjni.qti.so
+D/nativeloader(16691): Configuring clns-6 for other apk /system/framework/com.android.location.provider.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/lib/arm64:/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(16691): Extending system_exposed_libraries: libmisys_jni.xiaomi.so:libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libQOC.qti.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libQOC.qti.so:libdiag_system.qti.so:libqape.qti.so:liblistenjni.qti.so
+D/nativeloader(16691): Configuring clns-7 for other apk /system/framework/com.android.media.remotedisplay.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/lib/arm64:/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+D/nativeloader(16691): Extending system_exposed_libraries: libmisys_jni.xiaomi.so:libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libQOC.qti.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libQOC.qti.so:libdiag_system.qti.so:libqape.qti.so:liblistenjni.qti.so
+D/nativeloader(16691): Configuring clns-8 for other apk /data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/lib/arm64:/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
+V/NativeCrypto(16691): Registering com/google/android/gms/org/conscrypt/NativeCrypto's 334 native methods...
+W/manager_android(16691): Accessing hidden method Ljava/security/spec/ECParameterSpec;->getCurveName()Ljava/lang/String; (unsupported, reflection, allowed)
+E/GoogleApiManager(16691): Failed to get service from broker. 
+E/GoogleApiManager(16691): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+E/GoogleApiManager(16691):      at android.os.Parcel.createExceptionOrNull(Parcel.java:3011)
+E/GoogleApiManager(16691):      at android.os.Parcel.createException(Parcel.java:2995)
+E/GoogleApiManager(16691):      at android.os.Parcel.readException(Parcel.java:2978)
+E/GoogleApiManager(16691):      at android.os.Parcel.readException(Parcel.java:2920)
+E/GoogleApiManager(16691):      at bgaa.a(:com.google.android.gms@260834029@26.08.34 (190400-876566425):36)
+E/GoogleApiManager(16691):      at bfyb.z(:com.google.android.gms@260834029@26.08.34 (190400-876566425):143)
+E/GoogleApiManager(16691):      at bfef.run(:com.google.android.gms@260834029@26.08.34 (190400-876566425):42)
+E/GoogleApiManager(16691):      at android.os.Handler.handleCallback(Handler.java:942)
+E/GoogleApiManager(16691):      at android.os.Handler.dispatchMessage(Handler.java:99)
+E/GoogleApiManager(16691):      at ctti.mv(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
+E/GoogleApiManager(16691):      at ctti.dispatchMessage(:com.google.android.gms@260834029@26.08.34 (190400-876566425):5)
+E/GoogleApiManager(16691):      at android.os.Looper.loopOnce(Looper.java:211)
+E/GoogleApiManager(16691):      at android.os.Looper.loop(Looper.java:300)
+E/GoogleApiManager(16691):      at android.os.HandlerThread.run(HandlerThread.java:67)
+W/GoogleApiManager(16691): Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+W/FlagRegistrar(16691): Failed to register com.google.android.gms.providerinstaller#com.example.expense_manager_android
+W/FlagRegistrar(16691): gbqd: 17: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+W/FlagRegistrar(16691):         at gbqf.a(:com.google.android.gms@260834029@26.08.34 (190400-876566425):13)
+W/FlagRegistrar(16691):         at haar.d(:com.google.android.gms@260834029@26.08.34 (190400-876566425):3)
+W/FlagRegistrar(16691):         at haat.run(:com.google.android.gms@260834029@26.08.34 (190400-876566425):130)
+W/FlagRegistrar(16691):         at hada.execute(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
+W/FlagRegistrar(16691):         at habb.f(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
+W/FlagRegistrar(16691):         at habb.m(:com.google.android.gms@260834029@26.08.34 (190400-876566425):99)
+W/FlagRegistrar(16691):         at habb.r(:com.google.android.gms@260834029@26.08.34 (190400-876566425):17)
+W/FlagRegistrar(16691):         at fuec.hA(:com.google.android.gms@260834029@26.08.34 (190400-876566425):35)
+W/FlagRegistrar(16691):         at fgvk.run(:com.google.android.gms@260834029@26.08.34 (190400-876566425):12)
+W/FlagRegistrar(16691):         at hada.execute(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
+W/FlagRegistrar(16691):         at fgvl.b(:com.google.android.gms@260834029@26.08.34 (190400-876566425):18)
+W/FlagRegistrar(16691):         at fgwa.b(:com.google.android.gms@260834029@26.08.34 (190400-876566425):34)
+W/FlagRegistrar(16691):         at fgwc.d(:com.google.android.gms@260834029@26.08.34 (190400-876566425):25)
+W/FlagRegistrar(16691):         at bfbo.c(:com.google.android.gms@260834029@26.08.34 (190400-876566425):9)
+W/FlagRegistrar(16691):         at bfed.q(:com.google.android.gms@260834029@26.08.34 (190400-876566425):48)
+W/FlagRegistrar(16691):         at bfed.d(:com.google.android.gms@260834029@26.08.34 (190400-876566425):10)
+W/FlagRegistrar(16691):         at bfed.g(:com.google.android.gms@260834029@26.08.34 (190400-876566425):191)
+W/FlagRegistrar(16691):         at bfed.onConnectionFailed(:com.google.android.gms@260834029@26.08.34 (190400-876566425):2)
+W/FlagRegistrar(16691):         at bfef.run(:com.google.android.gms@260834029@26.08.34 (190400-876566425):70)
+W/FlagRegistrar(16691):         at android.os.Handler.handleCallback(Handler.java:942)
+W/FlagRegistrar(16691):         at android.os.Handler.dispatchMessage(Handler.java:99)
+W/FlagRegistrar(16691):         at ctti.mv(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
+W/FlagRegistrar(16691):         at ctti.dispatchMessage(:com.google.android.gms@260834029@26.08.34 (190400-876566425):5)
+W/FlagRegistrar(16691):         at android.os.Looper.loopOnce(Looper.java:211)
+W/FlagRegistrar(16691):         at android.os.Looper.loop(Looper.java:300)
+W/FlagRegistrar(16691):         at android.os.HandlerThread.run(HandlerThread.java:67)
+W/FlagRegistrar(16691): Caused by: bezv: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+W/FlagRegistrar(16691):         at bfxn.a(:com.google.android.gms@260834029@26.08.34 (190400-876566425):15)
+W/FlagRegistrar(16691):         at bfbr.a(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
+W/FlagRegistrar(16691):         at bfbo.c(:com.google.android.gms@260834029@26.08.34 (190400-876566425):5)
+W/FlagRegistrar(16691):         ... 12 more
+I/manager_android(16691): Waiting for a blocking GC ClassLinker
+W/manager_android(16691): Accessing hidden method Ldalvik/system/VMStack;->getStackClass2()Ljava/lang/Class; (unsupported, reflection, allowed)
+I/ProviderInstaller(16691): Installed default security provider GmsCore_OpenSSL
+D/TrafficStats(16691): tagSocket(199) with statsTag=0xffffffff, statsUid=-1
+W/manager_android(16691): Accessing hidden field Ljava/net/Socket;->impl:Ljava/net/SocketImpl; (unsupported, reflection, allowed)
+W/manager_android(16691): Accessing hidden method Ljava/security/spec/ECParameterSpec;->setCurveName(Ljava/lang/String;)V (unsupported, reflection, allowed)
+D/ProfileInstaller(16691): Installing profile for com.example.expense_manager_android
+I/flutter (16691): FCM token saved for user: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (16691): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (16691): ✅ User ID set: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (16691):    - isEnabled: false
+I/flutter (16691):    - ExpenseProvider: Ready
+I/flutter (16691): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (16691):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (16691):    ✅ ExpenseProvider: Ready
+I/flutter (16691): ⏱️ Pending notification poll timer started (every 30s)
+I/flutter (16691): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (16691): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (16691): ⏭️ Already processing pending notifications, skipping
+I/flutter (16691): 🔍 Checking for updates...
+I/flutter (16691): 📱 Current version: 1.0.26
+I/flutter (16691): 🌐 Fetching from: http://nthiennhan.ddns.net:90/app/version.json
+I/flutter (16691): 📡 Response status: 200
+I/flutter (16691): 📄 Response body: {
+I/flutter (16691):     "latestVersion":  "1.0.26",
+I/flutter (16691):     "minVersion":  "1.0.0",
+I/flutter (16691):     "releaseNotes":  "- Sua loi nho\n- Cai thien hieu suat",
+I/flutter (16691):     "downloadUrl":  "http://nthiennhan.ddns.net:90/app/expense_manager_v1.0.26.apk",
+I/flutter (16691):     "releaseDate":  "2026-03-01",
+I/flutter (16691):     "forceUpdate":  false
+I/flutter (16691): }
+I/flutter (16691):
+I/flutter (16691): 🆕 Latest version: 1.0.26
+I/flutter (16691): ⚙️  Min version: 1.0.0
+I/flutter (16691): ✅ Already up to date
+D/BankNotificationService(16691): Cleared pending notifications
+I/flutter (16691): 🗑️ Cleared pending notifications
+I/flutter (16691): ✅ No pending notifications to process
+I/flutter (16691): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (16691): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (16691): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (16691):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (16691):    ✅ ExpenseProvider: Ready
+I/flutter (16691): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (16691): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (16691): ⏭️ Already processing pending notifications, skipping
+D/BankNotificationService(16691): Cleared pending notifications
+I/flutter (16691): 🗑️ Cleared pending notifications
+I/flutter (16691): ✅ No pending notifications to process
+D/CompatibilityChangeReporter(16691): Compat change id reported: 160794467; UID 10302; state: ENABLED
+I/flutter (16691): Scheduling repeating notification: id=605386173, title=⏰ Thêm chi tiêu cho ngày hôm nay, time=2026-03-05 20:00:00.000+0700, repeat=DateTimeComponents.time
+I/flutter (16691): Repeating notification scheduled: id=605386173
+W/MirrorManager(16691): this model don't Support
+I/flutter (16691): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (16691): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (16691): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (16691):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (16691):    ✅ ExpenseProvider: Ready
+D/BankNotificationService(16691): Cleared pending notifications
+I/flutter (16691): 🗑️ Cleared pending notifications
+I/flutter (16691): ✅ No pending notifications to process
+D/DecorView[](16691): getWindowModeFromSystem  windowmode is 1
+D/DecorView[](16691): updateDecorCaptionStatus windowMode is 1
+W/OnBackInvokedCallback(16691): OnBackInvokedCallback is not enabled for the application.
+W/OnBackInvokedCallback(16691): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/DecorView[](16691): getWindowModeFromSystem  windowmode is 1
+D/DecorView[](16691): updateDecorCaptionStatus windowMode is 1
+D/DecorView[](16691): onWindowFocusChanged hasWindowFocus false
+I/flutter (16691): 📱 App resumed - re-checking notification access & listener
+I/flutter (16691): 🔄 Restarting notification listener...
+I/flutter (16691): 🔇 Stopping EventChannel stream...
+I/flutter (16691): ✅ EventChannel stream stopped
+I/flutter (16691): 🎧 Starting notification listener...
+I/flutter (16691): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (16691):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (16691):    ✅ ExpenseProvider: Ready
+D/DecorView[](16691): onWindowFocusChanged hasWindowFocus true
+I/HandWritingStubImpl(16691): refreshLastKeyboardType: 1
+I/HandWritingStubImpl(16691): getCurrentKeyboardType: 1
+D/BankNotificationService(16691): ! No active service instance to start
+I/flutter (16691): ✅ Native foreground service started
+I/flutter (16691): 🎧 Starting EventChannel stream...
+I/flutter (16691): ✅ EventChannel stream started
+I/flutter (16691): ✅ Notification listener started
+D/BankNotificationService(16691): 🔌 EventSink CONNECTED - Flutter app is listening
+D/BankNotificationService(16691): Cleared pending notifications
+I/flutter (16691): 🗑️ Cleared pending notifications
+I/flutter (16691): ✅ No pending notifications to process
+I/flutter (16691): 🔄 Auto expense DISABLED
+I/flutter (16691):    - userId: Set
+I/flutter (16691):    - ExpenseProvider: Ready
+I/flutter (16691): 🔇 Stopping notification listener...
+I/flutter (16691): 🔇 Stopping EventChannel stream...
+I/flutter (16691): ✅ EventChannel stream stopped
+D/BankNotificationService(16691): 🔌 EventSink DISCONNECTED - Flutter app stopped listening
+D/BankNotificationService(16691): ! No active service instance to stop
+I/flutter (16691): ✅ Native foreground service stopped
+I/flutter (16691): ✅ Notification listener stopped
+E/GoogleApiManager(16691): Failed to get service from broker. 
+E/GoogleApiManager(16691): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+E/GoogleApiManager(16691):      at android.os.Parcel.createExceptionOrNull(Parcel.java:3011)
+E/GoogleApiManager(16691):      at android.os.Parcel.createException(Parcel.java:2995)
+E/GoogleApiManager(16691):      at android.os.Parcel.readException(Parcel.java:2978)
+E/GoogleApiManager(16691):      at android.os.Parcel.readException(Parcel.java:2920)
+E/GoogleApiManager(16691):      at bgaa.a(:com.google.android.gms@260834029@26.08.34 (190400-876566425):36)
+E/GoogleApiManager(16691):      at bfyb.z(:com.google.android.gms@260834029@26.08.34 (190400-876566425):143)
+E/GoogleApiManager(16691):      at bfef.run(:com.google.android.gms@260834029@26.08.34 (190400-876566425):42)
+E/GoogleApiManager(16691):      at android.os.Handler.handleCallback(Handler.java:942)
+E/GoogleApiManager(16691):      at android.os.Handler.dispatchMessage(Handler.java:99)
+E/GoogleApiManager(16691):      at ctti.mv(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
+E/GoogleApiManager(16691):      at ctti.dispatchMessage(:com.google.android.gms@260834029@26.08.34 (190400-876566425):5)
+E/GoogleApiManager(16691):      at android.os.Looper.loopOnce(Looper.java:211)
+E/GoogleApiManager(16691):      at android.os.Looper.loop(Looper.java:300)
+E/GoogleApiManager(16691):      at android.os.HandlerThread.run(HandlerThread.java:67)
+W/GoogleApiManager(16691): Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+
+
+
+
+I/flutter (16691): 🔄 Auto expense ENABLED
+I/flutter (16691):    - userId: Set
+I/flutter (16691):    - ExpenseProvider: Ready
+I/flutter (16691): 🎧 Starting notification listener...
+I/flutter (16691): ⏱️ Pending notification poll timer started (every 30s)
+D/BankNotificationService(16691): ! No active service instance to start
+I/flutter (16691): ✅ Native foreground service started
+I/flutter (16691): 🎧 Starting EventChannel stream...
+I/flutter (16691): ✅ EventChannel stream started
+I/flutter (16691): ✅ Notification listener started
+D/BankNotificationService(16691): 🔌 EventSink CONNECTED - Flutter app is listening
+D/DecorView[](16691): onWindowFocusChanged hasWindowFocus false
+I/flutter (16691): 📱 App resumed - re-checking notification access & listener
+I/flutter (16691): 🔄 Restarting notification listener...
+I/flutter (16691): 🔇 Stopping EventChannel stream...
+I/flutter (16691): ✅ EventChannel stream stopped
+I/flutter (16691): 🎧 Starting notification listener...
+I/flutter (16691): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (16691):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (16691):    ✅ ExpenseProvider: Ready
+D/DecorView[](16691): onWindowFocusChanged hasWindowFocus true
+I/HandWritingStubImpl(16691): refreshLastKeyboardType: 1
+I/HandWritingStubImpl(16691): getCurrentKeyboardType: 1
+D/BankNotificationService(16691): 🔌 EventSink DISCONNECTED - Flutter app stopped listening
+D/BankNotificationService(16691): ! No active service instance to start
+I/flutter (16691): ✅ Native foreground service started
+I/flutter (16691): 🎧 Starting EventChannel stream...
+I/flutter (16691): ✅ EventChannel stream started
+I/flutter (16691): ✅ Notification listener started
+D/BankNotificationService(16691): 🔌 EventSink CONNECTED - Flutter app is listening
+D/BankNotificationService(16691): Cleared pending notifications
+I/flutter (16691): 🗑️ Cleared pending notifications
+I/flutter (16691): ✅ No pending notifications to process
+D/DecorView[](16691): onWindowFocusChanged hasWindowFocus false
+I/flutter (16691): 📱 App resumed - re-checking notification access & listener
+I/flutter (16691): 🔄 Restarting notification listener...
+I/flutter (16691): 🔇 Stopping EventChannel stream...
+I/flutter (16691): ✅ EventChannel stream stopped
+I/flutter (16691): 🎧 Starting notification listener...
+I/flutter (16691): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (16691):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (16691):    ✅ ExpenseProvider: Ready
+D/DecorView[](16691): onWindowFocusChanged hasWindowFocus true
+I/HandWritingStubImpl(16691): refreshLastKeyboardType: 1
+I/HandWritingStubImpl(16691): getCurrentKeyboardType: 1
+D/BankNotificationService(16691): 🔌 EventSink DISCONNECTED - Flutter app stopped listening
+D/BankNotificationService(16691): ! No active service instance to start
+I/flutter (16691): ✅ Native foreground service started
+I/flutter (16691): 🎧 Starting EventChannel stream...
+I/flutter (16691): ✅ EventChannel stream started
+I/flutter (16691): ✅ Notification listener started
+D/BankNotificationService(16691): 🔌 EventSink CONNECTED - Flutter app is listening
+D/BankNotificationService(16691): Cleared pending notifications
+I/flutter (16691): 🗑️ Cleared pending notifications
+I/flutter (16691): ✅ No pending notifications to process
+D/DecorView[](16691): onWindowFocusChanged hasWindowFocus false
+I/flutter (16691): 📱 App resumed - re-checking notification access & listener
+I/flutter (16691): 🔄 Restarting notification listener...
+I/flutter (16691): 🔇 Stopping EventChannel stream...
+I/flutter (16691): ✅ EventChannel stream stopped
+I/flutter (16691): 🎧 Starting notification listener...
+I/flutter (16691): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (16691):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (16691):    ✅ ExpenseProvider: Ready
+D/DecorView[](16691): onWindowFocusChanged hasWindowFocus true
+I/HandWritingStubImpl(16691): refreshLastKeyboardType: 1
+I/HandWritingStubImpl(16691): getCurrentKeyboardType: 1
+D/BankNotificationService(16691): 🔌 EventSink DISCONNECTED - Flutter app stopped listening
+D/BankNotificationService(16691): ! No active service instance to start
+I/flutter (16691): ✅ Native foreground service started
+I/flutter (16691): 🎧 Starting EventChannel stream...
+I/flutter (16691): ✅ EventChannel stream started
+I/flutter (16691): ✅ Notification listener started
+D/BankNotificationService(16691): 🔌 EventSink CONNECTED - Flutter app is listening
+D/BankNotificationService(16691): Cleared pending notifications
+I/flutter (16691): 🗑️ Cleared pending notifications
+I/flutter (16691): ✅ No pending notifications to process

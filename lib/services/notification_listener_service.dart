@@ -205,13 +205,35 @@ class NotificationListenerService {
     }
   }
 
-  /// Start the native foreground service notification
-  Future<void> startForegroundService() async {
+  /// Start the native foreground service notification.
+  /// Returns true if service was started successfully, false if service instance is not available.
+  Future<bool> startForegroundService() async {
     try {
-      await _methodChannel.invokeMethod('startForegroundService');
-      debugPrint('✅ Native foreground service started');
+      final result = await _methodChannel.invokeMethod<bool>(
+        'startForegroundService',
+      );
+      final started = result ?? false;
+      if (started) {
+        debugPrint('✅ Native foreground service started');
+      } else {
+        debugPrint(
+          '⚠️ Service instance not available - ensureServiceRunning triggered',
+        );
+      }
+      return started;
     } on PlatformException catch (e) {
       debugPrint('Error starting foreground service: ${e.message}');
+      return false;
+    }
+  }
+
+  /// Force Android to bind the NotificationListenerService if it's not running.
+  Future<void> ensureServiceRunning() async {
+    try {
+      await _methodChannel.invokeMethod('ensureServiceRunning');
+      debugPrint('🔄 ensureServiceRunning called');
+    } on PlatformException catch (e) {
+      debugPrint('Error ensuring service running: ${e.message}');
     }
   }
 

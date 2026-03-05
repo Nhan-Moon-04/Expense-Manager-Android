@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -79,12 +80,64 @@ class BankNotificationService : NotificationListenerService() {
             } ?: Log.d(TAG, "⚠️ No active service instance to stop")
         }
 
-        fun startForegroundServiceFromFlutter() {
-            instance?.let {
+        /**
+         * Start foreground service from Flutter.
+         * Returns true if service instance is alive and foreground started.
+         * Returns false if instance is null (service not bound by Android yet).
+         */
+        fun startForegroundServiceFromFlutter(): Boolean {
+            return instance?.let {
                 Log.d(TAG, "🎧 Starting foreground service from Flutter...")
                 it.startForegroundService()
                 Log.d(TAG, "✅ Foreground service notification started")
-            } ?: Log.d(TAG, "⚠️ No active service instance to start")
+                true
+            } ?: run {
+                Log.w(TAG, "⚠️ No active service instance - service not bound by Android")
+                false
+            }
+        }
+
+        /**
+         * Ensure the NotificationListenerService is running.
+         * If instance is null, try requestRebind first, then toggle trick.
+         */
+        fun ensureServiceRunning(context: Context) {
+            if (instance != null) {
+                Log.d(TAG, "✅ Service already running")
+                return
+            }
+            
+            Log.w(TAG, "⚠️ Service instance is null, attempting to start...")
+            
+            // Method 1: requestRebind (API 24+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                try {
+                    requestRebind(ComponentName(context, BankNotificationService::class.java))
+                    Log.d(TAG, "🔄 requestRebind() called from ensureServiceRunning")
+                } catch (e: Exception) {
+                    Log.e(TAG, "requestRebind failed: ${e.message}")
+                }
+            }
+            
+            // Method 2: Toggle component off/on to force Android to rebind
+            try {
+                val pm = context.packageManager
+                val componentName = ComponentName(context, BankNotificationService::class.java)
+                
+                pm.setComponentEnabledSetting(
+                    componentName,
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP
+                )
+                pm.setComponentEnabledSetting(
+                    componentName,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP
+                )
+                Log.d(TAG, "🔄 Component toggled off/on to force rebind")
+            } catch (e: Exception) {
+                Log.e(TAG, "Component toggle failed: ${e.message}")
+            }
         }
 
         fun isNotificationAccessEnabled(context: Context): Boolean {
@@ -315,6 +368,8 @@ class BankNotificationService : NotificationListenerService() {
 
     private val handler = Handler(Looper.getMainLooper())
     private var isListenerConnected = false
+    private var rebindRetryCount = 0
+    private val maxRebindRetries = 5
 
     override fun onCreate() {
         super.onCreate()
@@ -332,6 +387,9 @@ class BankNotificationService : NotificationListenerService() {
 
         // Schedule periodic refresh
         scheduleRefresh()
+        
+        // Start watchdog to ensure listener stays connected
+        startWatchdog()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -343,6 +401,7 @@ class BankNotificationService : NotificationListenerService() {
     override fun onListenerConnected() {
         super.onListenerConnected()
         isListenerConnected = true
+        rebindRetryCount = 0 // Reset retry counter on successful connection
         instance = this
         Log.d(TAG, "\u2705 NotificationListener CONNECTED - actively listening for bank notifications")
 
@@ -361,13 +420,54 @@ class BankNotificationService : NotificationListenerService() {
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
         isListenerConnected = false
+        rebindRetryCount = 0
         Log.w(TAG, "\u26A0\uFE0F NotificationListener DISCONNECTED - requesting rebind...")
 
         // Request rebind to reconnect the listener (API 24+)
+        attemptRebind()
+    }
+    
+    /// Attempt to rebind with exponential backoff retry
+    private fun attemptRebind() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            requestRebind(ComponentName(this, BankNotificationService::class.java))
-            Log.d(TAG, "\uD83D\uDD04 requestRebind() called, waiting for system to reconnect...")
+            try {
+                requestRebind(ComponentName(this, BankNotificationService::class.java))
+                Log.d(TAG, "\uD83D\uDD04 requestRebind() called (attempt ${rebindRetryCount + 1})")
+            } catch (e: Exception) {
+                Log.e(TAG, "\u274C requestRebind failed: ${e.message}")
+            }
+            
+            // Schedule retry in case requestRebind doesn't work
+            if (!isListenerConnected && rebindRetryCount < maxRebindRetries) {
+                rebindRetryCount++
+                val delayMs = (rebindRetryCount * 10_000L).coerceAtMost(60_000L) // 10s, 20s, 30s... max 60s
+                Log.d(TAG, "\u23F0 Scheduling rebind retry #$rebindRetryCount in ${delayMs/1000}s")
+                handler.postDelayed({
+                    if (!isListenerConnected) {
+                        Log.w(TAG, "\u26A0\uFE0F Still disconnected after ${delayMs/1000}s, retrying rebind...")
+                        attemptRebind()
+                    } else {
+                        Log.d(TAG, "\u2705 Already reconnected, cancelling retry")
+                    }
+                }, delayMs)
+            }
         }
+    }
+    
+    /// Watchdog: periodically checks if listener is still connected
+    private fun startWatchdog() {
+        val watchdogIntervalMs = 5 * 60 * 1000L // Check every 5 minutes
+        handler.postDelayed(object : Runnable {
+            override fun run() {
+                if (!isListenerConnected) {
+                    Log.w(TAG, "\uD83D\uDC41\uFE0F Watchdog: listener disconnected, attempting rebind...")
+                    rebindRetryCount = 0
+                    attemptRebind()
+                }
+                // Reschedule watchdog
+                handler.postDelayed(this, watchdogIntervalMs)
+            }
+        }, watchdogIntervalMs)
     }
 
     override fun onDestroy() {

@@ -205,6 +205,8 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
     if (value) {
       _startListening();
       _startPendingPollTimer();
+      // Auto-request battery optimization exemption when enabling
+      _requestBatteryOptimizationIfNeeded();
     } else {
       _stopListening();
       _pendingPollTimer?.cancel();
@@ -231,9 +233,41 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
     notifyListeners();
   }
 
+  /// Request battery optimization exemption if not already granted
+  Future<void> _requestBatteryOptimizationIfNeeded() async {
+    try {
+      final isDisabled =
+          await _notificationService.isBatteryOptimizationDisabled();
+      if (!isDisabled) {
+        debugPrint(
+          '🔋 Battery optimization active - requesting exemption...',
+        );
+        await _notificationService.requestDisableBatteryOptimization();
+      } else {
+        debugPrint('✅ Battery optimization already disabled');
+      }
+    } catch (e) {
+      debugPrint('Error checking battery optimization: $e');
+    }
+  }
+
   void _startListening() async {
     debugPrint('🎧 Starting notification listener...');
-    await _notificationService.startForegroundService();
+    final started = await _notificationService.startForegroundService();
+
+    if (!started) {
+      debugPrint(
+        '⚠️ Service instance null - calling ensureServiceRunning + retry',
+      );
+      await _notificationService.ensureServiceRunning();
+      // Give Android time to rebind the NotificationListenerService
+      await Future.delayed(const Duration(seconds: 3));
+      final retryStarted = await _notificationService.startForegroundService();
+      if (!retryStarted) {
+        debugPrint('⚠️ Retry also failed - will rely on pending poll timer');
+      }
+    }
+
     _notificationService.startListening();
     _subscription = _notificationService.notificationStream.listen(
       _handleNotification,
@@ -242,11 +276,13 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
   }
 
   /// Cancel old subscription and re-create it (fixes dead EventChannel after Activity recreation)
-  void _restartListening() {
+  void _restartListening() async {
     debugPrint('🔄 Restarting notification listener...');
     _subscription?.cancel();
     _subscription = null;
     _notificationService.stopListening();
+    // Ensure the native service is actually running before re-subscribing
+    await _notificationService.ensureServiceRunning();
     _startListening();
   }
 

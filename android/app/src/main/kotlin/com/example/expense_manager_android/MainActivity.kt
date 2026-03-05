@@ -13,6 +13,11 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         
+        // Ensure NotificationListenerService is bound by Android system
+        if (BankNotificationService.isNotificationAccessEnabled(this)) {
+            BankNotificationService.ensureServiceRunning(this)
+        }
+        
         // Method Channel for checking/requesting permissions
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
@@ -44,7 +49,15 @@ class MainActivity : FlutterActivity() {
                     result.success(true)
                 }
                 "startForegroundService" -> {
-                    BankNotificationService.startForegroundServiceFromFlutter()
+                    val started = BankNotificationService.startForegroundServiceFromFlutter()
+                    if (!started) {
+                        // Service not bound yet, force rebind
+                        BankNotificationService.ensureServiceRunning(this)
+                    }
+                    result.success(started)
+                }
+                "ensureServiceRunning" -> {
+                    BankNotificationService.ensureServiceRunning(this)
                     result.success(true)
                 }
                 else -> {
