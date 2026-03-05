@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../constants/app_strings.dart';
 
 enum ExpenseType { income, expense }
 
@@ -130,25 +131,25 @@ class ExpenseModel {
   static String getCategoryName(ExpenseCategory category) {
     switch (category) {
       case ExpenseCategory.food:
-        return 'Ăn Uống';
+        return AppStrings.food;
       case ExpenseCategory.transport:
-        return 'Di Chuyển';
+        return AppStrings.transport;
       case ExpenseCategory.shopping:
-        return 'Mua Sắm';
+        return AppStrings.shopping;
       case ExpenseCategory.entertainment:
-        return 'Giải Trí';
+        return AppStrings.entertainment;
       case ExpenseCategory.bills:
-        return 'Hóa Đơn';
+        return AppStrings.bills;
       case ExpenseCategory.health:
-        return 'Sức Khỏe';
+        return AppStrings.health;
       case ExpenseCategory.education:
-        return 'Giáo Dục';
+        return AppStrings.education;
       case ExpenseCategory.salary:
-        return 'Lương';
+        return AppStrings.salary;
       case ExpenseCategory.bonus:
-        return 'Thưởng';
+        return AppStrings.bonus;
       case ExpenseCategory.other:
-        return 'Khác';
+        return AppStrings.other;
     }
   }
 
