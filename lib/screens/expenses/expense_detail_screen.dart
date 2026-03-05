@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
@@ -22,7 +24,7 @@ class ExpenseDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Chi Tiết Giao Dịch'),
+        title: Text(AppStrings.transactionDetail),
         backgroundColor: color,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -103,7 +105,7 @@ class ExpenseDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    isExpense ? 'Chi tiêu' : 'Thu nhập',
+                    isExpense ? AppStrings.expense : AppStrings.income,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white.withValues(alpha: 0.8),
@@ -121,28 +123,28 @@ class ExpenseDetailScreen extends StatelessWidget {
                   _buildDetailCard([
                     _buildDetailItem(
                       icon: Icons.category,
-                      label: 'Danh mục',
+                      label: AppStrings.category,
                       value: expense.displayName,
                     ),
                     if (expense.hasBankSource)
                       _buildDetailItem(
                         icon: Icons.account_balance_rounded,
-                        label: 'Nguồn',
-                        value: 'Tự động từ ${expense.bankName}',
+                        label: AppStrings.source,
+                        value: '${AppStrings.autoFromBank} ${expense.bankName}',
                       ),
                     _buildDetailItem(
                       icon: Icons.calendar_today,
-                      label: 'Ngày',
+                      label: AppStrings.date,
                       value: DateFormat(
                         'EEEE, dd/MM/yyyy',
-                        'vi',
+                        AppLocalizations.currentLanguage,
                       ).format(expense.date),
                     ),
                     if (expense.description != null &&
                         expense.description!.isNotEmpty)
                       _buildDetailItem(
                         icon: Icons.notes,
-                        label: 'Mô tả',
+                        label: AppStrings.description,
                         value: expense.description!,
                       ),
                   ]),
@@ -150,14 +152,14 @@ class ExpenseDetailScreen extends StatelessWidget {
                   _buildDetailCard([
                     _buildDetailItem(
                       icon: Icons.access_time,
-                      label: 'Tạo lúc',
+                      label: AppStrings.createdAt,
                       value: DateFormat(
                         'HH:mm - dd/MM/yyyy',
                       ).format(expense.createdAt),
                     ),
                     _buildDetailItem(
                       icon: Icons.update,
-                      label: 'Cập nhật',
+                      label: AppStrings.updatedAt,
                       value: DateFormat(
                         'HH:mm - dd/MM/yyyy',
                       ).format(expense.updatedAt),
@@ -233,12 +235,12 @@ class ExpenseDetailScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Xóa giao dịch'),
-        content: const Text('Bạn có chắc muốn xóa giao dịch này?'),
+        title: Text(AppStrings.deleteTransaction),
+        content: Text(AppStrings.deleteTransactionConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Hủy'),
+            child: Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -266,7 +268,7 @@ class ExpenseDetailScreen extends StatelessWidget {
                   Navigator.pop(context); // Go back to list screen
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Text('Đã xóa giao dịch'),
+                      content: Text(AppStrings.transactionDeleted),
                       backgroundColor: AppColors.success,
                     ),
                   );
@@ -277,7 +279,7 @@ class ExpenseDetailScreen extends StatelessWidget {
               backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Xóa'),
+            child: Text(AppStrings.delete),
           ),
         ],
       ),

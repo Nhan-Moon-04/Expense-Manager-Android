@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(authProvider.error ?? 'Đăng nhập thất bại'),
+            content: Text(authProvider.error ?? AppStrings.loginFailed),
             backgroundColor: AppColors.error,
           ),
         );
@@ -106,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Quản lý chi tiêu thông minh',
+                    AppStrings.smartFinanceTagline,
                     style: TextStyle(
                       fontSize: 16,
                       color: AppColors.textSecondary,
@@ -239,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'hoặc',
+                          AppStrings.orDivider,
                           style: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 14,
@@ -287,7 +287,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                'Đăng nhập bằng Google',
+                                AppStrings.loginWithGoogle,
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
@@ -348,7 +348,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
     if (_emailController.text.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Vui lòng nhập email')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.pleaseEnterEmail)));
       return;
     }
 
@@ -367,8 +367,8 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
         SnackBar(
           content: Text(
             success
-                ? 'Email đặt lại mật khẩu đã được gửi'
-                : authProvider.error ?? 'Đã có lỗi xảy ra',
+                ? AppStrings.resetPasswordSent
+                : authProvider.error ?? AppStrings.errorOccurred,
           ),
           backgroundColor: success ? AppColors.success : AppColors.error,
         ),
@@ -385,7 +385,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
           labelText: AppStrings.email,
-          hintText: 'Nhập email của bạn',
+          hintText: AppStrings.enterYourEmail,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),

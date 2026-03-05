@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/group_provider.dart';
 import '../../models/group_model.dart';
@@ -95,7 +96,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          isEditing ? 'Chỉnh sửa nhóm' : 'Tạo nhóm mới',
+          isEditing ? AppStrings.editGroup : AppStrings.createNewGroup,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
@@ -178,7 +179,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Thêm ảnh',
+                          AppStrings.addPhoto,
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 12,
@@ -219,7 +220,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Ảnh đại diện nhóm',
+            AppStrings.groupAvatar,
             style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
           ),
         ],
@@ -231,16 +232,16 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Thông tin cơ bản'),
+        _buildSectionTitle(AppStrings.basicInfo),
         const SizedBox(height: 16),
         _buildTextField(
           controller: _nameController,
-          label: 'Tên nhóm',
-          hint: 'VD: Chi tiêu gia đình',
+          label: AppStrings.groupName,
+          hint: AppStrings.groupNameExample,
           prefixIcon: Icons.group_rounded,
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Vui lòng nhập tên nhóm';
+              return AppStrings.pleaseEnterGroupName;
             }
             return null;
           },
@@ -248,8 +249,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         const SizedBox(height: 16),
         _buildTextField(
           controller: _descriptionController,
-          label: 'Mô tả',
-          hint: 'Mô tả ngắn về nhóm (không bắt buộc)',
+          label: AppStrings.description,
+          hint: AppStrings.groupDescriptionHint,
           prefixIcon: Icons.description_rounded,
           maxLines: 3,
         ),
@@ -264,7 +265,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildSectionTitle('Mục tiêu hùn tiền'),
+            _buildSectionTitle(AppStrings.fundingTarget),
             Switch(
               value: _hasTarget,
               onChanged: (value) {
@@ -285,7 +286,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           const SizedBox(height: 16),
           _buildTextField(
             controller: _targetAmountController,
-            label: 'Số tiền mục tiêu',
+            label: AppStrings.targetAmount,
             hint: 'VD: 10000000',
             prefixIcon: Icons.savings_rounded,
             keyboardType: TextInputType.number,
@@ -294,8 +295,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           const SizedBox(height: 16),
           _buildTextField(
             controller: _targetDescriptionController,
-            label: 'Tên mục tiêu',
-            hint: 'VD: Du lịch Đà Lạt',
+            label: AppStrings.targetName,
+            hint: AppStrings.targetNameExample,
             prefixIcon: Icons.flag_rounded,
           ),
           const SizedBox(height: 16),
@@ -417,7 +418,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Hạn chót',
+                    AppStrings.deadline,
                     style: TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
@@ -427,7 +428,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   Text(
                     _targetDeadline != null
                         ? DateFormat('dd/MM/yyyy').format(_targetDeadline!)
-                        : 'Chọn ngày (không bắt buộc)',
+                        : AppStrings.selectDateOptional,
                     style: TextStyle(
                       fontSize: 16,
                       color: _targetDeadline != null
@@ -469,7 +470,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 ),
               )
             : Text(
-                isEditing ? 'Lưu thay đổi' : 'Tạo nhóm',
+                isEditing ? AppStrings.saveChanges : AppStrings.createGroup,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -492,9 +493,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             borderRadius: BorderRadius.circular(16),
           ),
         ),
-        child: const Text(
-          'Xóa nhóm',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        child: Text(
+          AppStrings.deleteGroup,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -525,7 +526,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Chọn ảnh đại diện',
+              AppStrings.selectAvatar,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -538,7 +539,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 Expanded(
                   child: _buildImageOption(
                     icon: Icons.camera_alt_rounded,
-                    label: 'Chụp ảnh',
+                    label: AppStrings.takePhoto,
                     onTap: () async {
                       Navigator.pop(context);
                       final image = await picker.pickImage(
@@ -559,7 +560,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 Expanded(
                   child: _buildImageOption(
                     icon: Icons.photo_library_rounded,
-                    label: 'Thư viện',
+                    label: AppStrings.photoGallery,
                     onTap: () async {
                       Navigator.pop(context);
                       final image = await picker.pickImage(
@@ -691,8 +692,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             SnackBar(
               content: Text(
                 isEditing
-                    ? 'Cập nhật nhóm thành công!'
-                    : 'Tạo nhóm thành công!',
+                    ? AppStrings.groupUpdatedSuccess
+                    : AppStrings.groupCreatedSuccess,
               ),
               backgroundColor: AppColors.success,
             ),
@@ -700,7 +701,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(groupProvider.error ?? 'Đã có lỗi xảy ra'),
+              content: Text(groupProvider.error ?? AppStrings.errorOccurred),
               backgroundColor: AppColors.error,
             ),
           );
@@ -710,7 +711,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi: $e'),
+            content: Text('${AppStrings.error}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -729,14 +730,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Xóa nhóm'),
-        content: const Text(
-          'Bạn có chắc chắn muốn xóa nhóm này? Hành động này không thể hoàn tác.',
+        title: Text(AppStrings.deleteGroup),
+        content: Text(
+          AppStrings.deleteGroupConfirm,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Hủy'),
+            child: Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -760,7 +761,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Text('Đã xóa nhóm'),
+                      content: Text(AppStrings.deleteGroup),
                       backgroundColor: AppColors.success,
                     ),
                   );
@@ -771,7 +772,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Xóa'),
+            child: Text(AppStrings.delete),
           ),
         ],
       ),

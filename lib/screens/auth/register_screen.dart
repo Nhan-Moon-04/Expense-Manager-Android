@@ -55,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(authProvider.error ?? 'Đăng ký thất bại'),
+              content: Text(authProvider.error ?? AppStrings.registerFailed),
               backgroundColor: AppColors.error,
             ),
           );
@@ -95,7 +95,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Tạo tài khoản mới để bắt đầu',
+                  AppStrings.createAccountSubtitle,
                   style: TextStyle(
                     fontSize: 16,
                     color: AppColors.textSecondary,
@@ -157,7 +157,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    labelText: '${AppStrings.phone} (không bắt buộc)',
+                    labelText: '${AppStrings.phone} ${AppStrings.optionalLabel}',
                     prefixIcon: const Icon(Icons.phone_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),

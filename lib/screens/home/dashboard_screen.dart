@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/reminder_provider.dart';
@@ -171,7 +172,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           // Income button (top-left of FAB)
           _buildMiniFab(
             icon: Icons.arrow_downward_rounded,
-            label: 'Thu nhập',
+            label: AppStrings.income,
             color: AppColors.success,
             offset: const Offset(-70, -70),
             onTap: () {
@@ -194,7 +195,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           // Expense button (directly above FAB)
           _buildMiniFab(
             icon: Icons.arrow_upward_rounded,
-            label: 'Chi tiêu',
+            label: AppStrings.expense,
             color: AppColors.error,
             offset: const Offset(0, -95),
             onTap: () {
@@ -421,7 +422,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    user?.fullName ?? 'Người dùng',
+                    user?.fullName ?? AppStrings.defaultUserName,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -506,13 +507,13 @@ class _DashboardScreenState extends State<DashboardScreen>
         // Determine growth label
         String growthLabel;
         if (growthPercent > 10) {
-          growthLabel = 'Tốt';
+          growthLabel = AppStrings.growthGood;
         } else if (growthPercent >= 0) {
-          growthLabel = 'Ổn định';
+          growthLabel = AppStrings.growthStable;
         } else if (growthPercent > -10) {
-          growthLabel = 'Giảm nhẹ';
+          growthLabel = AppStrings.growthSlightDrop;
         } else {
-          growthLabel = 'Giảm';
+          growthLabel = AppStrings.growthDrop;
         }
 
         return Container(
@@ -557,7 +558,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'Tổng số dư',
+                          AppStrings.totalBalance,
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.white.withValues(alpha: 0.9),
@@ -647,7 +648,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'So với tháng trước',
+                    AppStrings.comparedToLastMonth,
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.white.withValues(alpha: 0.7),
@@ -705,7 +706,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 color: AppColors.textSecondary,
               ),
               const SizedBox(width: 12),
-              Text(_isBalanceVisible ? 'Ẩn số dư' : 'Hiện số dư'),
+              Text(_isBalanceVisible ? AppStrings.hideBalance : AppStrings.showBalance),
             ],
           ),
         ),
@@ -719,7 +720,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 color: AppColors.textSecondary,
               ),
               const SizedBox(width: 12),
-              const Text('Làm mới'),
+              Text(AppStrings.refresh),
             ],
           ),
         ),
@@ -733,7 +734,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 color: AppColors.textSecondary,
               ),
               const SizedBox(width: 12),
-              const Text('Xem chi tiết'),
+              Text(AppStrings.viewDetails),
             ],
           ),
         ),
@@ -783,7 +784,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           children: [
             Expanded(
               child: _buildStatCard(
-                title: 'Thu nhập',
+                title: AppStrings.income,
                 amount: expenseProvider.monthIncome,
                 icon: Icons.arrow_downward_rounded,
                 gradientColors: AppColors.incomeGradient,
@@ -795,7 +796,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             const SizedBox(width: 14),
             Expanded(
               child: _buildStatCard(
-                title: 'Chi tiêu',
+                title: AppStrings.expense,
                 amount: expenseProvider.monthTotal,
                 icon: Icons.arrow_upward_rounded,
                 gradientColors: AppColors.expenseGradient,
@@ -914,9 +915,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Thao tác nhanh',
-          style: TextStyle(
+        Text(
+          AppStrings.quickActions,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -928,7 +929,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           children: [
             _buildActionButton(
               icon: Icons.remove_circle_outline_rounded,
-              label: 'Chi tiêu',
+              label: AppStrings.expense,
               color: AppColors.expenseColor,
               bgColor: AppColors.expenseColor.withValues(alpha: 0.1),
               onTap: () {
@@ -949,7 +950,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             const SizedBox(width: 12),
             _buildActionButton(
               icon: Icons.add_circle_outline_rounded,
-              label: 'Thu nhập',
+              label: AppStrings.income,
               color: AppColors.incomeColor,
               bgColor: AppColors.incomeColor.withValues(alpha: 0.1),
               onTap: () {
@@ -971,7 +972,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             const SizedBox(width: 12),
             _buildActionButton(
               icon: Icons.notifications_active_outlined,
-              label: 'Nhắc nhở',
+              label: AppStrings.reminders,
               color: AppColors.warning,
               bgColor: AppColors.warning.withValues(alpha: 0.1),
               onTap: () {
@@ -1062,9 +1063,9 @@ class _DashboardScreenState extends State<DashboardScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Nhắc nhở sắp tới',
-                  style: TextStyle(
+                Text(
+                  AppStrings.upcomingReminders,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -1086,9 +1087,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                     minimumSize: const Size(0, 0),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: const Text(
-                    'Xem tất cả',
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  child: Text(
+                    AppStrings.viewAll,
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                   ),
                 ),
               ],
@@ -1205,9 +1206,9 @@ class _DashboardScreenState extends State<DashboardScreen>
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Giao dịch gần đây',
-              style: TextStyle(
+            Text(
+              AppStrings.recentTransactions,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -1246,7 +1247,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Chưa có giao dịch nào',
+                        AppStrings.noTransactions,
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 15,
@@ -1255,7 +1256,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Thêm chi tiêu đầu tiên của bạn',
+                        AppStrings.addFirstExpense,
                         style: TextStyle(
                           color: AppColors.textHint,
                           fontSize: 13,
@@ -1414,9 +1415,9 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Chào buổi sáng 👋';
-    if (hour < 18) return 'Chào buổi chiều 👋';
-    return 'Chào buổi tối 👋';
+    if (hour < 12) return AppStrings.greetingMorning;
+    if (hour < 18) return AppStrings.greetingAfternoon;
+    return AppStrings.greetingEvening;
   }
 
   String _getInitials(String name) {

@@ -58,9 +58,9 @@ class _RemindersScreenState extends State<RemindersScreen>
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
-          tabs: const [
-            Tab(text: 'Đang hoạt động'),
-            Tab(text: 'Đã hoàn thành'),
+          tabs: [
+            Tab(text: AppStrings.active),
+            Tab(text: AppStrings.completedStatus),
           ],
         ),
       ),
@@ -98,8 +98,8 @@ class _RemindersScreenState extends State<RemindersScreen>
                 const SizedBox(height: 16),
                 Text(
                   showCompleted
-                      ? 'Chưa có nhắc nhở hoàn thành'
-                      : 'Chưa có nhắc nhở nào',
+                      ? AppStrings.noCompletedReminders
+                      : AppStrings.noActiveReminders,
                   style: TextStyle(
                     fontSize: 16,
                     color: AppColors.textSecondary,
@@ -148,8 +148,8 @@ class _RemindersScreenState extends State<RemindersScreen>
         return await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Xóa nhắc nhở'),
-            content: const Text('Bạn có chắc muốn xóa nhắc nhở này?'),
+            title: Text(AppStrings.deleteReminder),
+            content: Text(AppStrings.deleteReminderConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -240,7 +240,7 @@ class _RemindersScreenState extends State<RemindersScreen>
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                'Đã tắt',
+                                AppStrings.disabled,
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,

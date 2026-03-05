@@ -85,7 +85,7 @@ class _NotesScreenState extends State<NotesScreen> {
               controller: _searchController,
               onChanged: _search,
               decoration: InputDecoration(
-                hintText: 'Tìm kiếm ghi chú...',
+                hintText: AppStrings.searchNotesHint,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -139,8 +139,8 @@ class _NotesScreenState extends State<NotesScreen> {
                 const SizedBox(height: 16),
                 Text(
                   _isSearching
-                      ? 'Không tìm thấy ghi chú'
-                      : 'Chưa có ghi chú nào',
+                      ? AppStrings.noNotesFound
+                      : AppStrings.noNotesYet,
                   style: TextStyle(
                     fontSize: 16,
                     color: AppColors.textSecondary,
@@ -167,7 +167,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Đã ghim',
+                    AppStrings.pinned,
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -183,7 +183,7 @@ class _NotesScreenState extends State<NotesScreen> {
             if (unpinnedNotes.isNotEmpty) ...[
               if (pinnedNotes.isNotEmpty)
                 Text(
-                  'Khác',
+                  AppStrings.otherNotes,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -304,7 +304,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   note.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
                   color: AppColors.primary,
                 ),
-                title: Text(note.isPinned ? 'Bỏ ghim' : 'Ghim'),
+                title: Text(note.isPinned ? AppStrings.unpin : AppStrings.pin),
                 onTap: () async {
                   Navigator.pop(context);
                   await Provider.of<NoteProvider>(
@@ -315,7 +315,7 @@ class _NotesScreenState extends State<NotesScreen> {
               ),
               ListTile(
                 leading: Icon(Icons.edit, color: AppColors.primary),
-                title: const Text('Sửa'),
+                title: Text(AppStrings.edit),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -328,7 +328,7 @@ class _NotesScreenState extends State<NotesScreen> {
               ),
               ListTile(
                 leading: Icon(Icons.delete, color: AppColors.error),
-                title: Text('Xóa', style: TextStyle(color: AppColors.error)),
+                title: Text(AppStrings.delete, style: TextStyle(color: AppColors.error)),
                 onTap: () {
                   Navigator.pop(context);
                   _showDeleteDialog(note);
@@ -345,12 +345,12 @@ class _NotesScreenState extends State<NotesScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xóa ghi chú'),
-        content: const Text('Bạn có chắc muốn xóa ghi chú này?'),
+        title: Text(AppStrings.deleteNoteTitle),
+        content: Text(AppStrings.deleteNoteConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -364,7 +364,7 @@ class _NotesScreenState extends State<NotesScreen> {
               backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Xóa'),
+            child: Text(AppStrings.delete),
           ),
         ],
       ),

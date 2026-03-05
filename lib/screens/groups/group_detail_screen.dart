@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/group_provider.dart';
 import '../../providers/settings_provider.dart';
@@ -189,7 +190,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   children: [
                     Icon(Icons.exit_to_app_rounded, color: AppColors.error),
                     const SizedBox(width: 12),
-                    Text('Rời nhóm', style: TextStyle(color: AppColors.error)),
+                    Text(AppStrings.leaveGroup, style: TextStyle(color: AppColors.error)),
                   ],
                 ),
               ),
@@ -200,7 +201,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   children: [
                     Icon(Icons.delete_forever_rounded, color: AppColors.error),
                     const SizedBox(width: 12),
-                    Text('Xoá nhóm', style: TextStyle(color: AppColors.error)),
+                    Text(AppStrings.deleteGroup, style: TextStyle(color: AppColors.error)),
                   ],
                 ),
               ),
@@ -256,7 +257,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              '${group.members.length} thành viên',
+                              '${group.members.length} ${AppStrings.membersCount}',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.white.withValues(alpha: 0.8),
@@ -354,7 +355,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    group.targetDescription ?? 'Mục tiêu',
+                    group.targetDescription ?? AppStrings.target,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -431,7 +432,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Đã góp',
+                      AppStrings.contributed,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white.withValues(alpha: 0.8),
@@ -472,7 +473,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Đã chi',
+                      AppStrings.spent,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white.withValues(alpha: 0.8),
@@ -507,11 +508,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         indicatorColor: AppColors.primary,
         indicatorWeight: 3,
         labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-        tabs: const [
-          Tab(text: 'Tổng quan'),
-          Tab(text: 'Giao dịch'),
-          Tab(text: 'Thành viên'),
-          Tab(text: 'Chia tiền'),
+        tabs: [
+          Tab(text: AppStrings.overview),
+          Tab(text: AppStrings.transactions),
+          Tab(text: AppStrings.members),
+          Tab(text: AppStrings.splitBill),
         ],
       ),
     );
@@ -553,7 +554,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Thông tin nhóm',
+            AppStrings.groupInfo,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -563,19 +564,19 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           const SizedBox(height: 16),
           _buildInfoRow(
             icon: Icons.description_rounded,
-            label: 'Mô tả',
-            value: group.description ?? 'Chưa có mô tả',
+            label: AppStrings.description,
+            value: group.description ?? AppStrings.noDescription,
           ),
           const SizedBox(height: 12),
           _buildInfoRow(
             icon: Icons.calendar_today_rounded,
-            label: 'Ngày tạo',
+            label: AppStrings.createdDate,
             value: DateFormat('dd/MM/yyyy').format(group.createdAt),
           ),
           const SizedBox(height: 12),
           _buildInfoRow(
             icon: Icons.account_balance_wallet_rounded,
-            label: 'Số dư',
+            label: AppStrings.balance,
             value: currencyFormat.format(
               group.totalIncome - group.totalExpense,
             ),
@@ -657,7 +658,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
               ),
               const SizedBox(width: 12),
               Text(
-                'Mã mời nhóm',
+                AppStrings.groupInviteCode,
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.white.withValues(alpha: 0.9),
@@ -682,11 +683,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: group.inviteCode));
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Đã sao chép mã mời')),
+                  SnackBar(content: Text(AppStrings.inviteCodeCopied)),
                 );
               },
               icon: const Icon(Icons.copy_rounded, size: 18),
-              label: const Text('Sao chép mã'),
+              label: Text(AppStrings.copyCode),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: AppColors.primary,
@@ -741,14 +742,14 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Mục tiêu',
+                      AppStrings.target,
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
                       ),
                     ),
                     Text(
-                      group.targetDescription ?? 'Mục tiêu nhóm',
+                      group.targetDescription ?? AppStrings.groupTarget,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -765,14 +766,14 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
             children: [
               Expanded(
                 child: _buildTargetStat(
-                  label: 'Mục tiêu',
+                  label: AppStrings.target,
                   value: currencyFormat.format(group.targetAmount),
                   icon: Icons.savings_rounded,
                 ),
               ),
               Expanded(
                 child: _buildTargetStat(
-                  label: 'Còn thiếu',
+                  label: AppStrings.remainingAmount,
                   value: currencyFormat.format(group.remainingAmount),
                   icon: Icons.pending_rounded,
                 ),
@@ -780,8 +781,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
               if (daysLeft != null)
                 Expanded(
                   child: _buildTargetStat(
-                    label: 'Còn lại',
-                    value: '$daysLeft ngày',
+                    label: AppStrings.daysRemaining,
+                    value: '$daysLeft ${AppStrings.daysUnit}',
                     icon: Icons.timer_rounded,
                   ),
                 ),
@@ -825,8 +826,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
     if (expenses.isEmpty) {
       return _buildEmptyState(
         icon: Icons.receipt_long_rounded,
-        title: 'Chưa có giao dịch',
-        subtitle: 'Thêm giao dịch mới bằng nút + bên dưới',
+        title: AppStrings.noTransactions,
+        subtitle: AppStrings.addTransactionHint,
       );
     }
 
@@ -1000,7 +1001,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   children: [
                     Flexible(
                       child: Text(
-                        member.displayName ?? 'Thành viên',
+                        member.displayName ?? AppStrings.members,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -1023,7 +1024,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          isOwner ? 'Chủ nhóm' : 'Admin',
+                          isOwner ? AppStrings.groupOwner : AppStrings.adminRole,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -1036,7 +1037,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Đóng góp: ${currencyFormat.format(member.contribution)}',
+                  '${AppStrings.contributionLabel}: ${currencyFormat.format(member.contribution)}',
                   style: TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
@@ -1096,7 +1097,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
             child: Column(
               children: [
                 Text(
-                  'Tổng chi tiêu nhóm',
+                  AppStrings.totalGroupExpense,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.white.withValues(alpha: 0.8),
@@ -1131,7 +1132,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Trung bình: ${currencyFormat.format(perPerson)}/người',
+                        '${AppStrings.averagePrefix}: ${currencyFormat.format(perPerson)}${AppStrings.perPerson}',
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -1146,7 +1147,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
           ),
           const SizedBox(height: 24),
           Text(
-            'Chi tiết chia tiền',
+            AppStrings.splitBillDetail,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -1208,7 +1209,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          member.displayName ?? 'Thành viên',
+                          member.displayName ?? AppStrings.members,
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -1217,7 +1218,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          isOwed ? 'Được nhận lại' : 'Cần trả thêm',
+                          isOwed ? AppStrings.receivable : AppStrings.payable,
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textSecondary,
@@ -1335,7 +1336,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Mời bạn bè vào nhóm',
+                  AppStrings.inviteFriends,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -1344,7 +1345,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Chia sẻ mã này để mời người khác tham gia',
+                  AppStrings.shareCodeToInvite,
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textSecondary,
@@ -1375,11 +1376,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                       Clipboard.setData(ClipboardData(text: group.inviteCode));
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Đã sao chép mã mời')),
+                        SnackBar(content: Text(AppStrings.inviteCodeCopied)),
                       );
                     },
                     icon: const Icon(Icons.copy_rounded),
-                    label: const Text('Sao chép mã'),
+                    label: Text(AppStrings.copyCode),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,

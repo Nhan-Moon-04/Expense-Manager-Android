@@ -136,9 +136,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
         const SizedBox(width: 16),
-        const Text(
-          'Cài đặt',
-          style: TextStyle(
+        Text(
+          AppStrings.settings,
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -158,21 +158,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionHeader('Tài khoản', Icons.person_rounded),
+            _buildSectionHeader(AppStrings.account, Icons.person_rounded),
             const SizedBox(height: 12),
             _buildSettingsCard([
               _buildAvatarTile(user.avatarUrl, user.fullName),
               const Divider(height: 1, indent: 16, endIndent: 16),
               _buildListTile(
                 icon: Icons.person_outline_rounded,
-                title: 'Tên hiển thị',
+                title: AppStrings.displayName,
                 subtitle: user.fullName,
                 onTap: () => _showEditNameDialog(user.fullName),
               ),
               const Divider(height: 1, indent: 16, endIndent: 16),
               _buildListTile(
                 icon: Icons.email_outlined,
-                title: 'Email',
+                title: AppStrings.email,
                 subtitle: user.email,
                 onTap: () {}, // Email cannot be changed
               ),
@@ -264,9 +264,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Ảnh đại diện',
-                  style: TextStyle(
+                Text(
+                  AppStrings.avatar,
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
                     color: AppColors.textPrimary,
@@ -274,7 +274,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Nhấn vào biểu tượng camera để thay đổi',
+                  AppStrings.tapCameraToChange,
                   style: TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
@@ -339,9 +339,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Thay đổi ảnh đại diện',
-                  style: TextStyle(
+                Text(
+                  AppStrings.changeAvatar,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -350,7 +350,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 24),
                 _buildAvatarOptionTile(
                   icon: Icons.photo_library_rounded,
-                  title: 'Chọn từ thư viện',
+                  title: AppStrings.pickFromGallery,
                   onTap: () {
                     Navigator.pop(context);
                     _pickImage(ImageSource.gallery);
@@ -359,7 +359,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 12),
                 _buildAvatarOptionTile(
                   icon: Icons.camera_alt_rounded,
-                  title: 'Chụp ảnh mới',
+                  title: AppStrings.takeNewPhoto,
                   onTap: () {
                     Navigator.pop(context);
                     _pickImage(ImageSource.camera);
@@ -368,7 +368,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 12),
                 _buildAvatarOptionTile(
                   icon: Icons.delete_outline_rounded,
-                  title: 'Xóa ảnh đại diện',
+                  title: AppStrings.removeAvatar,
                   color: AppColors.error,
                   onTap: () {
                     Navigator.pop(context);
@@ -441,7 +441,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await _uploadAvatar(File(image.path));
       }
     } catch (e) {
-      _showErrorSnackBar('Không thể chọn ảnh');
+      _showErrorSnackBar(AppStrings.cannotUploadPhoto);
     }
   }
 
@@ -470,11 +470,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Row(
+              content: Row(
                 children: [
-                  Icon(Icons.check_circle, color: Colors.white),
-                  SizedBox(width: 12),
-                  Expanded(child: Text('Đã cập nhật ảnh đại diện')),
+                  const Icon(Icons.check_circle, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(AppStrings.avatarUpdated)),
                 ],
               ),
               backgroundColor: AppColors.success,
@@ -487,10 +487,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           );
         }
       } else {
-        _showErrorSnackBar('Không thể tải ảnh lên');
+        _showErrorSnackBar(AppStrings.cannotUploadPhoto);
       }
     } catch (e) {
-      _showErrorSnackBar('Đã xảy ra lỗi khi cập nhật ảnh');
+      _showErrorSnackBar(AppStrings.errorOccurred);
     } finally {
       if (mounted) {
         setState(() => _isUploadingAvatar = false);
@@ -512,11 +512,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 12),
-                Expanded(child: Text('Đã xóa ảnh đại diện')),
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text(AppStrings.avatarRemoved)),
               ],
             ),
             backgroundColor: AppColors.success,
@@ -529,7 +529,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       }
     } catch (e) {
-      _showErrorSnackBar('Không thể xóa ảnh đại diện');
+      _showErrorSnackBar(AppStrings.errorOccurred);
     } finally {
       if (mounted) {
         setState(() => _isUploadingAvatar = false);
@@ -544,9 +544,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Thay đổi tên hiển thị',
-          style: TextStyle(
+        title: Text(
+          AppStrings.changeDisplayName,
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
@@ -555,7 +555,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           controller: controller,
           autofocus: true,
           decoration: InputDecoration(
-            hintText: 'Nhập tên của bạn',
+            hintText: AppStrings.enterYourName,
             filled: true,
             fillColor: AppColors.background,
             border: OutlineInputBorder(
@@ -574,7 +574,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             style: TextButton.styleFrom(
               foregroundColor: AppColors.textSecondary,
             ),
-            child: const Text('Hủy'),
+            child: Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -591,7 +591,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Lưu'),
+            child: Text(AppStrings.save),
           ),
         ],
       ),
@@ -613,11 +613,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 12),
-                Expanded(child: Text('Đã cập nhật tên hiển thị')),
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text(AppStrings.displayNameUpdated)),
               ],
             ),
             backgroundColor: AppColors.success,
@@ -630,7 +630,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       }
     } catch (e) {
-      _showErrorSnackBar('Không thể cập nhật tên');
+      _showErrorSnackBar(AppStrings.errorOccurred);
     }
   }
 
@@ -663,7 +663,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionHeader(
-              'Tự động ghi chi tiêu',
+              AppStrings.autoRecordExpense,
               Icons.auto_awesome_rounded,
             ),
             const SizedBox(height: 12),
@@ -672,15 +672,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               if (provider.isEnabled) ...[
                 const Divider(height: 1, indent: 16, endIndent: 16),
                 _buildAutoExpenseOption(
-                  title: 'Tự động thêm chi tiêu',
-                  subtitle: 'Ghi nhận khi có giao dịch chi tiêu',
+                  title: AppStrings.autoAddExpenseLabel,
+                  subtitle: AppStrings.autoAddExpenseSubtitle,
                   value: provider.autoAddExpense,
                   onChanged: provider.setAutoAddExpense,
                 ),
                 const Divider(height: 1, indent: 16, endIndent: 16),
                 _buildAutoExpenseOption(
-                  title: 'Tự động thêm thu nhập',
-                  subtitle: 'Ghi nhận khi có giao dịch thu nhập',
+                  title: AppStrings.autoAddIncomeLabel,
+                  subtitle: AppStrings.autoAddIncomeSubtitle,
                   value: provider.autoAddIncome,
                   onChanged: provider.setAutoAddIncome,
                 ),
@@ -731,7 +731,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Đọc thông báo ngân hàng',
+                  AppStrings.readBankNotifications,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
@@ -742,7 +742,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Tự động ghi chi tiêu từ MoMo, VCB, MB...',
+                  AppStrings.readBankNotificationsSubtitle,
                   style: TextStyle(
                     fontSize: 13,
                     color: provider.isEnabled
@@ -834,17 +834,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Cần cấp quyền',
-                  style: TextStyle(
+                Text(
+                  AppStrings.permissionRequired,
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const Text(
-                  'Cho phép đọc thông báo để tự động ghi nhận',
-                  style: TextStyle(
+                Text(
+                  AppStrings.permissionRequiredSubtitle,
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
                   ),
@@ -862,9 +862,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text(
-              'Cấp quyền',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            child: Text(
+              AppStrings.grantPermission,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
             ),
           ),
         ],
@@ -906,7 +906,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Ngân hàng được hỗ trợ',
+                    AppStrings.supportedBanks,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
@@ -917,7 +917,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Bật/tắt để chọn ngân hàng muốn đọc thông báo',
+                AppStrings.supportedBanksSubtitle,
                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 12),
@@ -988,29 +988,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('Thông báo', Icons.notifications_rounded),
+        _buildSectionHeader(
+          AppStrings.notifications,
+          Icons.notifications_rounded,
+        ),
         const SizedBox(height: 12),
         _buildSettingsCard([
           _buildSwitchTile(
             icon: Icons.notifications_active_rounded,
-            title: 'Thông báo chung',
-            subtitle: 'Nhận thông báo từ ứng dụng',
+            title: AppStrings.generalNotifications,
+            subtitle: AppStrings.generalNotificationsSubtitle,
             value: _notificationsEnabled,
             onChanged: (value) => setState(() => _notificationsEnabled = value),
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _buildSwitchTile(
             icon: Icons.alarm_rounded,
-            title: 'Nhắc nhở',
-            subtitle: 'Nhận thông báo nhắc nhở chi tiêu',
+            title: AppStrings.reminders,
+            subtitle: AppStrings.reminderNotificationsSubtitle,
             value: _reminderEnabled,
             onChanged: (value) => setState(() => _reminderEnabled = value),
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _buildListTile(
             icon: Icons.science_rounded,
-            title: 'Test thông báo',
-            subtitle: 'Gửi thông báo test ngay lập tức',
+            title: AppStrings.testNotification,
+            subtitle: AppStrings.testNotificationSubtitle,
             onTap: _testNotification,
           ),
         ]),
@@ -1022,15 +1025,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       await PushNotificationService().showReminderNotification(
         id: DateTime.now().millisecondsSinceEpoch % 100000,
-        title: '🔔 Test thông báo',
-        body: 'Nếu bạn thấy thông báo này, push notification đang hoạt động!',
+        title: '🔔 Test',
+        body: 'Push notification is working!',
         payload: 'test',
       );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Đã gửi thông báo test'),
+            content: Text(AppStrings.testNotificationSent),
             backgroundColor: AppColors.success,
           ),
         );
@@ -1038,7 +1041,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text('${AppStrings.error}: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     }
@@ -1050,7 +1056,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionHeader('Hiển thị', Icons.palette_rounded),
+            _buildSectionHeader(AppStrings.display, Icons.palette_rounded),
             const SizedBox(height: 12),
             _buildSettingsCard([
               _buildListTile(
@@ -1071,7 +1077,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: settings.isDarkMode
                     ? Icons.dark_mode_rounded
                     : Icons.light_mode_rounded,
-                title: 'Giao diện',
+                title: AppStrings.theme,
                 subtitle: settings.themeModeDisplayName,
                 onTap: _showThemeModePicker,
               ),
@@ -1086,27 +1092,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('Dữ liệu', Icons.storage_rounded),
+        _buildSectionHeader(AppStrings.dataSection, Icons.storage_rounded),
         const SizedBox(height: 12),
         _buildSettingsCard([
           _buildListTile(
             icon: Icons.cloud_upload_rounded,
-            title: 'Sao lưu toàn bộ',
-            subtitle: 'Sao lưu giao dịch, ghi chú, nhắc nhở, nhóm',
+            title: AppStrings.backup,
+            subtitle: AppStrings.backupSubtitle,
             onTap: _isBackingUp ? () {} : _performBackup,
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _buildListTile(
             icon: Icons.cloud_download_rounded,
-            title: 'Khôi phục toàn bộ',
-            subtitle: 'Khôi phục tất cả dữ liệu từ bản sao lưu',
+            title: AppStrings.restore,
+            subtitle: AppStrings.restoreSubtitle,
             onTap: _isRestoring ? () {} : _showRestoreDialog,
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _buildListTile(
             icon: Icons.download_rounded,
-            title: 'Xuất báo cáo',
-            subtitle: 'Xuất dữ liệu ra file CSV',
+            title: AppStrings.exportReport,
+            subtitle: AppStrings.exportReportSubtitle,
             onTap: _isExporting ? () {} : _performExport,
           ),
         ]),
@@ -1119,7 +1125,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader(
-          'Vùng nguy hiểm',
+          AppStrings.dangerZone,
           Icons.warning_rounded,
           color: AppColors.error,
         ),
@@ -1127,8 +1133,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _buildSettingsCard([
           _buildListTile(
             icon: Icons.delete_forever_rounded,
-            title: 'Xóa tất cả dữ liệu',
-            subtitle: 'Xóa giao dịch, ghi chú, nhắc nhở, nhóm (giữ tài khoản)',
+            title: AppStrings.deleteAllData,
+            subtitle: AppStrings.deleteAllDataSubtitle,
             iconColor: AppColors.error,
             titleColor: AppColors.error,
             onTap: _isDeletingAll ? () {} : _showDeleteDataDialog,
@@ -1326,9 +1332,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Chọn loại tiền tệ',
-                  style: TextStyle(
+                Text(
+                  AppStrings.selectCurrency,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -1402,9 +1408,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Chọn ngôn ngữ',
-                  style: TextStyle(
+                Text(
+                  AppStrings.selectLanguage,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -1469,7 +1475,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Chọn giao diện',
+                  AppStrings.chooseTheme,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -1479,7 +1485,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 20),
                 _buildPickerOption(
                   'light',
-                  'Sáng',
+                  AppStrings.lightTheme,
                   settings.themeMode == ThemeMode.light,
                   () async {
                     await settings.setThemeMode(ThemeMode.light);
@@ -1489,7 +1495,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 _buildPickerOption(
                   'dark',
-                  'Tối',
+                  AppStrings.darkTheme,
                   settings.themeMode == ThemeMode.dark,
                   () async {
                     await settings.setThemeMode(ThemeMode.dark);
@@ -1499,7 +1505,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 _buildPickerOption(
                   'system',
-                  'Theo hệ thống',
+                  AppStrings.systemTheme,
                   settings.themeMode == ThemeMode.system,
                   () async {
                     await settings.setThemeMode(ThemeMode.system);
@@ -1543,11 +1549,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final info = await _backupService.getBackupInfo(user.uid);
       if (mounted) {
         final msg = info != null
-            ? 'Đã sao lưu: ${info['expenseCount']} giao dịch, '
-                  '${info['noteCount']} ghi chú, '
-                  '${info['reminderCount']} nhắc nhở, '
-                  '${info['groupCount']} nhóm'
-            : 'Đã sao lưu dữ liệu thành công';
+            ? '${AppStrings.backupDetail}: ${info['expenseCount']} ${AppStrings.transactionUnit}, '
+                  '${info['noteCount']} ${AppStrings.noteUnit}, '
+                  '${info['reminderCount']} ${AppStrings.reminderUnit}, '
+                  '${info['groupCount']} ${AppStrings.groupUnit}'
+            : AppStrings.backupSuccess;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -1567,7 +1573,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       }
     } catch (e) {
-      _showErrorSnackBar('Lỗi sao lưu: $e');
+      _showErrorSnackBar('${AppStrings.error}: $e');
     } finally {
       if (mounted) setState(() => _isBackingUp = false);
     }
@@ -1592,14 +1598,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Navigator.pop(context); // close loading
 
           if (info == null) {
-            _showErrorSnackBar('Không tìm thấy bản sao lưu');
+            _showErrorSnackBar(AppStrings.restoreNoBackup);
             return;
           }
 
           final backupAt = info['backupAt'] as DateTime?;
           final timeStr = backupAt != null
               ? '${backupAt.day}/${backupAt.month}/${backupAt.year} ${backupAt.hour}:${backupAt.minute.toString().padLeft(2, '0')}'
-              : 'Không rõ';
+              : AppStrings.unknown;
 
           showDialog(
             context: context,
@@ -1621,10 +1627,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Khôi phục dữ liệu',
-                      style: TextStyle(
+                      AppStrings.restoreData,
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
                       ),
@@ -1637,7 +1643,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bản sao lưu lúc: $timeStr',
+                    '${AppStrings.backupAt}: $timeStr',
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -1646,24 +1652,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 12),
                   _buildRestoreInfoRow(
                     Icons.receipt_long_rounded,
-                    '${info['expenseCount']} giao dịch',
+                    '${info['expenseCount']} ${AppStrings.transactionUnit}',
                   ),
                   _buildRestoreInfoRow(
                     Icons.note_rounded,
-                    '${info['noteCount']} ghi chú',
+                    '${info['noteCount']} ${AppStrings.noteUnit}',
                   ),
                   _buildRestoreInfoRow(
                     Icons.alarm_rounded,
-                    '${info['reminderCount']} nhắc nhở',
+                    '${info['reminderCount']} ${AppStrings.reminderUnit}',
                   ),
                   _buildRestoreInfoRow(
                     Icons.group_rounded,
-                    '${info['groupCount']} nhóm',
+                    '${info['groupCount']} ${AppStrings.groupUnit}',
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Dữ liệu hiện tại sẽ được gộp với bản sao lưu. Bạn có muốn tiếp tục?',
-                    style: TextStyle(color: AppColors.textSecondary),
+                  Text(
+                    AppStrings.restoreConfirm,
+                    style: const TextStyle(color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -1673,7 +1679,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.textSecondary,
                   ),
-                  child: const Text('Hủy'),
+                  child: Text(AppStrings.cancel),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -1687,7 +1693,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('Khôi phục'),
+                  child: Text(AppStrings.restoreAction),
                 ),
               ],
             ),
@@ -1696,7 +1702,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         .catchError((e) {
           if (!mounted) return;
           Navigator.pop(context);
-          _showErrorSnackBar('Lỗi kiểm tra bản sao lưu: $e');
+          _showErrorSnackBar('${AppStrings.error}: $e');
         });
   }
 
@@ -1740,10 +1746,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Đã khôi phục ${result['expenses']} giao dịch, '
-                    '${result['notes']} ghi chú, '
-                    '${result['reminders']} nhắc nhở, '
-                    '${result['groups']} nhóm',
+                    '${AppStrings.restoreAction} ${result['expenses']} ${AppStrings.transactionUnit}, '
+                    '${result['notes']} ${AppStrings.noteUnit}, '
+                    '${result['reminders']} ${AppStrings.reminderUnit}, '
+                    '${result['groups']} ${AppStrings.groupUnit}',
                   ),
                 ),
               ],
@@ -1781,7 +1787,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await SharePlus.instance.share(ShareParams(files: [XFile(filePath)]));
       }
     } catch (e) {
-      _showErrorSnackBar('Lỗi xuất file: $e');
+      _showErrorSnackBar('${AppStrings.error}: $e');
     } finally {
       if (mounted) setState(() => _isExporting = false);
     }
@@ -1854,10 +1860,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: const Icon(Icons.warning_rounded, color: AppColors.error),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Text(
-                'Xóa tất cả dữ liệu',
-                style: TextStyle(
+                AppStrings.deleteAllData,
+                style: const TextStyle(
                   color: AppColors.error,
                   fontWeight: FontWeight.bold,
                 ),
@@ -1869,22 +1875,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Sẽ xóa vĩnh viễn:',
-              style: TextStyle(
+            Text(
+              AppStrings.willPermanentlyDelete,
+              style: const TextStyle(
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
-            _buildDeleteInfoRow(Icons.receipt_long_rounded, 'Tất cả giao dịch'),
-            _buildDeleteInfoRow(Icons.note_rounded, 'Tất cả ghi chú'),
-            _buildDeleteInfoRow(Icons.alarm_rounded, 'Tất cả nhắc nhở'),
+            _buildDeleteInfoRow(
+              Icons.receipt_long_rounded,
+              AppStrings.allTransactions,
+            ),
+            _buildDeleteInfoRow(Icons.note_rounded, AppStrings.allNotes),
+            _buildDeleteInfoRow(Icons.alarm_rounded, AppStrings.allReminders),
             _buildDeleteInfoRow(
               Icons.notifications_rounded,
-              'Tất cả thông báo',
+              AppStrings.allNotifications,
             ),
-            _buildDeleteInfoRow(Icons.group_rounded, 'Tất cả nhóm'),
+            _buildDeleteInfoRow(Icons.group_rounded, AppStrings.allGroups),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
@@ -1892,18 +1901,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 color: AppColors.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.shield_rounded,
                     color: AppColors.success,
                     size: 18,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Tài khoản đăng nhập sẽ được giữ lại',
-                      style: TextStyle(
+                      AppStrings.accountWillBeKept,
+                      style: const TextStyle(
                         color: AppColors.success,
                         fontWeight: FontWeight.w500,
                         fontSize: 13,
@@ -1914,9 +1923,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Hệ thống sẽ tự động sao lưu ra file trước khi xóa.',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            Text(
+              AppStrings.autoBackupBeforeDelete,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+              ),
             ),
           ],
         ),
@@ -1926,7 +1938,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             style: TextButton.styleFrom(
               foregroundColor: AppColors.textSecondary,
             ),
-            child: const Text('Hủy'),
+            child: Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1940,7 +1952,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Xóa tất cả'),
+            child: Text(AppStrings.deleteAll),
           ),
         ],
       ),
@@ -1974,9 +1986,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // Step 1: Backup to local file first
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Row(
+          content: Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
@@ -1984,8 +1996,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: Colors.white,
                 ),
               ),
-              SizedBox(width: 12),
-              Expanded(child: Text('Đang sao lưu dữ liệu trước khi xóa...')),
+              const SizedBox(width: 12),
+              Expanded(child: Text(AppStrings.backingUpBeforeDelete)),
             ],
           ),
           backgroundColor: AppColors.warning,
@@ -2011,9 +2023,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // Step 3: Show loading and delete all data
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Row(
+          content: Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
@@ -2021,8 +2033,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: Colors.white,
                 ),
               ),
-              SizedBox(width: 12),
-              Expanded(child: Text('Đang xóa tất cả dữ liệu...')),
+              const SizedBox(width: 12),
+              Expanded(child: Text(AppStrings.deletingAllData)),
             ],
           ),
           backgroundColor: AppColors.error,
@@ -2059,11 +2071,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Đã xóa ${result['expenses']} chi tiêu, '
-                  '${result['notes']} ghi chú, '
-                  '${result['reminders']} nhắc nhở, '
-                  '${result['groups']} nhóm.\n'
-                  'File backup đã được lưu.',
+                  '${AppStrings.deleted} ${result['expenses']} ${AppStrings.expenseUnit}, '
+                  '${result['notes']} ${AppStrings.noteUnit}, '
+                  '${result['reminders']} ${AppStrings.reminderUnit}, '
+                  '${result['groups']} ${AppStrings.groupUnit}.\n'
+                  '${AppStrings.backupFileSaved}',
                 ),
               ),
             ],
@@ -2078,7 +2090,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       );
     } catch (e) {
-      _showErrorSnackBar('Lỗi xóa dữ liệu: $e');
+      _showErrorSnackBar('${AppStrings.error}: $e');
     } finally {
       if (mounted) setState(() => _isDeletingAll = false);
     }
@@ -2088,15 +2100,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('Thông tin', Icons.info_rounded),
+        _buildSectionHeader(AppStrings.info, Icons.info_rounded),
         const SizedBox(height: 12),
         _buildSettingsCard([
           _buildListTile(
             icon: Icons.update_rounded,
-            title: 'Phiên bản',
+            title: AppStrings.version,
             subtitle: _currentVersion.isNotEmpty
                 ? 'v$_currentVersion'
-                : 'Đang tải...',
+                : AppStrings.loading,
             onTap: () => _checkForUpdate(),
           ),
         ]),
@@ -2108,9 +2120,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // Hiện loading
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(
@@ -2118,8 +2130,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 color: Colors.white,
               ),
             ),
-            SizedBox(width: 12),
-            Expanded(child: Text('Đang kiểm tra phiên bản...')),
+            const SizedBox(width: 12),
+            Expanded(child: Text(AppStrings.checkingVersion)),
           ],
         ),
         backgroundColor: AppColors.primary,
@@ -2146,16 +2158,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.check_circle, color: Colors.white),
-                  SizedBox(width: 12),
-                  Expanded(child: Text('Bạn đang dùng phiên bản mới nhất!')),
+                  const Icon(Icons.check_circle, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(AppStrings.upToDate)),
                 ],
               ),
               const SizedBox(height: 4),
               Text(
-                'Hiện tại: $currentVer | Server: $latestVer',
+                '${AppStrings.currentVer}: $currentVer | Server: $latestVer',
                 style: const TextStyle(fontSize: 11, color: Colors.white70),
               ),
             ],

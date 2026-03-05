@@ -72,7 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            user?.fullName ?? 'Người dùng',
+                            user?.fullName ?? AppStrings.defaultUserName,
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -190,11 +190,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                       // Menu items
                       _buildMenuSection(
-                        title: 'Cài Đặt',
+                        title: AppStrings.settings,
                         items: [
                           _buildMenuItem(
                             icon: Icons.account_balance_wallet_outlined,
-                            title: 'Quản lý Ví',
+                            title: AppStrings.walletManagement,
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -207,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           _buildMenuItem(
                             icon: Icons.analytics_outlined,
-                            title: 'Thống kê',
+                            title: AppStrings.statistics,
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -217,6 +217,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               );
                             },
+                          ),
+                          Consumer<SettingsProvider>(
+                            builder: (context, settings, _) => _buildMenuItem(
+                              icon: settings.isDarkMode
+                                  ? Icons.dark_mode
+                                  : Icons.light_mode_outlined,
+                              title: AppStrings.theme,
+                              trailing: Switch(
+                                value: settings.isDarkMode,
+                                onChanged: (value) {
+                                  settings.setThemeMode(
+                                    value ? ThemeMode.dark : ThemeMode.light,
+                                  );
+                                },
+                                activeThumbColor: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                          Consumer<SettingsProvider>(
+                            builder: (context, settings, _) => _buildMenuItem(
+                              icon: Icons.language_outlined,
+                              title: AppStrings.language,
+                              trailing: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  settings.languageDisplayName,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                              onTap: () => _showLanguagePicker(context),
+                            ),
                           ),
                           _buildMenuItem(
                             icon: Icons.settings_outlined,
@@ -244,7 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 16),
 
                       _buildMenuSection(
-                        title: 'Khác',
+                        title: AppStrings.otherSection,
                         items: [
                           _buildMenuItem(
                             icon: Icons.info_outline,
@@ -260,7 +303,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           _buildMenuItem(
                             icon: Icons.help_outline,
-                            title: 'Trợ Giúp',
+                            title: AppStrings.help,
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -349,12 +392,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _showLanguagePicker(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context, listen: false);
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              AppStrings.selectLanguage,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Text('🇻🇳', style: TextStyle(fontSize: 24)),
+              title: const Text('Tiếng Việt'),
+              trailing: settings.language == 'vi'
+                  ? Icon(Icons.check_circle, color: AppColors.primary)
+                  : null,
+              onTap: () {
+                settings.setLanguage('vi');
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Text('🇺🇸', style: TextStyle(fontSize: 24)),
+              title: const Text('English'),
+              trailing: settings.language == 'en'
+                  ? Icon(Icons.check_circle, color: AppColors.primary)
+                  : null,
+              onTap: () {
+                settings.setLanguage('en');
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(AppStrings.logout),
-        content: const Text('Bạn có chắc muốn đăng xuất?'),
+        content: Text(AppStrings.logoutConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

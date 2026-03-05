@@ -142,9 +142,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Thông báo',
-                  style: TextStyle(
+                Text(
+                  AppStrings.notifications,
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -153,7 +153,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  unreadCount > 0 ? '$unreadCount chưa đọc' : 'Tất cả đã đọc',
+                  unreadCount > 0 ? '$unreadCount ${AppStrings.unreadSuffix}' : AppStrings.allRead,
                   style: const TextStyle(
                     fontSize: 14,
                     color: AppColors.textSecondary,
@@ -227,9 +227,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Text(
-                        'Đánh dấu tất cả đã đọc',
-                        style: TextStyle(fontSize: 14),
+                      Text(
+                        AppStrings.markAllRead,
+                        style: const TextStyle(fontSize: 14),
                       ),
                     ],
                   ),
@@ -251,7 +251,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Text('Xóa tất cả', style: TextStyle(fontSize: 14)),
+                      Text(AppStrings.deleteAll, style: const TextStyle(fontSize: 14)),
                     ],
                   ),
                 ),
@@ -302,7 +302,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Bạn có $unreadCount thông báo mới',
+                  '${AppStrings.youHave} $unreadCount ${AppStrings.newNotificationsSuffix}',
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -311,7 +311,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Chạm để xem chi tiết',
+                  AppStrings.tapToViewDetails,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white.withValues(alpha: 0.7),
@@ -337,9 +337,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text(
-                'Đọc hết',
-                style: TextStyle(
+              child: Text(
+                AppStrings.readAll,
+                style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -370,19 +370,19 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Không có thông báo',
-            style: TextStyle(
+          Text(
+            AppStrings.noNotifications,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Bạn sẽ nhận thông báo khi có\ncập nhật mới',
+          Text(
+            AppStrings.noNotificationsSubtitle,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
               height: 1.5,
@@ -408,19 +408,19 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       );
       String label;
       if (nDate == today) {
-        label = 'Hôm nay';
+        label = AppStrings.today;
       } else if (nDate == yesterday) {
-        label = 'Hôm qua';
+        label = AppStrings.yesterday;
       } else if (now.difference(nDate).inDays < 7) {
-        label = 'Tuần này';
+        label = AppStrings.thisWeek;
       } else {
-        label = 'Trước đó';
+        label = AppStrings.earlier;
       }
       grouped.putIfAbsent(label, () => []).add(n);
     }
 
     // Maintain order
-    const order = ['Hôm nay', 'Hôm qua', 'Tuần này', 'Trước đó'];
+    final order = [AppStrings.today, AppStrings.yesterday, AppStrings.thisWeek, AppStrings.earlier];
     final sortedKeys = order.where((key) => grouped.containsKey(key)).toList();
 
     return SliverList(
@@ -485,14 +485,14 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           color: AppColors.error,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.delete_rounded, color: Colors.white, size: 22),
-            SizedBox(height: 4),
+            const Icon(Icons.delete_rounded, color: Colors.white, size: 22),
+            const SizedBox(height: 4),
             Text(
-              'Xóa',
-              style: TextStyle(
+              AppStrings.delete,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
@@ -673,13 +673,13 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     final diff = now.difference(dateTime);
 
     if (diff.inMinutes < 1) {
-      return 'Vừa xong';
+      return AppStrings.justNow;
     } else if (diff.inMinutes < 60) {
-      return '${diff.inMinutes} phút trước';
+      return '${diff.inMinutes} ${AppStrings.minutesAgo}';
     } else if (diff.inHours < 24) {
-      return '${diff.inHours} giờ trước';
+      return '${diff.inHours} ${AppStrings.hoursAgo}';
     } else if (diff.inDays < 7) {
-      return '${diff.inDays} ngày trước';
+      return '${diff.inDays} ${AppStrings.daysAgo}';
     } else {
       return DateFormat('dd/MM/yyyy').format(dateTime);
     }
@@ -705,15 +705,15 @@ class _NotificationsScreenState extends State<NotificationsScreen>
               ),
             ),
             const SizedBox(width: 12),
-            const Text(
-              'Xóa tất cả',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            Text(
+              AppStrings.deleteAll,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
           ],
         ),
-        content: const Text(
-          'Bạn có chắc muốn xóa tất cả thông báo? Hành động này không thể hoàn tác.',
-          style: TextStyle(
+        content: Text(
+          AppStrings.deleteAllNotificationsConfirm,
+          style: const TextStyle(
             color: AppColors.textSecondary,
             fontSize: 14,
             height: 1.4,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 
 class HelpScreen extends StatelessWidget {
   const HelpScreen({super.key});
@@ -17,7 +18,7 @@ class HelpScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Trợ Giúp'),
+        title: Text(AppStrings.helpTitle),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: AppColors.textPrimary,
@@ -47,9 +48,9 @@ class HelpScreen extends StatelessWidget {
                     color: Colors.white,
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Bạn cần giúp đỡ?',
-                    style: TextStyle(
+                  Text(
+                    AppStrings.needHelp,
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -57,7 +58,7 @@ class HelpScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Chúng tôi luôn sẵn sàng hỗ trợ bạn',
+                    AppStrings.alwaysReadyToHelp,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.white.withValues(alpha: 0.85),
@@ -70,7 +71,7 @@ class HelpScreen extends StatelessWidget {
 
             // FAQ section
             Text(
-              'Câu Hỏi Thường Gặp',
+              AppStrings.faq,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -79,46 +80,34 @@ class HelpScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             _buildFaqItem(
-              question: 'Làm sao để thêm chi tiêu mới?',
-              answer:
-                  'Bạn vào tab "Chi Tiêu" rồi nhấn nút "+" ở góc dưới bên phải. '
-                  'Điền thông tin khoản chi tiêu và nhấn "Lưu".',
+              question: AppStrings.faqQuestion1,
+              answer: AppStrings.faqAnswer1,
             ),
             _buildFaqItem(
-              question: 'Làm sao để tạo nhóm chi tiêu?',
-              answer:
-                  'Vào tab "Nhóm", nhấn nút "+" để tạo nhóm mới. '
-                  'Bạn có thể thêm thành viên bằng cách chia sẻ mã nhóm hoặc mời qua email.',
+              question: AppStrings.faqQuestion2,
+              answer: AppStrings.faqAnswer2,
             ),
             _buildFaqItem(
-              question: 'Dữ liệu có được đồng bộ không?',
-              answer:
-                  'Có, tất cả dữ liệu được lưu trên Firebase Cloud và tự động '
-                  'đồng bộ giữa các thiết bị khi bạn đăng nhập cùng tài khoản.',
+              question: AppStrings.faqQuestion3,
+              answer: AppStrings.faqAnswer3,
             ),
             _buildFaqItem(
-              question: 'Làm sao để đổi mật khẩu?',
-              answer:
-                  'Vào "Cá Nhân" → "Đổi Mật Khẩu". Nhập mật khẩu hiện tại '
-                  'và mật khẩu mới để thay đổi.',
+              question: AppStrings.faqQuestion4,
+              answer: AppStrings.faqAnswer4,
             ),
             _buildFaqItem(
-              question: 'Làm sao để xem thống kê chi tiêu?',
-              answer:
-                  'Ở Trang Chủ, bạn có thể xem tổng quan chi tiêu theo tháng. '
-                  'Nhấn vào biểu đồ để xem chi tiết theo danh mục.',
+              question: AppStrings.faqQuestion5,
+              answer: AppStrings.faqAnswer5,
             ),
             _buildFaqItem(
-              question: 'Nhắc nhở chi tiêu hoạt động như nào?',
-              answer:
-                  'Bạn có thể tạo nhắc nhở ở Trang Chủ bằng cách nhấn vào mục "Nhắc Nhở". '
-                  'Ứng dụng sẽ gửi thông báo vào thời gian bạn đã đặt.',
+              question: AppStrings.faqQuestion6,
+              answer: AppStrings.faqAnswer6,
             ),
             const SizedBox(height: 28),
 
             // Contact support section
             Text(
-              'Liên Hệ Hỗ Trợ',
+              AppStrings.contactSupport,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -130,7 +119,7 @@ class HelpScreen extends StatelessWidget {
               icon: Icons.facebook_rounded,
               color: const Color(0xFF1877F2),
               title: 'Facebook',
-              subtitle: 'Nhắn tin qua Facebook Messenger',
+              subtitle: AppStrings.facebookMessenger,
               onTap: () => _launchUrl('https://www.facebook.com/thiennhan1611'),
             ),
             const SizedBox(height: 10),
@@ -138,14 +127,14 @@ class HelpScreen extends StatelessWidget {
               icon: Icons.chat_bubble_rounded,
               color: const Color(0xFF0068FF),
               title: 'Zalo',
-              subtitle: 'Chat trực tiếp qua Zalo: 0989057191',
+              subtitle: AppStrings.zaloChat,
               onTap: () => _launchUrl('https://zalo.me/0989057191'),
             ),
             const SizedBox(height: 10),
             _buildContactCard(
               icon: Icons.phone_rounded,
               color: AppColors.success,
-              title: 'Gọi điện',
+              title: AppStrings.callPhone,
               subtitle: '0989057191',
               onTap: () => _launchUrl('tel:0989057191'),
             ),
@@ -153,7 +142,7 @@ class HelpScreen extends StatelessWidget {
             _buildContactCard(
               icon: Icons.bug_report_rounded,
               color: AppColors.warning,
-              title: 'Báo lỗi trên GitHub',
+              title: AppStrings.reportBugGithub,
               subtitle: 'Nhan-Moon-04',
               onTap: () => _launchUrl('https://github.com/Nhan-Moon-04'),
             ),

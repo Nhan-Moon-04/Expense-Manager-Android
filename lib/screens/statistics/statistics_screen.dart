@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../models/expense_model.dart';
@@ -23,9 +25,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F0F1A) : AppColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Thống kê',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppStrings.statistics,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: isDark ? const Color(0xFF1E1E2E) : AppColors.primary,
         foregroundColor: Colors.white,
@@ -48,7 +50,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Chưa có dữ liệu thống kê',
+                    AppStrings.noStatisticsData,
                     style: TextStyle(
                       fontSize: 16,
                       color: isDark ? Colors.white70 : AppColors.textSecondary,
@@ -180,7 +182,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
                 // Category breakdown
                 if (sortedCategories.isNotEmpty) ...[
-                  _buildSectionTitle('Phân loại chi tiêu', isDark),
+                  _buildSectionTitle(AppStrings.categoryBreakdown, isDark),
                   const SizedBox(height: 12),
                   _buildCategoryBreakdown(
                     sortedCategories,
@@ -192,7 +194,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 ],
 
                 // Daily chart (simple bar representation)
-                _buildSectionTitle('Chi tiêu theo ngày', isDark),
+                _buildSectionTitle(AppStrings.dailyExpense, isDark),
                 const SizedBox(height: 12),
                 _buildDailyChart(dailyExpense, daysInMonth, isDark),
 
@@ -206,7 +208,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   }
 
   Widget _buildMonthSelector(DateTime selectedMonth, bool isDark) {
-    final monthLabel = DateFormat('MMMM yyyy', 'vi').format(selectedMonth);
+    final monthLabel = DateFormat('MMMM yyyy', AppLocalizations.currentLanguage).format(selectedMonth);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -294,7 +296,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Số dư tháng',
+                AppStrings.monthlyBalanceStat,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.9),
                   fontSize: 14,
@@ -319,7 +321,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           children: [
             Expanded(
               child: _buildStatCard(
-                'Thu nhập',
+                AppStrings.income,
                 fmt.format(income),
                 Icons.arrow_downward_rounded,
                 AppColors.incomeColor,
@@ -329,7 +331,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildStatCard(
-                'Chi tiêu',
+                AppStrings.expense,
                 fmt.format(expense),
                 Icons.arrow_upward_rounded,
                 AppColors.expenseColor,
@@ -431,8 +433,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       child: Column(
         children: [
           _buildStatRow(
-            'Số giao dịch chi',
-            '$expenseCount giao dịch',
+            AppStrings.expenseTransactionCount,
+            '$expenseCount ${AppStrings.transactionsSuffix}',
             Icons.receipt_long_rounded,
             AppColors.expenseColor,
             textColor,
@@ -440,8 +442,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           ),
           const Divider(height: 20),
           _buildStatRow(
-            'Số giao dịch thu',
-            '$incomeCount giao dịch',
+            AppStrings.incomeTransactionCount,
+            '$incomeCount ${AppStrings.transactionsSuffix}',
             Icons.receipt_rounded,
             AppColors.incomeColor,
             textColor,
@@ -449,7 +451,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           ),
           const Divider(height: 20),
           _buildStatRow(
-            'Chi tiêu TB/ngày',
+            AppStrings.avgDailyExpense,
             fmt.format(avgDaily),
             Icons.speed_rounded,
             AppColors.info,
@@ -459,7 +461,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           if (topDay != null) ...[
             const Divider(height: 20),
             _buildStatRow(
-              'Ngày chi nhiều nhất',
+              AppStrings.topSpendingDay,
               '$topDay/${selectedMonth.month} - ${fmt.format(topDayAmount)}',
               Icons.trending_up_rounded,
               AppColors.warning,
@@ -532,7 +534,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Thu nhập vs Chi tiêu',
+            AppStrings.incomeVsExpense,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -589,9 +591,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           const SizedBox(height: 12),
           Row(
             children: [
-              _buildLegendItem('Thu nhập', AppColors.incomeColor),
+              _buildLegendItem(AppStrings.income, AppColors.incomeColor),
               const SizedBox(width: 20),
-              _buildLegendItem('Chi tiêu', AppColors.expenseColor),
+              _buildLegendItem(AppStrings.expense, AppColors.expenseColor),
             ],
           ),
         ],
@@ -745,7 +747,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         ),
         child: Center(
           child: Text(
-            'Không có chi tiêu trong tháng này',
+            AppStrings.noExpenseThisMonth,
             style: TextStyle(
               color: isDark ? Colors.white70 : AppColors.textSecondary,
             ),
@@ -783,7 +785,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
             return Expanded(
               child: Tooltip(
-                message: 'Ngày $day: ${amount.toStringAsFixed(0)}đ',
+                message: '${AppStrings.dayPrefix} $day: ${amount.toStringAsFixed(0)}đ',
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 0.5),
                   child: Column(
@@ -885,25 +887,25 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   String _getCategoryName(ExpenseCategory category) {
     switch (category) {
       case ExpenseCategory.food:
-        return 'Ăn Uống';
+        return AppStrings.food;
       case ExpenseCategory.transport:
-        return 'Di Chuyển';
+        return AppStrings.transport;
       case ExpenseCategory.shopping:
-        return 'Mua Sắm';
+        return AppStrings.shopping;
       case ExpenseCategory.entertainment:
-        return 'Giải Trí';
+        return AppStrings.entertainment;
       case ExpenseCategory.bills:
-        return 'Hóa Đơn';
+        return AppStrings.bills;
       case ExpenseCategory.health:
-        return 'Sức Khỏe';
+        return AppStrings.health;
       case ExpenseCategory.education:
-        return 'Giáo Dục';
+        return AppStrings.education;
       case ExpenseCategory.salary:
-        return 'Lương';
+        return AppStrings.salary;
       case ExpenseCategory.bonus:
-        return 'Thưởng';
+        return AppStrings.bonus;
       case ExpenseCategory.other:
-        return 'Khác';
+        return AppStrings.other;
     }
   }
 }

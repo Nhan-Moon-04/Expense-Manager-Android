@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/group_provider.dart';
 import '../../providers/settings_provider.dart';
@@ -115,7 +116,7 @@ class _GroupsScreenState extends State<GroupsScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Nhóm của bạn',
+              AppStrings.yourGroups,
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -127,7 +128,7 @@ class _GroupsScreenState extends State<GroupsScreen>
             Consumer<GroupProvider>(
               builder: (context, groupProvider, child) {
                 return Text(
-                  '${groupProvider.groups.length} nhóm đang hoạt động',
+                  '${groupProvider.groups.length} ${AppStrings.activeGroups}',
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textSecondary,
@@ -187,7 +188,7 @@ class _GroupsScreenState extends State<GroupsScreen>
             Expanded(
               child: _buildSummaryCard(
                 icon: Icons.savings_rounded,
-                title: 'Tổng đóng góp',
+                title: AppStrings.totalContribution,
                 value: currencyFormat.format(totalContribution),
                 gradient: AppColors.incomeGradient,
               ),
@@ -196,8 +197,8 @@ class _GroupsScreenState extends State<GroupsScreen>
             Expanded(
               child: _buildSummaryCard(
                 icon: Icons.flag_rounded,
-                title: 'Mục tiêu',
-                value: '$activeTargets đang thực hiện',
+                title: AppStrings.target,
+                value: '$activeTargets ${AppStrings.inProgress}',
                 gradient: AppColors.primaryGradient,
               ),
             ),
@@ -272,7 +273,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         Expanded(
           child: _buildActionButton(
             icon: Icons.add_rounded,
-            label: 'Tạo nhóm',
+            label: AppStrings.createGroup,
             onTap: () {
               Navigator.push(
                 context,
@@ -288,7 +289,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         Expanded(
           child: _buildActionButton(
             icon: Icons.login_rounded,
-            label: 'Tham gia',
+            label: AppStrings.join,
             onTap: _showJoinGroupDialog,
             isPrimary: false,
           ),
@@ -391,7 +392,7 @@ class _GroupsScreenState extends State<GroupsScreen>
           ),
           const SizedBox(height: 24),
           Text(
-            'Chưa có nhóm nào',
+            AppStrings.noGroupsYet,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -400,7 +401,7 @@ class _GroupsScreenState extends State<GroupsScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            'Tạo nhóm mới hoặc tham gia bằng mã mời',
+            AppStrings.noGroupsSubtitle,
             style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
           ),
         ],
@@ -476,7 +477,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    '${group.members.length} thành viên',
+                                    '${group.members.length} ${AppStrings.membersCount}',
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: AppColors.textSecondary,
@@ -537,7 +538,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                     Expanded(
                       child: _buildStatItem(
                         icon: Icons.arrow_upward_rounded,
-                        label: 'Đã góp',
+                        label: AppStrings.contributed,
                         value: currencyFormat.format(group.totalIncome),
                         color: AppColors.incomeColor,
                       ),
@@ -550,7 +551,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                     Expanded(
                       child: _buildStatItem(
                         icon: Icons.arrow_downward_rounded,
-                        label: 'Đã chi',
+                        label: AppStrings.spent,
                         value: currencyFormat.format(group.totalExpense),
                         color: AppColors.expenseColor,
                       ),
@@ -652,7 +653,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                 Icon(Icons.flag_rounded, size: 16, color: AppColors.primary),
                 const SizedBox(width: 6),
                 Text(
-                  group.targetDescription ?? 'Mục tiêu nhóm',
+                  group.targetDescription ?? AppStrings.groupTarget,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
@@ -794,7 +795,7 @@ class _GroupsScreenState extends State<GroupsScreen>
               ),
               const SizedBox(height: 24),
               Text(
-                'Tham gia nhóm',
+                AppStrings.joinGroup,
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -803,7 +804,7 @@ class _GroupsScreenState extends State<GroupsScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                'Nhập mã mời 6 ký tự để tham gia nhóm',
+                AppStrings.joinGroupSubtitle,
                 style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 24),
@@ -851,8 +852,8 @@ class _GroupsScreenState extends State<GroupsScreen>
                           : () async {
                               if (codeController.text.trim().length != 6) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Mã nhóm phải có 6 ký tự'),
+                                  SnackBar(
+                                    content: Text(AppStrings.groupCodeInvalid),
                                   ),
                                 );
                                 return;
@@ -875,9 +876,9 @@ class _GroupsScreenState extends State<GroupsScreen>
                                   SnackBar(
                                     content: Text(
                                       success
-                                          ? 'Tham gia nhóm thành công!'
+                                          ? AppStrings.joinGroupSuccess
                                           : groupProvider.error ??
-                                                'Đã có lỗi xảy ra',
+                                                AppStrings.errorOccurred,
                                     ),
                                     backgroundColor: success
                                         ? AppColors.success
@@ -904,9 +905,9 @@ class _GroupsScreenState extends State<GroupsScreen>
                                 strokeWidth: 2,
                               ),
                             )
-                          : const Text(
-                              'Tham gia nhóm',
-                              style: TextStyle(
+                          : Text(
+                              AppStrings.joinGroup,
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),

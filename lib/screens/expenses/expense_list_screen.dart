@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/settings_provider.dart';
@@ -174,22 +176,25 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Chi tiêu',
-              style: TextStyle(
+              AppStrings.expenses,
+              style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
                 letterSpacing: -0.5,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
-              'Quản lý giao dịch của bạn',
-              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+              AppStrings.manageYourTransactions,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
             ),
           ],
         ),
@@ -284,7 +289,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Tìm số tiền, nội dung, ngân hàng, loại...',
+          hintText: AppStrings.searchExpenseHint,
           hintStyle: const TextStyle(fontSize: 14, color: AppColors.textHint),
           prefixIcon: const Icon(
             Icons.search_rounded,
@@ -317,7 +322,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
     return Consumer<WalletProvider>(
       builder: (context, walletProvider, child) {
         final selectedWallet = walletProvider.selectedWallet;
-        final displayName = selectedWallet?.name ?? 'Tất cả ví';
+        final displayName = selectedWallet?.name ?? AppStrings.allWallets;
 
         return GestureDetector(
           onTap: () => _showWalletPicker(walletProvider),
@@ -392,9 +397,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Chọn ví',
-                  style: TextStyle(
+                Text(
+                  AppStrings.selectWallet,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -408,7 +413,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                       children: [
                         // "All" option
                         _buildWalletPickerOption(
-                          name: 'Tất cả ví',
+                          name: AppStrings.allWallets,
                           icon: Icons.all_inclusive_rounded,
                           isSelected: walletProvider.selectedWalletId == null,
                           onTap: () {
@@ -495,9 +500,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text(
-                  'Chính',
-                  style: TextStyle(
+                child: Text(
+                  AppStrings.primaryBadge,
+                  style: const TextStyle(
                     fontSize: 9,
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,
@@ -674,7 +679,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Số dư tháng này',
+                              AppStrings.monthBalance,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.white.withValues(alpha: 0.9),
@@ -747,7 +752,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${expenses.length} giao dịch trong tháng',
+                    '${expenses.length} ${AppStrings.transactionsThisMonth}',
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.white.withValues(alpha: 0.7),
@@ -764,7 +769,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Tổng số dư',
+                          AppStrings.totalBalance,
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.white.withValues(alpha: 0.8),
@@ -793,7 +798,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
               children: [
                 Expanded(
                   child: _buildMiniStatCard(
-                    title: 'Thu nhập',
+                    title: AppStrings.income,
                     amount: totalIncome,
                     icon: Icons.arrow_downward_rounded,
                     color: AppColors.success,
@@ -802,7 +807,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 const SizedBox(width: 14),
                 Expanded(
                   child: _buildMiniStatCard(
-                    title: 'Chi tiêu',
+                    title: AppStrings.expense,
                     amount: totalExpense,
                     icon: Icons.arrow_upward_rounded,
                     color: AppColors.error,
@@ -879,11 +884,19 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
   Widget _buildFilterChips() {
     return Row(
       children: [
-        _buildFilterChip('all', 'Tất cả', Icons.list_rounded),
+        _buildFilterChip('all', AppStrings.all, Icons.list_rounded),
         const SizedBox(width: 10),
-        _buildFilterChip('income', 'Thu nhập', Icons.arrow_downward_rounded),
+        _buildFilterChip(
+          'income',
+          AppStrings.income,
+          Icons.arrow_downward_rounded,
+        ),
         const SizedBox(width: 10),
-        _buildFilterChip('expense', 'Chi tiêu', Icons.arrow_upward_rounded),
+        _buildFilterChip(
+          'expense',
+          AppStrings.expense,
+          Icons.arrow_upward_rounded,
+        ),
       ],
     );
   }
@@ -976,18 +989,18 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    'Chưa có giao dịch nào',
-                    style: TextStyle(
+                  Text(
+                    AppStrings.noTransactions,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Thêm giao dịch đầu tiên của bạn',
-                    style: TextStyle(
+                  Text(
+                    AppStrings.addFirstTransaction,
+                    style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.textSecondary,
                     ),
@@ -1208,9 +1221,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                               color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Text(
-                              'Tự động',
-                              style: TextStyle(
+                            child: Text(
+                              AppStrings.autoBadge,
+                              style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primary,
@@ -1359,9 +1372,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Bộ lọc',
-                  style: TextStyle(
+                Text(
+                  AppStrings.filterTitle,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -1370,17 +1383,17 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 const SizedBox(height: 20),
                 _buildFilterDialogOption(
                   'all',
-                  'Tất cả giao dịch',
+                  AppStrings.allTransactions,
                   Icons.list_rounded,
                 ),
                 _buildFilterDialogOption(
                   'income',
-                  'Chỉ thu nhập',
+                  AppStrings.incomeOnly,
                   Icons.arrow_downward_rounded,
                 ),
                 _buildFilterDialogOption(
                   'expense',
-                  'Chỉ chi tiêu',
+                  AppStrings.expenseOnly,
                   Icons.arrow_upward_rounded,
                 ),
                 const SizedBox(height: 16),
@@ -1474,10 +1487,11 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
     final today = DateTime(now.year, now.month, now.day);
     final dateOnly = DateTime(date.year, date.month, date.day);
 
-    if (dateOnly == today) return 'Hôm nay';
-    if (dateOnly == today.subtract(const Duration(days: 1))) return 'Hôm qua';
+    if (dateOnly == today) return AppStrings.today;
+    if (dateOnly == today.subtract(const Duration(days: 1)))
+      return AppStrings.yesterday;
 
-    return DateFormat('EEEE', 'vi').format(date);
+    return DateFormat('EEEE', AppLocalizations.currentLanguage).format(date);
   }
 
   Color _getCategoryColor(ExpenseCategory category) {

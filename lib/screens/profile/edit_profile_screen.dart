@@ -65,8 +65,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         SnackBar(
           content: Text(
             success
-                ? 'Cập nhật thành công'
-                : authProvider.error ?? 'Đã có lỗi xảy ra',
+                ? AppStrings.updateSuccess
+                : authProvider.error ?? AppStrings.errorOccurred,
           ),
           backgroundColor: success ? AppColors.success : AppColors.error,
         ),

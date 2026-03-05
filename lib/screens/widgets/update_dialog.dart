@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../services/version_service.dart';
 import '../../services/apk_installer_service.dart';
 
@@ -77,7 +78,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
             // Title
             Text(
-              isForce ? 'Cập nhật bắt buộc' : 'Có phiên bản mới!',
+              isForce ? AppStrings.forceUpdate : AppStrings.newVersionAvailable,
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -126,7 +127,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'Có gì mới?',
+                          AppStrings.whatsNew,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -171,7 +172,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Bạn cần cập nhật để tiếp tục sử dụng ứng dụng.',
+                        AppStrings.mustUpdateMessage,
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
@@ -218,7 +219,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'Đang tải... ${(_downloadProgress * 100).toStringAsFixed(0)}%',
+                            '${AppStrings.downloadingProgress} ${(_downloadProgress * 100).toStringAsFixed(0)}%',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -226,13 +227,13 @@ class _UpdateDialogState extends State<UpdateDialog> {
                           ),
                         ],
                       )
-                    : const Row(
+                    : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.download_rounded, size: 20),
-                          SizedBox(width: 8),
+                          const Icon(Icons.download_rounded, size: 20),
+                          const SizedBox(width: 8),
                           Text(
-                            'Cập nhật ngay',
+                            AppStrings.updateNow,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -251,7 +252,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.textSecondary,
                 ),
-                child: const Text('Để sau', style: TextStyle(fontSize: 14)),
+                child: Text(AppStrings.later, style: const TextStyle(fontSize: 14)),
               ),
             ],
           ],
@@ -286,8 +287,8 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
       if (!success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Không thể tải hoặc cài đặt bản cập nhật'),
+          SnackBar(
+            content: Text(AppStrings.installError),
             backgroundColor: AppColors.error,
           ),
         );

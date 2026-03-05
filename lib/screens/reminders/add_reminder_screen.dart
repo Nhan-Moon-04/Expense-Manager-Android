@@ -75,7 +75,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Vui lòng nhập tiêu đề')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.pleaseEnterTitle)));
       return;
     }
 
@@ -132,8 +132,8 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
           SnackBar(
             content: Text(
               widget.reminder != null
-                  ? 'Cập nhật thành công'
-                  : 'Thêm nhắc nhở thành công',
+                  ? AppStrings.updateSuccess
+                  : AppStrings.reminderAddedSuccess,
             ),
             backgroundColor: AppColors.success,
           ),
@@ -141,7 +141,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(reminderProvider.error ?? 'Đã có lỗi xảy ra'),
+            content: Text(reminderProvider.error ?? AppStrings.errorOccurred),
             backgroundColor: AppColors.error,
           ),
         );
@@ -195,7 +195,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
-                hintText: 'Nhập tiêu đề nhắc nhở',
+                hintText: AppStrings.reminderTitleHint,
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -313,7 +313,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
 
             // Amount (optional)
             Text(
-              '${AppStrings.amount} (không bắt buộc)',
+              '${AppStrings.amount} ${AppStrings.optionalLabel}',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -324,7 +324,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
               controller: _amountController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                hintText: 'Số tiền liên quan',
+                hintText: AppStrings.relatedAmount,
                 suffixText: '₫',
                 filled: true,
                 fillColor: Colors.white,
@@ -337,7 +337,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
 
             // Description
             Text(
-              '${AppStrings.description} (không bắt buộc)',
+              '${AppStrings.description} ${AppStrings.optionalLabel}',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -348,7 +348,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
               controller: _descriptionController,
               maxLines: 3,
               decoration: InputDecoration(
-                hintText: 'Nhập mô tả',
+                hintText: AppStrings.enterDescription,
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(

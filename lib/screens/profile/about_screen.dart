@@ -18,7 +18,7 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Về Ứng Dụng'),
+        title: Text(AppStrings.aboutApp),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: AppColors.textPrimary,
@@ -69,7 +69,7 @@ class AboutScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'Phiên bản ${AppStrings.appVersion}',
+                '${AppStrings.versionPrefix} ${AppStrings.appVersion}',
                 style: TextStyle(
                   fontSize: 14,
                   color: AppColors.primary,
@@ -102,9 +102,7 @@ class AboutScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Ứng dụng quản lý chi tiêu thông minh, giúp bạn theo dõi '
-                    'và kiểm soát tài chính cá nhân một cách hiệu quả. '
-                    'Hỗ trợ quản lý nhóm, ghi chú, nhắc nhở và thống kê chi tiết.',
+                    AppStrings.aboutDescription,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
@@ -140,7 +138,7 @@ class AboutScreen extends StatelessWidget {
                       Icon(Icons.code_rounded, color: AppColors.primary),
                       const SizedBox(width: 10),
                       Text(
-                        'Nhà Phát Triển',
+                        AppStrings.developer,
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
@@ -170,7 +168,7 @@ class AboutScreen extends StatelessWidget {
                   _buildContactItem(
                     icon: Icons.phone_rounded,
                     color: AppColors.success,
-                    label: 'Điện thoại',
+                    label: AppStrings.phoneContact,
                     value: '0989057191',
                     onTap: () => _launchUrl('tel:0989057191'),
                   ),

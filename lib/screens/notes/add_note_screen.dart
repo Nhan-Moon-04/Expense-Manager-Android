@@ -57,7 +57,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Vui lòng nhập tiêu đề')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.pleaseEnterTitle)));
       return;
     }
 
@@ -95,8 +95,8 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
           SnackBar(
             content: Text(
               widget.note != null
-                  ? 'Cập nhật thành công'
-                  : 'Thêm ghi chú thành công',
+                  ? AppStrings.updateSuccess
+                  : AppStrings.noteAddedSuccess,
             ),
             backgroundColor: AppColors.success,
           ),
@@ -104,7 +104,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(noteProvider.error ?? 'Đã có lỗi xảy ra'),
+            content: Text(noteProvider.error ?? AppStrings.errorOccurred),
             backgroundColor: AppColors.error,
           ),
         );
@@ -158,8 +158,8 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
             TextField(
               controller: _titleController,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              decoration: const InputDecoration(
-                hintText: 'Tiêu đề',
+              decoration: InputDecoration(
+                hintText: AppStrings.noteTitle,
                 border: InputBorder.none,
               ),
             ),
@@ -169,8 +169,8 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
               maxLines: null,
               minLines: 20,
               style: const TextStyle(fontSize: 16),
-              decoration: const InputDecoration(
-                hintText: 'Nội dung ghi chú...',
+              decoration: InputDecoration(
+                hintText: AppStrings.noteContentHint,
                 border: InputBorder.none,
               ),
             ),
@@ -194,7 +194,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Chọn màu nền',
+                AppStrings.chooseBackgroundColor,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

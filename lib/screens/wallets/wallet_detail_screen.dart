@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/wallet_model.dart';
 import '../../models/expense_model.dart';
 import '../../providers/auth_provider.dart';
@@ -227,28 +229,28 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'edit',
               child: Row(
                 children: [
-                  Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
-                  SizedBox(width: 8),
-                  Text('Sửa tên ví'),
+                  const Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Text(AppStrings.editWallet),
                 ],
               ),
             ),
             if (!_wallet.isPrimary)
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.delete_rounded,
                       size: 20,
                       color: AppColors.error,
                     ),
-                    SizedBox(width: 8),
-                    Text('Xóa ví', style: TextStyle(color: AppColors.error)),
+                    const SizedBox(width: 8),
+                    Text(AppStrings.deleteWallet, style: const TextStyle(color: AppColors.error)),
                   ],
                 ),
               ),
@@ -288,9 +290,9 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Số dư',
-            style: TextStyle(
+          Text(
+            AppStrings.balance,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Colors.white70,
@@ -310,7 +312,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
             children: [
               Expanded(
                 child: _buildSummaryItem(
-                  'Thu nhập',
+                  AppStrings.income,
                   currencyFormat.format(income),
                   Icons.arrow_downward_rounded,
                   Colors.greenAccent,
@@ -319,7 +321,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
               const SizedBox(width: 16),
               Expanded(
                 child: _buildSummaryItem(
-                  'Chi tiêu',
+                  AppStrings.expense,
                   currencyFormat.format(expense),
                   Icons.arrow_upward_rounded,
                   Colors.redAccent,
@@ -385,9 +387,9 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Ngân hàng liên kết',
-              style: TextStyle(
+            Text(
+              AppStrings.linkedBanks,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -396,7 +398,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
             TextButton.icon(
               onPressed: () => _showAddBankDialog(walletProvider, authProvider),
               icon: const Icon(Icons.add_rounded, size: 18),
-              label: const Text('Thêm'),
+              label: Text(AppStrings.add),
               style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
           ],
@@ -422,9 +424,9 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                   color: AppColors.textHint,
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Chưa gán ngân hàng',
-                  style: TextStyle(
+                Text(
+                  AppStrings.noBanksAssigned,
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
@@ -499,9 +501,9 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Giao dịch gần đây',
-          style: TextStyle(
+        Text(
+          AppStrings.recentTransactions,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -524,9 +526,9 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                   color: AppColors.textHint,
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Chưa có giao dịch nào',
-                  style: TextStyle(
+                Text(
+                  AppStrings.noTransactions,
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
@@ -591,7 +593,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
-          DateFormat('dd/MM/yyyy', 'vi').format(expense.date),
+          DateFormat('dd/MM/yyyy', AppLocalizations.currentLanguage).format(expense.date),
           style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
         trailing: Text(
@@ -681,10 +683,10 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(16),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
                     child: Text(
-                      'Thêm ngân hàng',
+                      AppStrings.addBank,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -696,7 +698,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                     child: TextField(
                       controller: searchController,
                       decoration: InputDecoration(
-                        hintText: 'Tìm kiếm ngân hàng...',
+                        hintText: AppStrings.searchBankHint,
                         prefixIcon: const Icon(Icons.search_rounded),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -745,7 +747,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                                       )
                                     : isLinked
                                     ? Text(
-                                        'Đã gán',
+                                        AppStrings.assigned,
                                         style: TextStyle(
                                           color: AppColors.textHint,
                                           fontSize: 12,
@@ -758,19 +760,19 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                                     : isLinked
                                     ? null
                                     : () async {
-                                        final nav = Navigator.of(context);
-                                        final scaffold = ScaffoldMessenger.of(this.context);
                                         await walletProvider.linkBank(
                                           userId,
                                           _wallet.id,
                                           bankId,
                                         );
-                                        if (mounted) {
-                                          nav.pop();
-                                          scaffold.showSnackBar(
+                                        if (context.mounted) {
+                                          Navigator.pop(context);
+                                          ScaffoldMessenger.of(
+                                            this.context,
+                                          ).showSnackBar(
                                             SnackBar(
                                               content: Text(
-                                                'Đã gán $bankName vào ${_wallet.name}',
+                                                '${AppStrings.assigned} $bankName → ${_wallet.name}',
                                               ),
                                               backgroundColor:
                                                   AppColors.success,
@@ -799,11 +801,11 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Sửa tên ví'),
+        title: Text(AppStrings.renameWallet),
         content: TextField(
           controller: nameController,
           decoration: InputDecoration(
-            hintText: 'Nhập tên ví mới',
+            hintText: AppStrings.enterNewName,
             prefixIcon: const Icon(
               Icons.wallet_rounded,
               color: AppColors.primary,
@@ -815,27 +817,25 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
               final name = nameController.text.trim();
               if (name.isEmpty) return;
 
-              final nav = Navigator.of(context);
-              final scaffold = ScaffoldMessenger.of(this.context);
               final updated = _wallet.copyWith(
                 name: name,
                 updatedAt: DateTime.now(),
               );
               final success = await walletProvider.updateWallet(updated);
-              if (mounted) {
-                nav.pop();
+              if (context.mounted) {
+                Navigator.pop(context);
                 if (success) {
                   setState(() => _wallet = updated);
-                  scaffold.showSnackBar(
-                    const SnackBar(
-                      content: Text('Đã cập nhật tên ví'),
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    SnackBar(
+                      content: Text(AppStrings.walletRenamed),
                       backgroundColor: AppColors.success,
                     ),
                   );
@@ -849,7 +849,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Lưu'),
+            child: Text(AppStrings.save),
           ),
         ],
       ),
@@ -859,8 +859,8 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
   void _showDeleteWalletDialog() {
     if (_wallet.isPrimary) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Không thể xóa ví chính'),
+        SnackBar(
+          content: Text(AppStrings.cannotDeletePrimary),
           backgroundColor: AppColors.error,
         ),
       );
@@ -874,31 +874,28 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Xóa ví'),
+        title: Text(AppStrings.deleteWallet),
         content: Text(
-          'Bạn có chắc muốn xóa "${_wallet.name}"? Tất cả giao dịch sẽ được chuyển sang ví chính.',
+          '${AppStrings.confirmDelete} "${_wallet.name}"',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
-              final nav = Navigator.of(context);
-              final outerNav = Navigator.of(this.context);
-              final scaffold = ScaffoldMessenger.of(this.context);
               final success = await walletProvider.deleteWallet(
                 authProvider.user!.uid,
                 _wallet.id,
               );
-              if (mounted) {
-                nav.pop(); // Close dialog
-                if (success) {
-                  outerNav.pop(); // Go back to wallet list
-                  scaffold.showSnackBar(
-                    const SnackBar(
-                      content: Text('Đã xóa ví'),
+              if (context.mounted) {
+                Navigator.pop(context); // Close dialog
+                if (success && this.context.mounted) {
+                  Navigator.pop(this.context); // Go back to wallet list
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    SnackBar(
+                      content: Text(AppStrings.walletDeleted),
                       backgroundColor: AppColors.success,
                     ),
                   );
@@ -912,7 +909,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Xóa'),
+            child: Text(AppStrings.delete),
           ),
         ],
       ),

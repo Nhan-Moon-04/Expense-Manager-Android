@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../models/wallet_model.dart';
 import '../../models/expense_model.dart';
 import '../../providers/auth_provider.dart';
@@ -59,7 +60,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                                 currencyFormat,
                               ),
                               const SizedBox(height: 24),
-                              _buildSectionTitle('Danh sách ví'),
+                              _buildSectionTitle(AppStrings.walletList),
                               const SizedBox(height: 12),
                               ...wallets.map(
                                 (wallet) => _buildWalletCard(
@@ -118,9 +119,9 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
           ),
         ),
         const SizedBox(width: 16),
-        const Text(
-          'Quản lý Ví',
-          style: TextStyle(
+        Text(
+          AppStrings.walletManagement,
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -174,9 +175,9 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              const Text(
-                'Tổng số dư',
-                style: TextStyle(
+              Text(
+                AppStrings.totalBalance,
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Colors.white70,
@@ -195,7 +196,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            '${walletProvider.wallets.length} ví',
+            '${walletProvider.wallets.length} ${AppStrings.walletCount}',
             style: TextStyle(
               fontSize: 14,
               color: Colors.white.withValues(alpha: 0.7),
@@ -299,9 +300,9 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                                 color: AppColors.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child: const Text(
-                                'Chính',
-                                style: TextStyle(
+                              child: Text(
+                                AppStrings.primaryBadge,
+                                style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.primary,
@@ -326,7 +327,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
-                            '${wallet.linkedBankIds.length} ngân hàng liên kết',
+                            '${wallet.linkedBankIds.length} ${AppStrings.linkedBanks}',
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
@@ -359,18 +360,18 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
             color: AppColors.textHint,
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Chưa có ví nào',
-            style: TextStyle(
+          Text(
+            AppStrings.noWalletsYet,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Bấm + để tạo ví mới',
-            style: TextStyle(fontSize: 14, color: AppColors.textHint),
+          Text(
+            AppStrings.noWalletsSubtitle,
+            style: const TextStyle(fontSize: 14, color: AppColors.textHint),
           ),
         ],
       ),
@@ -413,14 +414,14 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Tạo ví mới'),
+        title: Text(AppStrings.createWallet),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
               decoration: InputDecoration(
-                hintText: 'Nhập tên ví',
+                hintText: AppStrings.enterWalletName,
                 prefixIcon: const Icon(
                   Icons.wallet_rounded,
                   color: AppColors.primary,
@@ -436,7 +437,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -453,8 +454,8 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                 Navigator.pop(context);
                 if (success) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Tạo ví thành công'),
+                    SnackBar(
+                      content: Text(AppStrings.walletCreatedSuccess),
                       backgroundColor: AppColors.success,
                     ),
                   );
@@ -468,7 +469,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Tạo'),
+            child: Text(AppStrings.create),
           ),
         ],
       ),

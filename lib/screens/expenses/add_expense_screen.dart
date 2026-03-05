@@ -148,8 +148,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           SnackBar(
             content: Text(
               widget.expense != null
-                  ? 'Cập nhật thành công'
-                  : 'Thêm thành công',
+                  ? AppStrings.updateSuccess
+                  : AppStrings.addSuccess,
             ),
             backgroundColor: AppColors.success,
           ),
@@ -158,7 +158,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(expenseProvider.error ?? 'Đã có lỗi xảy ra'),
+            content: Text(expenseProvider.error ?? AppStrings.errorOccurred),
             backgroundColor: AppColors.error,
           ),
         );
@@ -175,8 +175,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       appBar: AppBar(
         title: Text(
           isEditing
-              ? 'Sửa ${_type == ExpenseType.income ? "Thu Nhập" : "Chi Tiêu"}'
-              : 'Thêm ${_type == ExpenseType.income ? "Thu Nhập" : "Chi Tiêu"}',
+              ? '${AppStrings.edit} ${_type == ExpenseType.income ? AppStrings.income : AppStrings.expense}'
+              : '${AppStrings.add} ${_type == ExpenseType.income ? AppStrings.income : AppStrings.expense}',
         ),
         backgroundColor: _type == ExpenseType.income
             ? AppColors.incomeColor
@@ -227,7 +227,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     return AppStrings.requiredField;
                   }
                   if (double.tryParse(value.replaceAll(',', '')) == null) {
-                    return 'Số tiền không hợp lệ';
+                    return AppStrings.invalidAmount;
                   }
                   return null;
                 },
@@ -297,7 +297,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 controller: _descriptionController,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  hintText: 'Nhập mô tả (không bắt buộc)',
+                  hintText: AppStrings.descriptionHint,
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
@@ -309,7 +309,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
               // Wallet selector
               Text(
-                'Ví',
+                AppStrings.wallet,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -396,7 +396,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Chi tiêu',
+                    AppStrings.expense,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: _type == ExpenseType.expense
@@ -442,7 +442,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Thu nhập',
+                    AppStrings.income,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: _type == ExpenseType.income
@@ -471,9 +471,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppColors.textHint),
             ),
-            child: const Text(
-              'Ví chính',
-              style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
+            child: Text(
+              AppStrings.primaryWallet,
+              style: const TextStyle(fontSize: 16, color: AppColors.textPrimary),
             ),
           );
         }
@@ -525,9 +525,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                             color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: const Text(
-                            'Chính',
-                            style: TextStyle(
+                          child: Text(
+                            AppStrings.primaryBadge,
+                            style: const TextStyle(
                               fontSize: 9,
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
