@@ -217,7 +217,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   hintText: '0',
                   suffixText: '₫',
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppColors.inputFillColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -260,7 +260,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.inputFillColor,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: AppColors.textHint),
                   ),
@@ -299,7 +299,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 decoration: InputDecoration(
                   hintText: AppStrings.descriptionHint,
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppColors.inputFillColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -377,7 +377,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               decoration: BoxDecoration(
                 color: _type == ExpenseType.expense
                     ? AppColors.expenseColor
-                    : Colors.white,
+                    : AppColors.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _type == ExpenseType.expense
@@ -423,7 +423,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               decoration: BoxDecoration(
                 color: _type == ExpenseType.income
                     ? AppColors.incomeColor
-                    : Colors.white,
+                    : AppColors.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _type == ExpenseType.income
@@ -467,7 +467,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.inputFillColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppColors.textHint),
             ),
@@ -484,7 +484,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.inputFillColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.textHint),
           ),
@@ -569,7 +569,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             decoration: BoxDecoration(
               color: isSelected
                   ? _getCategoryColor(category).withValues(alpha: 0.2)
-                  : Colors.white,
+                  : AppColors.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isSelected
