@@ -1,15 +1,16 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/expense_model.dart';
 import '../services/notification_listener_service.dart';
 import 'expense_provider.dart';
+import 'wallet_provider.dart';
 
 class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
   final NotificationListenerService _notificationService =
       NotificationListenerService();
   ExpenseProvider? _expenseProvider;
+  WalletProvider? _walletProvider;
 
   bool _isEnabled = false;
   bool _isNotificationAccessGranted = false;
@@ -18,6 +19,7 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
   bool _showConfirmation = false; // Always auto-add without confirmation
   bool _pendingEnable =
       false; // Track if user tried to enable but needs permission first
+  Set<String> _disabledBanks = {}; // Banks that are disabled for auto-reading
 
   final List<BankNotification> _pendingNotifications = [];
   final List<BankNotification> _processedNotifications = [];
@@ -34,6 +36,19 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
   bool get showConfirmation => _showConfirmation;
   List<BankNotification> get pendingNotifications => _pendingNotifications;
   List<BankNotification> get processedNotifications => _processedNotifications;
+  Set<String> get disabledBanks => _disabledBanks;
+
+  bool isBankEnabled(String bankSource) => !_disabledBanks.contains(bankSource);
+
+  void setBankEnabled(String bankSource, bool enabled) {
+    if (enabled) {
+      _disabledBanks.remove(bankSource);
+    } else {
+      _disabledBanks.add(bankSource);
+    }
+    _saveSettings();
+    notifyListeners();
+  }
 
   AutoExpenseProvider() {
     _loadSettings();
@@ -46,6 +61,8 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
     _autoAddExpense = prefs.getBool('auto_add_expense') ?? true;
     _autoAddIncome = prefs.getBool('auto_add_income') ?? true;
     _showConfirmation = false; // Always auto-add without confirmation
+    final disabledBanksList = prefs.getStringList('disabled_banks') ?? [];
+    _disabledBanks = disabledBanksList.toSet();
 
     // Validate: if enabled but permission was revoked (e.g. after app update), disable
     if (_isEnabled) {
@@ -68,6 +85,7 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
     await prefs.setBool('auto_expense_enabled', _isEnabled);
     await prefs.setBool('auto_add_expense', _autoAddExpense);
     await prefs.setBool('auto_add_income', _autoAddIncome);
+    await prefs.setStringList('disabled_banks', _disabledBanks.toList());
     // No need to save _showConfirmation as it's always false
   }
 
@@ -96,6 +114,11 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
 
     // Start periodic polling for pending notifications
     _startPendingPollTimer();
+  }
+
+  void setWalletProvider(WalletProvider provider) {
+    _walletProvider = provider;
+    debugPrint('✅ WalletProvider injected into AutoExpenseProvider');
   }
 
   void setExpenseProvider(ExpenseProvider provider) {
@@ -205,8 +228,6 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
     if (value) {
       _startListening();
       _startPendingPollTimer();
-      // Auto-request battery optimization exemption when enabling
-      _requestBatteryOptimizationIfNeeded();
     } else {
       _stopListening();
       _pendingPollTimer?.cancel();
@@ -231,24 +252,6 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
     _showConfirmation = value;
     _saveSettings();
     notifyListeners();
-  }
-
-  /// Request battery optimization exemption if not already granted
-  Future<void> _requestBatteryOptimizationIfNeeded() async {
-    try {
-      final isDisabled =
-          await _notificationService.isBatteryOptimizationDisabled();
-      if (!isDisabled) {
-        debugPrint(
-          '🔋 Battery optimization active - requesting exemption...',
-        );
-        await _notificationService.requestDisableBatteryOptimization();
-      } else {
-        debugPrint('✅ Battery optimization already disabled');
-      }
-    } catch (e) {
-      debugPrint('Error checking battery optimization: $e');
-    }
   }
 
   void _startListening() async {
@@ -338,6 +341,12 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
       return;
     }
 
+    // Check if specific bank is disabled
+    if (_disabledBanks.contains(notification.source)) {
+      debugPrint('⚠️ Bank ${notification.sourceName} is disabled');
+      return;
+    }
+
     debugPrint('✅ Processing notification...');
     if (_showConfirmation) {
       // Add to pending for user confirmation
@@ -389,6 +398,13 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
       return;
     }
 
+    // Determine wallet based on bank source
+    String? walletId;
+    if (_walletProvider != null) {
+      walletId = _walletProvider!.getWalletIdForBank(notification.source);
+      walletId ??= _walletProvider!.primaryWallet?.id;
+    }
+
     final expense = ExpenseModel(
       id: '',
       userId: _userId!,
@@ -398,6 +414,7 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
       date: notification.timestamp,
       description: '${notification.sourceName}: ${notification.description}',
       isAutoAdded: true,
+      walletId: walletId,
       metadata: {
         'bankSource': notification.source,
         'bankName': notification.sourceName,

@@ -5,6 +5,7 @@ import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../wallets/wallet_management_screen.dart';
 import 'about_screen.dart';
 import 'help_screen.dart';
 import 'settings_screen.dart';
@@ -190,6 +191,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _buildMenuSection(
                         title: 'Cài Đặt',
                         items: [
+                          _buildMenuItem(
+                            icon: Icons.account_balance_wallet_outlined,
+                            title: 'Quản lý Ví',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const WalletManagementScreen(),
+                                ),
+                              );
+                            },
+                          ),
                           _buildMenuItem(
                             icon: Icons.settings_outlined,
                             title: AppStrings.settings,

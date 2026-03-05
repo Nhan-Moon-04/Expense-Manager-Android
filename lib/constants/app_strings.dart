@@ -1,114 +1,128 @@
+import '../l10n/app_localizations.dart';
+
 class AppStrings {
   // App Info
-  static const String appName = 'Quản Lý Chi Tiêu';
-  static const String appVersion = '1.0.0';
-  static const String appDescription = 'Quản lý tài chính cá nhân thông minh';
+  static String get appName => AppLocalizations.get('appName');
+  static String get appVersion => AppLocalizations.get('appVersion');
+  static String get appDescription => AppLocalizations.get('appDescription');
 
   // Auth Strings
-  static const String login = 'Đăng Nhập';
-  static const String register = 'Đăng Ký';
-  static const String logout = 'Đăng Xuất';
-  static const String email = 'Email';
-  static const String password = 'Mật Khẩu';
-  static const String confirmPassword = 'Xác Nhận Mật Khẩu';
-  static const String fullName = 'Họ và Tên';
-  static const String phone = 'Số Điện Thoại';
-  static const String forgotPassword = 'Quên Mật Khẩu?';
-  static const String dontHaveAccount = 'Chưa có tài khoản?';
-  static const String alreadyHaveAccount = 'Đã có tài khoản?';
-  static const String resetPassword = 'Đặt Lại Mật Khẩu';
+  static String get login => AppLocalizations.get('login');
+  static String get register => AppLocalizations.get('register');
+  static String get logout => AppLocalizations.get('logout');
+  static String get email => AppLocalizations.get('email');
+  static String get password => AppLocalizations.get('password');
+  static String get confirmPassword => AppLocalizations.get('confirmPassword');
+  static String get fullName => AppLocalizations.get('fullName');
+  static String get phone => AppLocalizations.get('phone');
+  static String get forgotPassword => AppLocalizations.get('forgotPassword');
+  static String get dontHaveAccount => AppLocalizations.get('dontHaveAccount');
+  static String get alreadyHaveAccount =>
+      AppLocalizations.get('alreadyHaveAccount');
+  static String get resetPassword => AppLocalizations.get('resetPassword');
 
   // Navigation
-  static const String home = 'Trang Chủ';
-  static const String expenses = 'Chi Tiêu';
-  static const String notes = 'Ghi Chú';
-  static const String groups = 'Nhóm';
-  static const String profile = 'Tôi';
+  static String get home => AppLocalizations.get('home');
+  static String get expenses => AppLocalizations.get('expenses');
+  static String get notes => AppLocalizations.get('notes');
+  static String get groups => AppLocalizations.get('groups');
+  static String get profile => AppLocalizations.get('profile');
 
   // Expense
-  static const String addExpense = 'Thêm Chi Tiêu';
-  static const String editExpense = 'Sửa Chi Tiêu';
-  static const String deleteExpense = 'Xóa Chi Tiêu';
-  static const String amount = 'Số Tiền';
-  static const String category = 'Danh Mục';
-  static const String date = 'Ngày';
-  static const String description = 'Mô Tả';
-  static const String income = 'Thu Nhập';
-  static const String expense = 'Chi Tiêu';
-  static const String totalBalance = 'Tổng Số Dư';
-  static const String todayExpense = 'Chi Tiêu Hôm Nay';
-  static const String monthlyExpense = 'Chi Tiêu Tháng Này';
+  static String get addExpense => AppLocalizations.get('addExpense');
+  static String get editExpense => AppLocalizations.get('editExpense');
+  static String get deleteExpense => AppLocalizations.get('deleteExpense');
+  static String get amount => AppLocalizations.get('amount');
+  static String get category => AppLocalizations.get('category');
+  static String get date => AppLocalizations.get('date');
+  static String get description => AppLocalizations.get('description');
+  static String get income => AppLocalizations.get('income');
+  static String get expense => AppLocalizations.get('expense');
+  static String get totalBalance => AppLocalizations.get('totalBalance');
+  static String get todayExpense => AppLocalizations.get('todayExpense');
+  static String get monthlyExpense => AppLocalizations.get('monthlyExpense');
 
   // Categories
-  static const String food = 'Ăn Uống';
-  static const String transport = 'Di Chuyển';
-  static const String shopping = 'Mua Sắm';
-  static const String entertainment = 'Giải Trí';
-  static const String bills = 'Hóa Đơn';
-  static const String health = 'Sức Khỏe';
-  static const String education = 'Giáo Dục';
-  static const String other = 'Khác';
+  static String get food => AppLocalizations.get('food');
+  static String get transport => AppLocalizations.get('transport');
+  static String get shopping => AppLocalizations.get('shopping');
+  static String get entertainment => AppLocalizations.get('entertainment');
+  static String get bills => AppLocalizations.get('bills');
+  static String get health => AppLocalizations.get('health');
+  static String get education => AppLocalizations.get('education');
+  static String get other => AppLocalizations.get('other');
 
   // Notes
-  static const String addNote = 'Thêm Ghi Chú';
-  static const String editNote = 'Sửa Ghi Chú';
-  static const String deleteNote = 'Xóa Ghi Chú';
-  static const String noteTitle = 'Tiêu Đề';
-  static const String noteContent = 'Nội Dung';
+  static String get addNote => AppLocalizations.get('addNote');
+  static String get editNote => AppLocalizations.get('editNote');
+  static String get deleteNote => AppLocalizations.get('deleteNote');
+  static String get noteTitle => AppLocalizations.get('noteTitle');
+  static String get noteContent => AppLocalizations.get('noteContent');
 
   // Groups
-  static const String createGroup = 'Tạo Nhóm';
-  static const String joinGroup = 'Tham Gia Nhóm';
-  static const String leaveGroup = 'Rời Nhóm';
-  static const String groupName = 'Tên Nhóm';
-  static const String groupMembers = 'Thành Viên';
-  static const String addMember = 'Thêm Thành Viên';
-  static const String sharedExpenses = 'Chi Tiêu Chung';
-  static const String splitBill = 'Chia Tiền';
-  static const String groupCode = 'Mã Nhóm';
+  static String get createGroup => AppLocalizations.get('createGroup');
+  static String get joinGroup => AppLocalizations.get('joinGroup');
+  static String get leaveGroup => AppLocalizations.get('leaveGroup');
+  static String get groupName => AppLocalizations.get('groupName');
+  static String get groupMembers => AppLocalizations.get('groupMembers');
+  static String get addMember => AppLocalizations.get('addMember');
+  static String get sharedExpenses => AppLocalizations.get('sharedExpenses');
+  static String get splitBill => AppLocalizations.get('splitBill');
+  static String get groupCode => AppLocalizations.get('groupCode');
 
   // Reminders
-  static const String reminders = 'Nhắc Nhở';
-  static const String addReminder = 'Thêm Nhắc Nhở';
-  static const String editReminder = 'Sửa Nhắc Nhở';
-  static const String deleteReminder = 'Xóa Nhắc Nhở';
-  static const String reminderTitle = 'Tiêu Đề';
-  static const String reminderTime = 'Thời Gian';
-  static const String reminderRepeat = 'Lặp Lại';
+  static String get reminders => AppLocalizations.get('reminders');
+  static String get addReminder => AppLocalizations.get('addReminder');
+  static String get editReminder => AppLocalizations.get('editReminder');
+  static String get deleteReminder => AppLocalizations.get('deleteReminder');
+  static String get reminderTitle => AppLocalizations.get('reminderTitle');
+  static String get reminderTime => AppLocalizations.get('reminderTime');
+  static String get reminderRepeat => AppLocalizations.get('reminderRepeat');
 
   // Profile
-  static const String editProfile = 'Chỉnh Sửa Thông Tin';
-  static const String settings = 'Cài Đặt';
-  static const String notifications = 'Thông Báo';
-  static const String changePassword = 'Đổi Mật Khẩu';
-  static const String language = 'Ngôn Ngữ';
-  static const String currency = 'Tiền Tệ';
-  static const String about = 'Về Ứng Dụng';
+  static String get editProfile => AppLocalizations.get('editProfile');
+  static String get settings => AppLocalizations.get('settings');
+  static String get notifications => AppLocalizations.get('notifications');
+  static String get changePassword => AppLocalizations.get('changePassword');
+  static String get language => AppLocalizations.get('language');
+  static String get currency => AppLocalizations.get('currency');
+  static String get about => AppLocalizations.get('about');
 
   // Actions
-  static const String save = 'Lưu';
-  static const String cancel = 'Hủy';
-  static const String delete = 'Xóa';
-  static const String edit = 'Sửa';
-  static const String add = 'Thêm';
-  static const String confirm = 'Xác Nhận';
-  static const String search = 'Tìm Kiếm';
-  static const String filter = 'Lọc';
-  static const String sort = 'Sắp Xếp';
+  static String get save => AppLocalizations.get('save');
+  static String get cancel => AppLocalizations.get('cancel');
+  static String get delete => AppLocalizations.get('delete');
+  static String get edit => AppLocalizations.get('edit');
+  static String get add => AppLocalizations.get('add');
+  static String get confirm => AppLocalizations.get('confirm');
+  static String get search => AppLocalizations.get('search');
+  static String get filter => AppLocalizations.get('filter');
+  static String get sort => AppLocalizations.get('sort');
 
   // Messages
-  static const String loading = 'Đang Tải...';
-  static const String success = 'Thành Công';
-  static const String error = 'Lỗi';
-  static const String noData = 'Không Có Dữ Liệu';
-  static const String confirmDelete = 'Bạn có chắc muốn xóa?';
-  static const String loginSuccess = 'Đăng nhập thành công';
-  static const String registerSuccess = 'Đăng ký thành công';
-  static const String logoutSuccess = 'Đăng xuất thành công';
-  static const String saveSuccess = 'Lưu thành công';
-  static const String deleteSuccess = 'Xóa thành công';
-  static const String invalidEmail = 'Email không hợp lệ';
-  static const String invalidPassword = 'Mật khẩu phải có ít nhất 6 ký tự';
-  static const String passwordNotMatch = 'Mật khẩu không khớp';
-  static const String requiredField = 'Trường này bắt buộc';
+  static String get loading => AppLocalizations.get('loading');
+  static String get success => AppLocalizations.get('success');
+  static String get error => AppLocalizations.get('error');
+  static String get noData => AppLocalizations.get('noData');
+  static String get confirmDelete => AppLocalizations.get('confirmDelete');
+  static String get loginSuccess => AppLocalizations.get('loginSuccess');
+  static String get registerSuccess => AppLocalizations.get('registerSuccess');
+  static String get logoutSuccess => AppLocalizations.get('logoutSuccess');
+  static String get saveSuccess => AppLocalizations.get('saveSuccess');
+  static String get deleteSuccess => AppLocalizations.get('deleteSuccess');
+  static String get invalidEmail => AppLocalizations.get('invalidEmail');
+  static String get invalidPassword => AppLocalizations.get('invalidPassword');
+  static String get passwordNotMatch =>
+      AppLocalizations.get('passwordNotMatch');
+  static String get requiredField => AppLocalizations.get('requiredField');
+
+  // Wallet
+  static String get wallets => AppLocalizations.get('wallets');
+  static String get walletManagement =>
+      AppLocalizations.get('walletManagement');
+  static String get primaryWallet => AppLocalizations.get('primaryWallet');
+  static String get allWallets => AppLocalizations.get('allWallets');
+
+  // Statistics
+  static String get statistics => AppLocalizations.get('statistics');
 }

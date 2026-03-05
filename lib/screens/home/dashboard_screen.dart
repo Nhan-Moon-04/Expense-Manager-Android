@@ -8,6 +8,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/reminder_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../../providers/wallet_provider.dart';
 import '../../models/expense_model.dart';
 import '../expenses/add_expense_screen.dart';
 import '../expenses/expense_list_screen.dart';
@@ -175,10 +176,17 @@ class _DashboardScreenState extends State<DashboardScreen>
             offset: const Offset(-70, -70),
             onTap: () {
               _toggleFab();
+              final walletProvider = Provider.of<WalletProvider>(
+                context,
+                listen: false,
+              );
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const AddExpenseScreen(isIncome: true),
+                  builder: (context) => AddExpenseScreen(
+                    isIncome: true,
+                    defaultWalletId: walletProvider.primaryWallet?.id,
+                  ),
                 ),
               );
             },
@@ -191,10 +199,17 @@ class _DashboardScreenState extends State<DashboardScreen>
             offset: const Offset(0, -95),
             onTap: () {
               _toggleFab();
+              final walletProvider = Provider.of<WalletProvider>(
+                context,
+                listen: false,
+              );
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const AddExpenseScreen(isIncome: false),
+                  builder: (context) => AddExpenseScreen(
+                    isIncome: false,
+                    defaultWalletId: walletProvider.primaryWallet?.id,
+                  ),
                 ),
               );
             },
@@ -480,10 +495,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _buildBalanceCard() {
-    return Consumer2<AuthProvider, ExpenseProvider>(
-      builder: (context, authProvider, expenseProvider, child) {
-        final balance =
-            expenseProvider.totalBalance; // Total balance from all transactions
+    return Consumer3<AuthProvider, ExpenseProvider, WalletProvider>(
+      builder: (context, authProvider, expenseProvider, walletProvider, child) {
+        final balance = walletProvider.wallets.isEmpty
+            ? expenseProvider.totalBalance
+            : walletProvider.getTotalBalance(expenseProvider.expenses);
         final growthPercent = expenseProvider.monthGrowthPercent;
         final isGrowthPositive = growthPercent >= 0;
 
@@ -916,10 +932,16 @@ class _DashboardScreenState extends State<DashboardScreen>
               color: AppColors.expenseColor,
               bgColor: AppColors.expenseColor.withValues(alpha: 0.1),
               onTap: () {
+                final walletProvider = Provider.of<WalletProvider>(
+                  context,
+                  listen: false,
+                );
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AddExpenseScreen(),
+                    builder: (context) => AddExpenseScreen(
+                      defaultWalletId: walletProvider.primaryWallet?.id,
+                    ),
                   ),
                 );
               },
@@ -931,11 +953,17 @@ class _DashboardScreenState extends State<DashboardScreen>
               color: AppColors.incomeColor,
               bgColor: AppColors.incomeColor.withValues(alpha: 0.1),
               onTap: () {
+                final walletProvider = Provider.of<WalletProvider>(
+                  context,
+                  listen: false,
+                );
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        const AddExpenseScreen(isIncome: true),
+                    builder: (context) => AddExpenseScreen(
+                      isIncome: true,
+                      defaultWalletId: walletProvider.primaryWallet?.id,
+                    ),
                   ),
                 );
               },

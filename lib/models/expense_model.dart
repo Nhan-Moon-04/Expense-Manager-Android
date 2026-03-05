@@ -19,6 +19,7 @@ class ExpenseModel {
   final String id;
   final String userId;
   final String? groupId; // null if personal expense
+  final String? walletId; // wallet this expense belongs to
   final double amount;
   final ExpenseType type;
   final ExpenseCategory category;
@@ -34,6 +35,7 @@ class ExpenseModel {
     required this.id,
     required this.userId,
     this.groupId,
+    this.walletId,
     required this.amount,
     required this.type,
     required this.category,
@@ -53,6 +55,7 @@ class ExpenseModel {
       id: doc.id,
       userId: data['userId'] ?? '',
       groupId: data['groupId'],
+      walletId: data['walletId'],
       amount: (data['amount'] ?? 0.0).toDouble(),
       type: ExpenseType.values.firstWhere(
         (e) => e.name == data['type'],
@@ -76,6 +79,7 @@ class ExpenseModel {
     return {
       'userId': userId,
       'groupId': groupId,
+      'walletId': walletId,
       'amount': amount,
       'type': type.name,
       'category': category.name,
@@ -93,6 +97,7 @@ class ExpenseModel {
     String? id,
     String? userId,
     String? groupId,
+    String? walletId,
     double? amount,
     ExpenseType? type,
     ExpenseCategory? category,
@@ -108,6 +113,7 @@ class ExpenseModel {
       id: id ?? this.id,
       userId: userId ?? this.userId,
       groupId: groupId ?? this.groupId,
+      walletId: walletId ?? this.walletId,
       amount: amount ?? this.amount,
       type: type ?? this.type,
       category: category ?? this.category,

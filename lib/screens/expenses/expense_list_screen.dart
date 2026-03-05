@@ -6,6 +6,7 @@ import '../../constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../../providers/wallet_provider.dart';
 import '../../models/expense_model.dart';
 import 'add_expense_screen.dart';
 import 'expense_detail_screen.dart';
@@ -23,6 +24,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
       context.read<SettingsProvider>().currencyFormat;
   DateTime _selectedMonth = DateTime.now();
   String _filterType = 'all';
+  String _searchQuery = '';
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   bool _isBalanceVisible = false;
@@ -49,6 +53,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -74,19 +79,40 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
   }
 
   List<ExpenseModel> _filterExpenses(List<ExpenseModel> expenses) {
-    var filtered = expenses.where(
-      (e) =>
-          e.date.year == _selectedMonth.year &&
-          e.date.month == _selectedMonth.month,
-    );
+    // First filter by wallet
+    final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+    var filtered = walletProvider.filterByWallet(expenses);
+
+    // Filter by month
+    filtered = filtered
+        .where(
+          (e) =>
+              e.date.year == _selectedMonth.year &&
+              e.date.month == _selectedMonth.month,
+        )
+        .toList();
 
     if (_filterType == 'income') {
-      filtered = filtered.where((e) => e.type == ExpenseType.income);
+      filtered = filtered.where((e) => e.type == ExpenseType.income).toList();
     } else if (_filterType == 'expense') {
-      filtered = filtered.where((e) => e.type == ExpenseType.expense);
+      filtered = filtered.where((e) => e.type == ExpenseType.expense).toList();
     }
 
-    return filtered.toList()..sort((a, b) => b.date.compareTo(a.date));
+    // Search filter
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      filtered = filtered.where((e) {
+        final amount = e.amount.toString().contains(query);
+        final desc = (e.description ?? '').toLowerCase().contains(query);
+        final category = ExpenseModel.getCategoryName(
+          e.category,
+        ).toLowerCase().contains(query);
+        final bankName = (e.bankName ?? '').toLowerCase().contains(query);
+        return amount || desc || category || bankName;
+      }).toList();
+    }
+
+    return filtered..sort((a, b) => b.date.compareTo(a.date));
   }
 
   @override
@@ -115,6 +141,12 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildHeader(),
+                          const SizedBox(height: 12),
+                          _buildWalletSelector(),
+                          if (_isSearching) ...[
+                            const SizedBox(height: 12),
+                            _buildSearchBar(),
+                          ],
                           const SizedBox(height: 20),
                           _buildMonthSelector(),
                           const SizedBox(height: 20),
@@ -161,35 +193,315 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
             ),
           ],
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
+        Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _showFilterDialog,
-              borderRadius: BorderRadius.circular(14),
-              child: const Padding(
-                padding: EdgeInsets.all(12),
-                child: Icon(
-                  Icons.tune_rounded,
-                  color: AppColors.textPrimary,
-                  size: 24,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      _isSearching = !_isSearching;
+                      if (!_isSearching) {
+                        _searchQuery = '';
+                        _searchController.clear();
+                      }
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(14),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Icon(
+                      _isSearching
+                          ? Icons.search_off_rounded
+                          : Icons.search_rounded,
+                      color: AppColors.textPrimary,
+                      size: 24,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
+            const SizedBox(width: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _showFilterDialog,
+                  borderRadius: BorderRadius.circular(14),
+                  child: const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Icon(
+                      Icons.tune_rounded,
+                      color: AppColors.textPrimary,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Tìm số tiền, nội dung, ngân hàng, loại...',
+          hintStyle: const TextStyle(fontSize: 14, color: AppColors.textHint),
+          prefixIcon: const Icon(
+            Icons.search_rounded,
+            color: AppColors.textSecondary,
+          ),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: AppColors.textSecondary,
+                  ),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() => _searchQuery = '');
+                  },
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
+        ),
+        onChanged: (value) => setState(() => _searchQuery = value),
+      ),
+    );
+  }
+
+  Widget _buildWalletSelector() {
+    return Consumer<WalletProvider>(
+      builder: (context, walletProvider, child) {
+        final selectedWallet = walletProvider.selectedWallet;
+        final displayName = selectedWallet?.name ?? 'Tất cả ví';
+
+        return GestureDetector(
+          onTap: () => _showWalletPicker(walletProvider),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: AppColors.primary,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  displayName,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: AppColors.textSecondary,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showWalletPicker(WalletProvider walletProvider) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.textHint,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Chọn ví',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // "All" option
+                _buildWalletPickerOption(
+                  name: 'Tất cả ví',
+                  icon: Icons.all_inclusive_rounded,
+                  isSelected: walletProvider.selectedWalletId == null,
+                  onTap: () {
+                    walletProvider.setSelectedWallet(null);
+                    Navigator.pop(context);
+                  },
+                ),
+                ...walletProvider.wallets.map(
+                  (wallet) => _buildWalletPickerOption(
+                    name: wallet.name,
+                    icon: wallet.isPrimary
+                        ? Icons.account_balance_wallet_rounded
+                        : Icons.wallet_rounded,
+                    isSelected: walletProvider.selectedWalletId == wallet.id,
+                    isPrimary: wallet.isPrimary,
+                    onTap: () {
+                      walletProvider.setSelectedWallet(wallet.id);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildWalletPickerOption({
+    required String name,
+    required IconData icon,
+    required bool isSelected,
+    bool isPrimary = false,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: isSelected
+            ? AppColors.primary.withValues(alpha: 0.1)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isSelected ? AppColors.primary : AppColors.background,
+          width: 1.5,
+        ),
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? AppColors.primary.withValues(alpha: 0.15)
+                : AppColors.background,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            color: isSelected ? AppColors.primary : AppColors.textSecondary,
+            size: 20,
+          ),
+        ),
+        title: Row(
+          children: [
+            Text(
+              name,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isSelected ? AppColors.primary : AppColors.textPrimary,
+              ),
+            ),
+            if (isPrimary) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'Chính',
+                  style: TextStyle(
+                    fontSize: 9,
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        trailing: isSelected
+            ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
+            : null,
+        onTap: onTap,
+      ),
     );
   }
 
@@ -281,8 +593,8 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
   }
 
   Widget _buildSummaryCards() {
-    return Consumer<ExpenseProvider>(
-      builder: (context, expenseProvider, child) {
+    return Consumer2<ExpenseProvider, WalletProvider>(
+      builder: (context, expenseProvider, walletProvider, child) {
         final expenses = _filterExpenses(expenseProvider.expenses);
         final totalIncome = expenses
             .where((e) => e.type == ExpenseType.income)
@@ -291,6 +603,18 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
             .where((e) => e.type == ExpenseType.expense)
             .fold(0.0, (sum, e) => sum + e.amount);
         final balance = totalIncome - totalExpense;
+
+        // Total balance across all time for selected wallet
+        final allExpenses = walletProvider.filterByWallet(
+          expenseProvider.expenses,
+        );
+        final totalBalanceAllTime =
+            allExpenses
+                .where((e) => e.type == ExpenseType.income)
+                .fold(0.0, (sum, e) => sum + e.amount) -
+            allExpenses
+                .where((e) => e.type == ExpenseType.expense)
+                .fold(0.0, (sum, e) => sum + e.amount);
 
         return Column(
           children: [
@@ -417,6 +741,37 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.white.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Tổng số dư',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          _isBalanceVisible
+                              ? currencyFormat.format(totalBalanceAllTime)
+                              : '••••••',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -866,6 +1221,34 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                    // Wallet name
+                    Consumer<WalletProvider>(
+                      builder: (context, walletProvider, _) {
+                        final walletName = walletProvider.getWalletName(
+                          expense.walletId,
+                        );
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.wallet_rounded,
+                                size: 12,
+                                color: AppColors.textHint,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                walletName,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.textHint,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -917,9 +1300,19 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
       child: FloatingActionButton(
         heroTag: 'expense_list_fab',
         onPressed: () {
+          final walletProvider = Provider.of<WalletProvider>(
+            context,
+            listen: false,
+          );
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddExpenseScreen()),
+            MaterialPageRoute(
+              builder: (context) => AddExpenseScreen(
+                defaultWalletId:
+                    walletProvider.selectedWalletId ??
+                    walletProvider.primaryWallet?.id,
+              ),
+            ),
           );
         },
         backgroundColor: Colors.transparent,

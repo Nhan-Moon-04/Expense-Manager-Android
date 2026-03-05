@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../providers/auto_expense_provider.dart';
+import '../../providers/wallet_provider.dart';
 import '../expenses/expense_list_screen.dart';
 import '../notes/notes_screen.dart';
 import '../groups/groups_screen.dart';
@@ -57,6 +58,14 @@ class _HomeScreenState extends State<HomeScreen> {
         listen: false,
       ).listenToNotifications(userId);
 
+      // Initialize wallet provider
+      final walletProvider = Provider.of<WalletProvider>(
+        context,
+        listen: false,
+      );
+      walletProvider.ensurePrimaryWallet(userId);
+      walletProvider.listenToWallets(userId);
+
       // Initialize auto expense listener with user ID
       final autoExpenseProvider = Provider.of<AutoExpenseProvider>(
         context,
@@ -93,30 +102,30 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedItemColor: AppColors.primary,
           unselectedItemColor: AppColors.textSecondary,
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
+              icon: const Icon(Icons.home_outlined),
+              activeIcon: const Icon(Icons.home),
               label: AppStrings.home,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance_wallet_outlined),
-              activeIcon: Icon(Icons.account_balance_wallet),
+              icon: const Icon(Icons.account_balance_wallet_outlined),
+              activeIcon: const Icon(Icons.account_balance_wallet),
               label: AppStrings.expenses,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.note_outlined),
-              activeIcon: Icon(Icons.note),
+              icon: const Icon(Icons.note_outlined),
+              activeIcon: const Icon(Icons.note),
               label: AppStrings.notes,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.group_outlined),
-              activeIcon: Icon(Icons.group),
+              icon: const Icon(Icons.group_outlined),
+              activeIcon: const Icon(Icons.group),
               label: AppStrings.groups,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person_outlined),
-              activeIcon: Icon(Icons.person),
+              icon: const Icon(Icons.person_outlined),
+              activeIcon: const Icon(Icons.person),
               label: AppStrings.profile,
             ),
           ],

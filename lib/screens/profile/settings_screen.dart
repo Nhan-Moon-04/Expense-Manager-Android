@@ -21,6 +21,7 @@ import '../../services/push_notification_service.dart';
 import '../../services/backup_service.dart';
 import '../../services/version_service.dart';
 import '../widgets/update_dialog.dart';
+import '../statistics/statistics_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -84,6 +85,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _buildAutoExpenseSection(),
                       const SizedBox(height: 24),
                       _buildNotificationsSection(),
+                      const SizedBox(height: 24),
+                      _buildStatisticsSection(),
                       const SizedBox(height: 24),
                       _buildDisplaySection(),
                       const SizedBox(height: 24),
@@ -873,67 +876,114 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildSupportedAppsInfo() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Consumer<AutoExpenseProvider>(
+      builder: (context, provider, _) {
+        final banks = [
+          {'source': 'momo', 'name': 'MoMo'},
+          {'source': 'vcb', 'name': 'Vietcombank'},
+          {'source': 'mbbank', 'name': 'MB Bank'},
+          {'source': 'techcombank', 'name': 'Techcombank'},
+          {'source': 'bidv', 'name': 'BIDV'},
+          {'source': 'tpbank', 'name': 'TPBank'},
+          {'source': 'vietinbank', 'name': 'VietinBank'},
+          {'source': 'acb', 'name': 'ACB'},
+          {'source': 'sacombank', 'name': 'Sacombank'},
+          {'source': 'agribank', 'name': 'Agribank'},
+        ];
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.info.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.info_outline_rounded, color: AppColors.info, size: 18),
-              const SizedBox(width: 8),
+              Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: AppColors.info,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Ngân hàng được hỗ trợ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: AppColors.info,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
               Text(
-                'Ứng dụng được hỗ trợ',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  color: AppColors.info,
-                ),
+                'Bật/tắt để chọn ngân hàng muốn đọc thông báo',
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: banks.map((bank) {
+                  final source = bank['source']!;
+                  final name = bank['name']!;
+                  final isEnabled = provider.isBankEnabled(source);
+
+                  return GestureDetector(
+                    onTap: () {
+                      provider.setBankEnabled(source, !isEnabled);
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isEnabled
+                            ? AppColors.primary.withValues(alpha: 0.1)
+                            : Colors.grey.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isEnabled
+                              ? AppColors.primary.withValues(alpha: 0.5)
+                              : Colors.grey.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isEnabled
+                                ? Icons.check_circle_rounded
+                                : Icons.radio_button_unchecked_rounded,
+                            size: 16,
+                            color: isEnabled ? AppColors.primary : Colors.grey,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: isEnabled
+                                  ? AppColors.primary
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _buildAppChip('MoMo'),
-              _buildAppChip('Vietcombank'),
-              _buildAppChip('MB Bank'),
-              _buildAppChip('Techcombank'),
-              _buildAppChip('BIDV'),
-              _buildAppChip('TPBank'),
-              _buildAppChip('VietinBank'),
-              _buildAppChip('ACB'),
-              _buildAppChip('Sacombank'),
-              _buildAppChip('Agribank'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppChip(String name) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
-      ),
-      child: Text(
-        name,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: AppColors.info,
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -997,6 +1047,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Widget _buildStatisticsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader('Thống kê', Icons.analytics_rounded),
+        const SizedBox(height: 12),
+        _buildSettingsCard([
+          _buildListTile(
+            icon: Icons.bar_chart_rounded,
+            title: 'Xem thống kê',
+            subtitle: 'Phân tích thu chi, danh mục, xu hướng',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const StatisticsScreen(),
+                ),
+              );
+            },
+          ),
+        ]),
+      ],
+    );
+  }
+
   Widget _buildDisplaySection() {
     return Consumer<SettingsProvider>(
       builder: (context, settings, child) {
@@ -1018,6 +1093,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: AppStrings.language,
                 subtitle: settings.languageDisplayName,
                 onTap: _showLanguagePicker,
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              _buildListTile(
+                icon: settings.isDarkMode
+                    ? Icons.dark_mode_rounded
+                    : Icons.light_mode_rounded,
+                title: 'Giao diện',
+                subtitle: settings.themeModeDisplayName,
+                onTap: _showThemeModePicker,
               ),
             ]),
           ],
@@ -1371,6 +1455,82 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   settings.language == 'en',
                   () async {
                     await settings.setLanguage('en');
+                    await _syncSettingsToFirestore();
+                    if (context.mounted) Navigator.pop(context);
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showThemeModePicker() {
+    final settings = context.read<SettingsProvider>();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.textHint,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Chọn giao diện',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _buildPickerOption(
+                  'light',
+                  'Sáng',
+                  settings.themeMode == ThemeMode.light,
+                  () async {
+                    await settings.setThemeMode(ThemeMode.light);
+                    await _syncSettingsToFirestore();
+                    if (context.mounted) Navigator.pop(context);
+                  },
+                ),
+                _buildPickerOption(
+                  'dark',
+                  'Tối',
+                  settings.themeMode == ThemeMode.dark,
+                  () async {
+                    await settings.setThemeMode(ThemeMode.dark);
+                    await _syncSettingsToFirestore();
+                    if (context.mounted) Navigator.pop(context);
+                  },
+                ),
+                _buildPickerOption(
+                  'system',
+                  'Theo hệ thống',
+                  settings.themeMode == ThemeMode.system,
+                  () async {
+                    await settings.setThemeMode(ThemeMode.system);
                     await _syncSettingsToFirestore();
                     if (context.mounted) Navigator.pop(context);
                   },

@@ -5,13 +5,20 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
+import '../../providers/wallet_provider.dart';
 import '../../models/expense_model.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   final bool isIncome;
   final ExpenseModel? expense; // For editing
+  final String? defaultWalletId; // Default wallet to use
 
-  const AddExpenseScreen({super.key, this.isIncome = false, this.expense});
+  const AddExpenseScreen({
+    super.key,
+    this.isIncome = false,
+    this.expense,
+    this.defaultWalletId,
+  });
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -25,6 +32,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   late ExpenseType _type;
   ExpenseCategory _category = ExpenseCategory.other;
   DateTime _selectedDate = DateTime.now();
+  String? _selectedWalletId;
   bool _isLoading = false;
 
   final List<ExpenseCategory> _expenseCategories = [
@@ -55,10 +63,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       _type = widget.expense!.type;
       _category = widget.expense!.category;
       _selectedDate = widget.expense!.date;
+      _selectedWalletId = widget.expense!.walletId;
     } else {
       _category = widget.isIncome
           ? ExpenseCategory.salary
           : ExpenseCategory.food;
+      _selectedWalletId = widget.defaultWalletId;
     }
   }
 
@@ -94,6 +104,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       context,
       listen: false,
     );
+    final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+
+    // Default to primary wallet if not selected
+    final walletId = _selectedWalletId ?? walletProvider.primaryWallet?.id;
 
     final now = DateTime.now();
     final amount = double.parse(_amountController.text.replaceAll(',', ''));
@@ -110,6 +124,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       date: _selectedDate,
       createdAt: widget.expense?.createdAt ?? now,
       updatedAt: now,
+      walletId: walletId,
     );
 
     bool success;
@@ -290,6 +305,18 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 24),
+
+              // Wallet selector
+              Text(
+                'Ví',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildWalletSelector(),
               const SizedBox(height: 32),
 
               // Save button
@@ -429,6 +456,96 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildWalletSelector() {
+    return Consumer<WalletProvider>(
+      builder: (context, walletProvider, child) {
+        final wallets = walletProvider.wallets;
+        if (wallets.isEmpty) {
+          return Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.textHint),
+            ),
+            child: const Text(
+              'Ví chính',
+              style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
+            ),
+          );
+        }
+
+        // Set default wallet if not set
+        _selectedWalletId ??= walletProvider.primaryWallet?.id;
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.textHint),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: _selectedWalletId,
+              isExpanded: true,
+              icon: const Icon(Icons.keyboard_arrow_down_rounded),
+              items: wallets.map((wallet) {
+                return DropdownMenuItem<String>(
+                  value: wallet.id,
+                  child: Row(
+                    children: [
+                      Icon(
+                        wallet.isPrimary
+                            ? Icons.account_balance_wallet_rounded
+                            : Icons.wallet_rounded,
+                        size: 20,
+                        color: wallet.isPrimary
+                            ? AppColors.primary
+                            : AppColors.secondary,
+                      ),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          wallet.name,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (wallet.isPrimary) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 1,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'Chính',
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() => _selectedWalletId = value);
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
