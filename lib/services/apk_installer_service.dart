@@ -24,12 +24,9 @@ class ApkInstallerService {
         return false;
       }
 
-      // 2. Get download directory
-      final dir = await getExternalStorageDirectory();
-      if (dir == null) {
-        debugPrint('❌ Cannot get storage directory');
-        return false;
-      }
+      // 2. Get download directory (ưu tiên External Storage, fallback sang Temporary)
+      Directory? dir = await getExternalStorageDirectory();
+      dir ??= await getTemporaryDirectory();
 
       final filePath = '${dir.path}/expense_manager_update.apk';
       final file = File(filePath);
@@ -87,7 +84,7 @@ class ApkInstallerService {
     }
   }
 
-  /// Request storage permission (chỉ cho Android < 13)
+  /// Request storage & install permissions
   Future<bool> _requestPermission() async {
     if (!Platform.isAndroid) {
       return false;
@@ -100,57 +97,54 @@ class ApkInstallerService {
 
       debugPrint('📱 Android SDK: $sdkInt');
 
-      // Android 13+ (API 33+): Không cần storage permission cho app-specific directory
+      // 1. Check & request install packages permission (Android 8.0+ / API 26+)
+      if (sdkInt >= 26) {
+        final installStatus = await Permission.requestInstallPackages.status;
+        debugPrint('📋 Install packages permission status: $installStatus');
+        if (!installStatus.isGranted) {
+          debugPrint('📋 Requesting install packages permission...');
+          final status = await Permission.requestInstallPackages.request();
+          if (!status.isGranted) {
+            debugPrint('❌ Install packages permission denied');
+            if (status.isPermanentlyDenied) {
+              await openAppSettings();
+            }
+            return false;
+          }
+        }
+      }
+
+      // 2. Android 13+ (API 33+): Không cần storage permission cho app-specific directory
       if (sdkInt >= 33) {
         debugPrint('✅ Android 13+: No storage permission needed');
         return true;
       }
 
-      // Android 10-12 (API 29-32): Cần WRITE_EXTERNAL_STORAGE
-      if (sdkInt >= 29) {
-        if (await Permission.storage.isGranted) {
-          debugPrint('✅ Storage permission already granted');
-          return true;
-        }
-
-        debugPrint('📋 Requesting storage permission...');
-        final status = await Permission.storage.request();
-
-        if (status.isGranted) {
-          debugPrint('✅ Storage permission granted');
-          return true;
-        } else if (status.isPermanentlyDenied) {
-          debugPrint(
-            '⚠️ Storage permission permanently denied, opening settings...',
-          );
-          await openAppSettings();
-          return false;
-        } else {
-          debugPrint('❌ Storage permission denied');
-          return false;
-        }
-      }
-
-      // Android < 10: Cần WRITE_EXTERNAL_STORAGE
+      // 3. Android < 33: Check storage permission
       if (await Permission.storage.isGranted) {
         debugPrint('✅ Storage permission already granted');
         return true;
       }
 
+      debugPrint('📋 Requesting storage permission...');
       final status = await Permission.storage.request();
-      debugPrint('📋 Storage permission status: $status');
 
-      if (status.isPermanentlyDenied) {
+      if (status.isGranted) {
+        debugPrint('✅ Storage permission granted');
+        return true;
+      } else if (status.isPermanentlyDenied) {
         debugPrint(
           '⚠️ Storage permission permanently denied, opening settings...',
         );
         await openAppSettings();
+        return false;
+      } else {
+        debugPrint('❌ Storage permission denied');
+        return false;
       }
-
-      return status.isGranted;
     } catch (e) {
       debugPrint('❌ Error requesting permission: $e');
-      // Nếu lỗi, cho phép tiếp tục (có thể vẫn work trên Android 13+)
+      // Nếu lỗi, cho phép tiếp tục
       return true;
     }
   }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -25,326 +27,376 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final currencyFormat = context.watch<SettingsProvider>().currencyFormat;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Consumer2<AuthProvider, ExpenseProvider>(
-        builder: (context, authProvider, expenseProvider, child) {
-          final user = authProvider.user;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: (AppColors.isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: Consumer2<AuthProvider, ExpenseProvider>(
+          builder: (context, authProvider, expenseProvider, child) {
+            final user = authProvider.user;
 
-          return CustomScrollView(
-            slivers: [
-              // App bar with profile header
-              SliverAppBar(
-                expandedHeight: 200,
-                pinned: true,
-                backgroundColor: AppColors.primary,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [AppColors.primary, AppColors.primaryLight],
-                      ),
-                    ),
-                    child: SafeArea(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 20),
-                          CircleAvatar(
-                            radius: 45,
-                            backgroundColor: Colors.white,
-                            child: user?.avatarUrl != null
-                                ? ClipOval(
-                                    child: Image.network(
-                                      user!.avatarUrl!,
-                                      width: 90,
-                                      height: 90,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : Icon(
-                                    Icons.person,
-                                    size: 50,
-                                    color: AppColors.primary,
-                                  ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            user?.fullName ?? AppStrings.defaultUserName,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Text(
-                            user?.email ?? '',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white.withValues(alpha: 0.8),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+            return SafeArea(
+              child: CustomScrollView(
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
                 ),
-              ),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                      child: Column(
+                        children: [
+                          // Profile Header
+                          _buildProfileHeader(user),
+                          const SizedBox(height: 20),
 
-              // Content
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      // Balance card
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: AppColors.cardBackground,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                Icons.account_balance_wallet,
-                                color: AppColors.primary,
-                                size: 28,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    AppStrings.totalBalance,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: AppColors.textSecondary,
+                          // Balance card
+                          _buildBalanceCard(expenseProvider, currencyFormat),
+                          const SizedBox(height: 24),
+
+                          // Menu items
+                          _buildMenuSection(
+                            title: AppStrings.settings,
+                            items: [
+                              _buildMenuItem(
+                                icon: Icons.account_balance_wallet_outlined,
+                                title: AppStrings.walletManagement,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const WalletManagementScreen(),
                                     ),
+                                  );
+                                },
+                              ),
+                              _buildMenuItem(
+                                icon: Icons.bar_chart_rounded,
+                                title: AppStrings.statistics,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const StatisticsScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              Consumer<SettingsProvider>(
+                                builder: (context, settings, _) => _buildMenuItem(
+                                  icon: settings.isDarkMode
+                                      ? Icons.dark_mode_rounded
+                                      : Icons.light_mode_rounded,
+                                  title: AppStrings.theme,
+                                  trailing: Switch(
+                                    value: settings.isDarkMode,
+                                    onChanged: (value) {
+                                      settings.setThemeMode(
+                                        value ? ThemeMode.dark : ThemeMode.light,
+                                      );
+                                    },
+                                    activeColor: AppColors.primary,
                                   ),
-                                  const SizedBox(height: 4),
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 200),
-                                    layoutBuilder:
-                                        (currentChild, previousChildren) {
-                                          return Stack(
-                                            alignment: Alignment.centerLeft,
-                                            children: [
-                                              ...previousChildren,
-                                              ?currentChild,
-                                            ],
-                                          );
-                                        },
+                                ),
+                              ),
+                              Consumer<SettingsProvider>(
+                                builder: (context, settings, _) => _buildMenuItem(
+                                  icon: Icons.language_rounded,
+                                  title: AppStrings.language,
+                                  trailing: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.08,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                     child: Text(
-                                      _isBalanceVisible
-                                          ? currencyFormat.format(
-                                              expenseProvider.totalBalance,
-                                            )
-                                          : '••••••••',
-                                      key: ValueKey(_isBalanceVisible),
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
+                                      settings.languageDisplayName,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primary,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _isBalanceVisible = !_isBalanceVisible;
-                                });
-                              },
-                              child: Icon(
-                                _isBalanceVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                color: AppColors.textSecondary,
-                                size: 22,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Menu items
-                      _buildMenuSection(
-                        title: AppStrings.settings,
-                        items: [
-                          _buildMenuItem(
-                            icon: Icons.account_balance_wallet_outlined,
-                            title: AppStrings.walletManagement,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const WalletManagementScreen(),
+                                  onTap: () => _showLanguagePicker(context),
                                 ),
-                              );
-                            },
-                          ),
-                          _buildMenuItem(
-                            icon: Icons.analytics_outlined,
-                            title: AppStrings.statistics,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const StatisticsScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          Consumer<SettingsProvider>(
-                            builder: (context, settings, _) => _buildMenuItem(
-                              icon: settings.isDarkMode
-                                  ? Icons.dark_mode
-                                  : Icons.light_mode_outlined,
-                              title: AppStrings.theme,
-                              trailing: Switch(
-                                value: settings.isDarkMode,
-                                onChanged: (value) {
-                                  settings.setThemeMode(
-                                    value ? ThemeMode.dark : ThemeMode.light,
+                              ),
+                              _buildMenuItem(
+                                icon: Icons.settings_outlined,
+                                title: AppStrings.settings,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const SettingsScreen(),
+                                    ),
                                   );
                                 },
-                                activeThumbColor: AppColors.primary,
+                              ),
+                              _buildMenuItem(
+                                icon: Icons.notifications_outlined,
+                                title: AppStrings.notifications,
+                                trailing: Switch(
+                                  value: true,
+                                  onChanged: (value) {},
+                                  activeColor: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+
+                          _buildMenuSection(
+                            title: AppStrings.otherSection,
+                            items: [
+                              _buildMenuItem(
+                                icon: Icons.info_outline_rounded,
+                                title: AppStrings.about,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const AboutScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              _buildMenuItem(
+                                icon: Icons.help_outline_rounded,
+                                title: AppStrings.help,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const HelpScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Logout button
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () => _showLogoutDialog(context),
+                              icon: Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
+                              label: Text(
+                                AppStrings.logout,
+                                style: GoogleFonts.inter(
+                                  color: AppColors.error,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                side: BorderSide(color: AppColors.error.withValues(alpha: 0.3)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
                               ),
                             ),
                           ),
-                          Consumer<SettingsProvider>(
-                            builder: (context, settings, _) => _buildMenuItem(
-                              icon: Icons.language_outlined,
-                              title: AppStrings.language,
-                              trailing: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  settings.languageDisplayName,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                              onTap: () => _showLanguagePicker(context),
-                            ),
-                          ),
-                          _buildMenuItem(
-                            icon: Icons.settings_outlined,
-                            title: AppStrings.settings,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SettingsScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          _buildMenuItem(
-                            icon: Icons.notifications_outlined,
-                            title: AppStrings.notifications,
-                            trailing: Switch(
-                              value: true,
-                              onChanged: (value) {},
-                              activeThumbColor: AppColors.primary,
-                            ),
-                          ),
+                          const SizedBox(height: 32),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 
-                      _buildMenuSection(
-                        title: AppStrings.otherSection,
-                        items: [
-                          _buildMenuItem(
-                            icon: Icons.info_outline,
-                            title: AppStrings.about,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const AboutScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          _buildMenuItem(
-                            icon: Icons.help_outline,
-                            title: AppStrings.help,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const HelpScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
+  Widget _buildProfileHeader(dynamic user) {
+    return Column(
+      children: [
+        // Avatar
+        Container(
+          width: 72,
+          height: 72,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: user?.avatarUrl == null || (user?.avatarUrl ?? '').isEmpty
+                ? const LinearGradient(
+                    colors: AppColors.primaryGradient,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.15),
+              width: 3,
+            ),
+          ),
+          child: ClipOval(
+            child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
+                ? Image.network(
+                    user.avatarUrl!,
+                    width: 72,
+                    height: 72,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => _buildAvatarFallback(user.fullName),
+                  )
+                : _buildAvatarFallback(user?.fullName ?? 'U'),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          user?.fullName ?? AppStrings.defaultUserName,
+          style: GoogleFonts.inter(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+            letterSpacing: -0.3,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          user?.email ?? '',
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
 
-                      // Logout button
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () => _showLogoutDialog(context),
-                          icon: Icon(Icons.logout, color: AppColors.error),
-                          label: Text(
-                            AppStrings.logout,
-                            style: TextStyle(color: AppColors.error),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: BorderSide(color: AppColors.error),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                    ],
+  Widget _buildAvatarFallback(String name) {
+    final trimmed = name.trim();
+    String initials = 'U';
+    if (trimmed.isNotEmpty) {
+      final parts = trimmed.split(' ').where((p) => p.isNotEmpty).toList();
+      if (parts.length >= 2) {
+        initials = '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+      } else if (parts.isNotEmpty) {
+        initials = parts[0][0].toUpperCase();
+      }
+    }
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: AppColors.primaryGradient,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          initials,
+          style: GoogleFonts.inter(
+            color: Colors.white,
+            fontSize: 26,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBalanceCard(ExpenseProvider expenseProvider, dynamic currencyFormat) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.cardBackground,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.borderColor, width: 1),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.account_balance_wallet_rounded,
+              color: AppColors.primary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.totalBalance,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
+                const SizedBox(height: 4),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  layoutBuilder:
+                      (currentChild, previousChildren) {
+                        return Stack(
+                          alignment: Alignment.centerLeft,
+                          children: [
+                            ...previousChildren,
+                            ?currentChild,
+                          ],
+                        );
+                      },
+                  child: Text(
+                    _isBalanceVisible
+                        ? currencyFormat.format(
+                            expenseProvider.totalBalance,
+                          )
+                        : '••••••••',
+                    key: ValueKey(_isBalanceVisible),
+                    style: GoogleFonts.inter(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isBalanceVisible = !_isBalanceVisible;
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceVariant,
+                shape: BoxShape.circle,
               ),
-            ],
-          );
-        },
+              child: Icon(
+                _isBalanceVisible
+                    ? Icons.visibility_rounded
+                    : Icons.visibility_off_rounded,
+                color: AppColors.textSecondary,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -357,13 +409,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          padding: const EdgeInsets.only(left: 4, bottom: 10),
           child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textSecondary,
+            title.toUpperCase(),
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textHint,
+              letterSpacing: 1,
             ),
           ),
         ),
@@ -371,6 +424,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           decoration: BoxDecoration(
             color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.borderColor, width: 1),
           ),
           child: Column(children: items),
         ),
@@ -385,11 +439,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
     VoidCallback? onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.textPrimary),
-      title: Text(title),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: AppColors.textPrimary, size: 20),
+      ),
+      title: Text(
+        title,
+        style: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textPrimary,
+        ),
+      ),
       trailing:
-          trailing ?? Icon(Icons.chevron_right, color: AppColors.textSecondary),
+          trailing ?? Icon(Icons.chevron_right_rounded, color: AppColors.textHint, size: 20),
       onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
     );
   }
 
@@ -397,52 +466,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final settings = Provider.of<SettingsProvider>(context, listen: false);
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 12),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.textHint,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppStrings.selectLanguage,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              leading: const Text('🇻🇳', style: TextStyle(fontSize: 24)),
-              title: const Text('Tiếng Việt'),
-              trailing: settings.language == 'vi'
-                  ? Icon(Icons.check_circle, color: AppColors.primary)
-                  : null,
-              onTap: () {
-                settings.setLanguage('vi');
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Text('🇺🇸', style: TextStyle(fontSize: 24)),
-              title: const Text('English'),
-              trailing: settings.language == 'en'
-                  ? Icon(Icons.check_circle, color: AppColors.primary)
-                  : null,
-              onTap: () {
-                settings.setLanguage('en');
-                Navigator.pop(context);
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 20),
+              Text(
+                AppStrings.selectLanguage,
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ListTile(
+                leading: const Text('🇻🇳', style: TextStyle(fontSize: 24)),
+                title: Text('Tiếng Việt', style: GoogleFonts.inter(fontWeight: FontWeight.w500)),
+                trailing: settings.language == 'vi'
+                    ? Icon(Icons.check_circle_rounded, color: AppColors.primary)
+                    : null,
+                onTap: () {
+                  settings.setLanguage('vi');
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Text('🇺🇸', style: TextStyle(fontSize: 24)),
+                title: Text('English', style: GoogleFonts.inter(fontWeight: FontWeight.w500)),
+                trailing: settings.language == 'en'
+                    ? Icon(Icons.check_circle_rounded, color: AppColors.primary)
+                    : null,
+                onTap: () {
+                  settings.setLanguage('en');
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
@@ -452,7 +529,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppStrings.logout),
+        title: Text(AppStrings.logout, style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
         content: Text(AppStrings.logoutConfirm),
         actions: [
           TextButton(

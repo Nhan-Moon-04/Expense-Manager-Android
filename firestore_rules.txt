@@ -1,117 +1,213 @@
-rules_version = '2';
-
-service cloud.firestore {
-  match /databases/{database}/documents {
-    
-    // ==================== HELPER FUNCTIONS ====================
-    function isAuthenticated() {
-      return request.auth != null;
+{
+  "version": 1,
+  "lastUpdated": "2026-08-08",
+  "banks": [
+    {
+      "id": "momo",
+      "name": "MoMo",
+      "packageName": "com.mservice.momotransfer",
+      "enabled": true,
+      "titleFilter": null,
+      "rules": [
+        {
+          "name": "Chuyển tiền / Thanh toán",
+          "type": "expense",
+          "titleMatch": null,
+          "bodyMatch": "(chuyển|chuyen|thanh toán|thanh toan|chi|trừ|tru|payment|đã thanh toán|da thanh toan|đã chuyển|da chuyen)",
+          "bodyExclude": "(khuyến mãi|thất bại|không thành công|thưởng|voucher|ưu đãi|giảm giá)",
+          "amountPattern": "([\\d.,]+)\\s*(đ|₫|vnd|vnđ|VND|VNĐ)",
+          "descriptionPattern": null
+        },
+        {
+          "name": "Nhận tiền",
+          "type": "income",
+          "titleMatch": null,
+          "bodyMatch": "(nhận|nhan|cộng|cong|được|duoc|receive|hoàn tiền|hoan tien|refund)",
+          "bodyExclude": "(khuyến mãi|thất bại|không thành công|thưởng|voucher|ưu đãi|giảm giá)",
+          "amountPattern": "([\\d.,]+)\\s*(đ|₫|vnd|vnđ|VND|VNĐ)",
+          "descriptionPattern": null
+        }
+      ]
+    },
+    {
+      "id": "vcb",
+      "name": "Vietcombank",
+      "packageName": "com.VCB",
+      "enabled": true,
+      "titleFilter": null,
+      "rules": [
+        {
+          "name": "Thông báo giao dịch VCB",
+          "type": "auto",
+          "titleMatch": "(Thông báo VCB|Thong bao VCB|VCB Digibank|VCB)",
+          "bodyMatch": "(Số dư TK VCB|So du TK VCB)",
+          "bodyExclude": null,
+          "amountPattern": "([-+])\\s*([\\d.,]+)\\s*(VND|VNĐ|vnd|vnđ|đ|₫)",
+          "descriptionPattern": "(?:Ref|ND|N\\.D|Noi dung|Nội dung|Noi dung GD|Nội dung GD|Noi dung giao dich|Nội dung giao dịch)[:\\s]+(.+?)(?:\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "mbbank",
+      "name": "MB Bank",
+      "packageName": "com.mbmobile",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|thay đổi số dư|thay doi so du|số dư|so du|giao dịch|giao dich|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])\\s*([\\d.,]+)\\s*(VND|VNĐ|vnd|vnđ|đ|₫)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung|Noi dung GD|Nội dung GD|Noi dung giao dich|Nội dung giao dịch)[:\\s]+(.+?)(?:\\.|;|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "techcombank",
+      "name": "Techcombank",
+      "packageName": "vn.com.techcombank.bb.app",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|thay đổi số dư|thay doi so du|số dư|so du|giao dịch|giao dich|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])\\s*([\\d.,]+)\\s*(VND|VNĐ|vnd|vnđ|đ|₫)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung|Noi dung GD|Nội dung GD|Noi dung giao dich|Nội dung giao dịch)[:\\s]+(.+?)(?:\\.|;|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "bidv",
+      "name": "BIDV",
+      "packageName": "com.vnpay.bidv",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|thay đổi số dư|thay doi so du|số dư|so du|giao dịch|giao dich|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])\\s*([\\d.,]+)\\s*(VND|VNĐ|vnd|vnđ|đ|₫)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung|Noi dung GD|Nội dung GD|Noi dung giao dich|Nội dung giao dịch|Lý do|Ly do)[:\\s]+(.+?)(?:\\.|;|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "tpbank",
+      "name": "TPBank",
+      "packageName": "com.tpb.mb.gprsandroid",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|thay đổi số dư|thay doi so du|số dư|so du|giao dịch|giao dich|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])\\s*([\\d.,]+)\\s*(VND|VNĐ|vnd|vnđ|đ|₫)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung|Noi dung GD|Nội dung GD|Noi dung giao dich|Nội dung giao dịch)[:\\s]+(.+?)(?:\\.|;|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "vietinbank",
+      "name": "VietinBank",
+      "packageName": "com.vietinbank.ipay",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|thay đổi số dư|thay doi so du|số dư|so du|giao dịch|giao dich|GD|TK|iPay|IPay|ipay)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])\\s*([\\d.,]+)\\s*(VND|VNĐ|vnd|vnđ|đ|₫)",
+          "descriptionPattern": "(?:ND|N\\.D|Noi dung|Nội dung|Noi dung GD|Nội dung GD|Noi dung giao dich|Nội dung giao dịch)[:\\s]+(.+?)(?:\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "acb",
+      "name": "ACB",
+      "packageName": "mobile.acb.com.vn",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|thay đổi số dư|thay doi so du|số dư|so du|giao dịch|giao dich|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])\\s*([\\d.,]+)\\s*(VND|VNĐ|vnd|vnđ|đ|₫)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung|Noi dung GD|Nội dung GD|Noi dung giao dich|Nội dung giao dịch)[:\\s]+(.+?)(?:\\.|;|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "sacombank",
+      "name": "Sacombank",
+      "packageName": "src.com.sacombank",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|thay đổi số dư|thay doi so du|số dư|so du|giao dịch|giao dich|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])\\s*([\\d.,]+)\\s*(VND|VNĐ|vnd|vnđ|đ|₫)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung|Noi dung GD|Nội dung GD|Noi dung giao dich|Nội dung giao dịch)[:\\s]+(.+?)(?:\\.|;|\\n|$)"
+        }
+      ]
+    },
+    {
+      "id": "agribank",
+      "name": "Agribank",
+      "packageName": "com.vnpay.Agribank3g",
+      "enabled": true,
+      "titleFilter": "(biến động|bien dong|thay đổi số dư|thay doi so du|số dư|so du|giao dịch|giao dich|GD|TK)",
+      "rules": [
+        {
+          "name": "Biến động số dư",
+          "type": "auto",
+          "titleMatch": null,
+          "bodyMatch": null,
+          "bodyExclude": null,
+          "amountPattern": "([-+])\\s*([\\d.,]+)\\s*(VND|VNĐ|vnd|vnđ|đ|₫)",
+          "descriptionPattern": "(?:ND|Noi dung|N\\.D|Nội dung|Noi dung GD|Nội dung GD|Noi dung giao dich|Nội dung giao dịch)[:\\s]+(.+?)(?:\\.|;|\\n|$)"
+        }
+      ]
     }
-    
-    function isOwner(userId) {
-      return request.auth.uid == userId;
-    }
-    
-    // Kiểm tra user có role admin trong Firestore
-    function isAdmin() {
-      return isAuthenticated() && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-    
-    // ==================== USERS ====================
-    match /users/{userId} {
-      // Admin đọc/ghi tất cả user
-      allow read, write: if isAdmin();
-      
-      // User đọc/ghi document của chính mình
-      allow read, write: if isAuthenticated() && isOwner(userId);
-      
-      // Cho phép user khác đọc (cho group members)
-      allow read: if isAuthenticated();
-    }
-    
-    // ==================== EXPENSES ====================
-    match /expenses/{expenseId} {
-      // Admin đọc tất cả expenses (thống kê)
-      allow read: if isAdmin();
-      
-      // User đọc/ghi expenses của mình
-      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      
-      // User tạo expense cho mình
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      
-      // Đọc/ghi group expenses
-      allow read, write: if isAuthenticated() && resource.data.groupId != null;
-    }
-    
-    // ==================== NOTES ====================
-    match /notes/{noteId} {
-      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-    }
-    
-    // ==================== GROUPS ====================
-    match /groups/{groupId} {
-      // Admin đọc tất cả groups (thống kê)
-      allow read: if isAdmin();
-      
-      allow read, write: if isAuthenticated();
-      allow create: if isAuthenticated() && request.resource.data.ownerId == request.auth.uid;
-      allow delete: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
-    }
-    
-    // ==================== REMINDERS ====================
-    match /reminders/{reminderId} {
-      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-    }
-    
-    // ==================== NOTIFICATIONS (Personal) ====================
-    match /notifications/{notificationId} {
-      // Admin đọc/ghi tất cả notifications (gửi thông báo cho user)
-      allow read, write: if isAdmin();
-      
-      // User đọc/ghi notifications của mình
-      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      
-      // Cho phép tạo notification
-      allow create: if isAuthenticated();
-    }
-    
-    // ==================== ADMIN NOTIFICATION LOGS ====================
-    match /admin_notification_logs/{logId} {
-      // Chỉ admin mới đọc/ghi logs
-      allow read, write: if isAdmin();
-    }
-    
-    // ==================== ADMIN NOTIFICATIONS (Broadcast) ====================
-    match /admin_notifications/{notificationId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
-    }
-    
-    // ==================== AUTO EXPENSES (Bank notifications) ====================
-    match /auto_expenses/{expenseId} {
-      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-    }
-    
-    // ==================== CATEGORIES ====================
-    match /categories/{categoryId} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
-    }
-
-    // ==================== BACKUPS ====================
-    match /backups/{userId} {
-      allow read, write: if isAuthenticated() && isOwner(userId);
-    }
-
-    // ==================== APP CONFIG (Version check) ====================
-    match /app_config/{docId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
-    }
-  }
+  ],
+  "globalIgnorePatterns": [
+    "OTP",
+    "mã xác thực",
+    "ma xac thuc",
+    "mã giao dịch",
+    "xác nhận",
+    "đăng nhập",
+    "dang nhap",
+    "mật khẩu",
+    "mat khau",
+    "cập nhật",
+    "cap nhat",
+    "nâng cấp",
+    "khuyến mãi đặc biệt",
+    "tải app",
+    "download",
+    "quảng cáo"
+  ]
 }

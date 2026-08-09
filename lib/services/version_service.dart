@@ -19,10 +19,16 @@ class VersionInfo {
   });
 
   factory VersionInfo.fromMap(Map<String, dynamic> map) {
+    String url = map['downloadUrl'] ?? '';
+    if (url.isNotEmpty &&
+        !url.startsWith('http://') &&
+        !url.startsWith('https://')) {
+      url = '${VersionService.apkBaseUrl}$url';
+    }
     return VersionInfo(
       latestVersion: map['latestVersion'] ?? '1.0.0',
       minVersion: map['minVersion'] ?? '1.0.0',
-      downloadUrl: map['downloadUrl'] ?? '',
+      downloadUrl: url,
       releaseNotes: map['releaseNotes'] ?? '',
       forceUpdate: map['forceUpdate'] ?? false,
     );

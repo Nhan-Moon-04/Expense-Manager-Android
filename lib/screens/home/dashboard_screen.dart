@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -95,7 +96,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
+      value: (AppColors.isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
@@ -113,20 +114,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildHeader(),
-                          const SizedBox(height: 24),
-                          _buildBalanceCard(),
                           const SizedBox(height: 20),
+                          _buildBalanceCard(),
+                          const SizedBox(height: 16),
                           _buildIncomeExpenseCards(),
-                          const SizedBox(height: 28),
+                          const SizedBox(height: 24),
                           _buildQuickActions(),
-                          const SizedBox(height: 28),
+                          const SizedBox(height: 24),
                           _buildUpcomingReminders(),
-                          const SizedBox(height: 28),
+                          const SizedBox(height: 24),
                           _buildRecentExpenses(),
                           const SizedBox(height: 100),
                         ],
@@ -226,9 +227,9 @@ class _DashboardScreenState extends State<DashboardScreen>
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.4),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+                  color: AppColors.primary.withValues(alpha: 0.35),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
@@ -291,33 +292,28 @@ class _DashboardScreenState extends State<DashboardScreen>
               decoration: BoxDecoration(
                 color: AppColors.cardBackground,
                 shape: BoxShape.circle,
+                border: Border.all(color: AppColors.borderColor, width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withValues(alpha: 0.3),
+                    color: color.withValues(alpha: 0.2),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child: Icon(icon, color: color, size: 24),
+              child: Icon(icon, color: color, size: 22),
             ),
             const SizedBox(height: 4),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                border: Border.all(color: AppColors.borderColor, width: 0.5),
               ),
               child: Text(
                 label,
-                style: TextStyle(
+                style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: color,
@@ -337,97 +333,109 @@ class _DashboardScreenState extends State<DashboardScreen>
         final greeting = _getGreeting();
         return Row(
           children: [
+            // Circle avatar with gradient ring border
             Container(
-              width: 52,
-              height: 52,
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                gradient: user?.avatarUrl == null || user!.avatarUrl!.isEmpty
-                    ? const LinearGradient(
-                        colors: AppColors.primaryGradient,
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      )
-                    : null,
-                borderRadius: BorderRadius.circular(16),
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+                    color: const Color(0xFF3B82F6).withValues(alpha: 0.25),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: user.avatarUrl!,
-                        fit: BoxFit.cover,
-                        width: 52,
-                        height: 52,
-                        placeholder: (context, url) => Center(
-                          child: Text(
-                            _getInitials(user.fullName),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: AppColors.primaryGradient,
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
-                          child: Center(
+              child: Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.cardBackground,
+                  gradient: user?.avatarUrl == null || user!.avatarUrl!.isEmpty
+                      ? const LinearGradient(
+                          colors: AppColors.primaryGradient,
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
+                ),
+                child: ClipOval(
+                  child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: user.avatarUrl!,
+                          fit: BoxFit.cover,
+                          width: 46,
+                          height: 46,
+                          placeholder: (context, url) => Center(
                             child: Text(
                               _getInitials(user.fullName),
-                              style: const TextStyle(
+                              style: GoogleFonts.inter(
                                 color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
-                        ),
-                      )
-                    : Center(
-                        child: Text(
-                          _getInitials(user?.fullName ?? 'U'),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                          errorWidget: (context, url, error) => Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: AppColors.primaryGradient,
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                _getInitials(user.fullName),
+                                style: GoogleFonts.inter(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            _getInitials(user?.fullName ?? 'U'),
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
-                      ),
+                ),
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     greeting,
-                    style: TextStyle(
-                      fontSize: 14,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 1),
                   Text(
                     user?.fullName ?? AppStrings.defaultUserName,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                    style: GoogleFonts.inter(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
-                      letterSpacing: -0.5,
+                      letterSpacing: -0.3,
                     ),
                   ),
                 ],
@@ -443,15 +451,9 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget _buildNotificationButton() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AppColors.surfaceVariant,
+        shape: BoxShape.circle,
+        border: Border.all(color: AppColors.borderColor, width: 1),
       ),
       child: Material(
         color: Colors.transparent,
@@ -464,27 +466,27 @@ class _DashboardScreenState extends State<DashboardScreen>
               ),
             );
           },
-          borderRadius: BorderRadius.circular(14),
+          customBorder: const CircleBorder(),
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             child: Stack(
               children: [
                 Icon(
                   Icons.notifications_none_rounded,
                   color: AppColors.textPrimary,
-                  size: 26,
+                  size: 22,
                 ),
                 Positioned(
                   right: 0,
                   top: 0,
                   child: Container(
-                    width: 10,
-                    height: 10,
+                    width: 8,
+                    height: 8,
                     decoration: BoxDecoration(
                       color: AppColors.error,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppColors.cardBackground,
+                        color: AppColors.surfaceVariant,
                         width: 1.5,
                       ),
                     ),
@@ -521,145 +523,217 @@ class _DashboardScreenState extends State<DashboardScreen>
 
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFA855F7)],
+              colors: [
+                Color(0xFF0F172A),
+                Color(0xFF1E1B4B),
+                Color(0xFF312E81),
+                Color(0xFF2563EB),
+              ],
+              stops: [0.0, 0.35, 0.7, 1.0],
             ),
-            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.18),
+              width: 1.2,
+            ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.35),
+                color: const Color(0xFF312E81).withValues(alpha: 0.45),
                 blurRadius: 24,
-                offset: const Offset(0, 12),
+                offset: const Offset(0, 10),
+              ),
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.2),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              children: [
+                // Ambient luminous orb - Top Right
+                Positioned(
+                  top: -30,
+                  right: -30,
+                  child: Container(
+                    width: 150,
+                    height: 150,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.account_balance_wallet_rounded,
-                          color: Colors.white.withValues(alpha: 0.9),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          AppStrings.totalBalance,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFF60A5FA).withValues(alpha: 0.3),
+                          Colors.transparent,
+                        ],
+                      ),
                     ),
                   ),
-                  _buildBalanceMenuButton(balance),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 38, // cố định chiều cao
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        switchInCurve: Curves.easeOut,
-                        switchOutCurve: Curves.easeIn,
-                        layoutBuilder: (currentChild, previousChildren) {
-                          return Stack(
-                            alignment: Alignment.centerLeft,
-                            children: [...previousChildren, ?currentChild],
-                          );
-                        },
-                        child: _isBalanceVisible
-                            ? Text(
-                                currencyFormat.format(balance),
-                                key: const ValueKey('visible'),
-                                style: const TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  letterSpacing: -1,
-                                  height: 1.1, // rất quan trọng
+                ),
+                // Ambient luminous orb - Bottom Left
+                Positioned(
+                  bottom: -40,
+                  left: -20,
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFFA78BFA).withValues(alpha: 0.25),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Content Layer
+                Padding(
+                  padding: const EdgeInsets.all(22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.account_balance_wallet_rounded,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  size: 14,
                                 ),
-                              )
-                            : Text(
-                                '••••••••',
-                                key: const ValueKey('hidden'),
-                                style: const TextStyle(
-                                  fontSize: 30, // giữ y chang
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  letterSpacing: 4,
-                                  height: 1.1, // giữ y chang
+                                const SizedBox(width: 6),
+                                Text(
+                                  AppStrings.totalBalance,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          _buildBalanceMenuButton(balance),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SizedBox(
+                              height: 38,
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                switchInCurve: Curves.easeOut,
+                                switchOutCurve: Curves.easeIn,
+                                layoutBuilder: (currentChild, previousChildren) {
+                                  return Stack(
+                                    alignment: Alignment.centerLeft,
+                                    children: [...previousChildren, ?currentChild],
+                                  );
+                                },
+                                child: _isBalanceVisible
+                                    ? Text(
+                                        currencyFormat.format(balance),
+                                        key: const ValueKey('visible'),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white,
+                                          letterSpacing: -1,
+                                          height: 1.1,
+                                        ),
+                                      )
+                                    : Text(
+                                        '••••••••',
+                                        key: const ValueKey('hidden'),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white,
+                                          letterSpacing: 4,
+                                          height: 1.1,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isBalanceVisible = !_isBalanceVisible;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  width: 1,
                                 ),
                               ),
+                              child: Icon(
+                                _isBalanceVisible
+                                    ? Icons.visibility_rounded
+                                    : Icons.visibility_off_rounded,
+                                color: Colors.white.withValues(alpha: 0.9),
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isBalanceVisible = !_isBalanceVisible;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          _buildBalanceTrend(
+                            isPositive: isGrowthPositive,
+                            label: growthLabel,
+                            percent: growthPercent,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            AppStrings.comparedToLastMonth,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: Colors.white.withValues(alpha: 0.7),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                      child: Icon(
-                        _isBalanceVisible
-                            ? Icons.visibility_rounded
-                            : Icons.visibility_off_rounded,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        size: 22,
-                      ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _buildBalanceTrend(
-                    isPositive: isGrowthPositive,
-                    label: growthLabel,
-                    percent: growthPercent,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    AppStrings.comparedToLastMonth,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.white.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -670,7 +744,8 @@ class _DashboardScreenState extends State<DashboardScreen>
     return PopupMenuButton<String>(
       icon: Icon(
         Icons.more_horiz_rounded,
-        color: Colors.white.withValues(alpha: 0.7),
+        color: Colors.white.withValues(alpha: 0.8),
+        size: 22,
       ),
       color: AppColors.cardBackground,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -754,11 +829,16 @@ class _DashboardScreenState extends State<DashboardScreen>
     required String label,
     required double percent,
   }) {
+    final badgeColor = isPositive ? const Color(0xFF34D399) : const Color(0xFFFB7185);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(8),
+        color: badgeColor.withValues(alpha: 0.22),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: badgeColor.withValues(alpha: 0.4),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -767,16 +847,17 @@ class _DashboardScreenState extends State<DashboardScreen>
             isPositive
                 ? Icons.trending_up_rounded
                 : Icons.trending_down_rounded,
-            color: Colors.white,
+            color: badgeColor,
             size: 14,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 5),
           Text(
             '${percent.abs().toStringAsFixed(0)}% $label',
-            style: const TextStyle(
-              fontSize: 12,
+            style: GoogleFonts.inter(
+              fontSize: 11,
               color: Colors.white,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.1,
             ),
           ),
         ],
@@ -793,23 +874,21 @@ class _DashboardScreenState extends State<DashboardScreen>
               child: _buildStatCard(
                 title: AppStrings.income,
                 amount: expenseProvider.monthIncome,
-                icon: Icons.arrow_downward_rounded,
-                gradientColors: AppColors.incomeGradient,
-                iconBgColor: AppColors.success.withValues(alpha: 0.15),
-                iconColor: AppColors.success,
-                isVisible: _isBalanceVisible, // Đồng bộ với tổng số dư
+                icon: Icons.south_west_rounded,
+                color: AppColors.success,
+                gradient: AppColors.incomeGradient,
+                isVisible: _isBalanceVisible,
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 12),
             Expanded(
               child: _buildStatCard(
                 title: AppStrings.expense,
                 amount: expenseProvider.monthTotal,
-                icon: Icons.arrow_upward_rounded,
-                gradientColors: AppColors.expenseGradient,
-                iconBgColor: AppColors.error.withValues(alpha: 0.15),
-                iconColor: AppColors.error,
-                isVisible: _isBalanceVisible, // Đồng bộ với tổng số dư
+                icon: Icons.north_east_rounded,
+                color: AppColors.error,
+                gradient: AppColors.expenseGradient,
+                isVisible: _isBalanceVisible,
               ),
             ),
           ],
@@ -822,21 +901,21 @@ class _DashboardScreenState extends State<DashboardScreen>
     required String title,
     required double amount,
     required IconData icon,
-    required List<Color> gradientColors,
-    required Color iconBgColor,
-    required Color iconColor,
+    required Color color,
+    required List<Color> gradient,
     required bool isVisible,
   }) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            color: AppColors.shadowColor,
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -846,34 +925,36 @@ class _DashboardScreenState extends State<DashboardScreen>
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(9),
                 decoration: BoxDecoration(
-                  color: iconBgColor,
+                  gradient: LinearGradient(
+                    colors: gradient,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                child: Icon(icon, color: iconColor, size: 18),
+                child: Icon(icon, color: Colors.white, size: 16),
               ),
-              const Spacer(),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: gradientColors),
-                  borderRadius: BorderRadius.circular(2),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 14),
           SizedBox(
             width: double.infinity,
             child: AnimatedSwitcher(
@@ -891,11 +972,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                       currencyFormat.format(amount),
                       key: const ValueKey('visible'),
                       textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.inter(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
-                        letterSpacing: -0.5,
+                        letterSpacing: -0.3,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -904,9 +985,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                       '••••••',
                       key: const ValueKey('hidden'),
                       textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.inter(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
                         letterSpacing: 2,
                       ),
@@ -924,21 +1005,21 @@ class _DashboardScreenState extends State<DashboardScreen>
       children: [
         Text(
           AppStrings.quickActions,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+          style: GoogleFonts.inter(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
-            letterSpacing: -0.3,
+            letterSpacing: -0.2,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         Row(
           children: [
             _buildActionButton(
-              icon: Icons.remove_circle_outline_rounded,
+              icon: Icons.remove_rounded,
               label: AppStrings.expense,
               color: AppColors.expenseColor,
-              bgColor: AppColors.expenseColor.withValues(alpha: 0.1),
+              gradient: AppColors.expenseGradient,
               onTap: () {
                 final walletProvider = Provider.of<WalletProvider>(
                   context,
@@ -954,12 +1035,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                 );
               },
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             _buildActionButton(
-              icon: Icons.add_circle_outline_rounded,
+              icon: Icons.add_rounded,
               label: AppStrings.income,
               color: AppColors.incomeColor,
-              bgColor: AppColors.incomeColor.withValues(alpha: 0.1),
+              gradient: AppColors.incomeGradient,
               onTap: () {
                 final walletProvider = Provider.of<WalletProvider>(
                   context,
@@ -976,12 +1057,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                 );
               },
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             _buildActionButton(
               icon: Icons.notifications_active_outlined,
               label: AppStrings.reminders,
               color: AppColors.warning,
-              bgColor: AppColors.warning.withValues(alpha: 0.1),
+              gradient: const [Color(0xFFF59E0B), Color(0xFFFBBF24)],
               onTap: () {
                 Navigator.push(
                   context,
@@ -1001,7 +1082,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     required IconData icon,
     required String label,
     required Color color,
-    required Color bgColor,
+    required List<Color> gradient,
     required VoidCallback onTap,
   }) {
     return Expanded(
@@ -1009,16 +1090,17 @@ class _DashboardScreenState extends State<DashboardScreen>
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(18),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 20),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
               color: AppColors.cardBackground,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: AppColors.borderColor, width: 1),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 10,
+                  color: AppColors.shadowColor,
+                  blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ],
@@ -1026,18 +1108,29 @@ class _DashboardScreenState extends State<DashboardScreen>
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: bgColor,
-                    borderRadius: BorderRadius.circular(16),
+                    gradient: LinearGradient(
+                      colors: gradient,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  child: Icon(icon, color: color, size: 26),
+                  child: Icon(icon, color: Colors.white, size: 20),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 13,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
@@ -1072,11 +1165,11 @@ class _DashboardScreenState extends State<DashboardScreen>
               children: [
                 Text(
                   AppStrings.upcomingReminders,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  style: GoogleFonts.inter(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
-                    letterSpacing: -0.3,
+                    letterSpacing: -0.2,
                   ),
                 ),
                 TextButton(
@@ -1096,15 +1189,15 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ),
                   child: Text(
                     AppStrings.viewAll,
-                    style: const TextStyle(
+                    style: GoogleFonts.inter(
                       fontWeight: FontWeight.w600,
-                      fontSize: 14,
+                      fontSize: 13,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             ...reminders.map(
               (reminder) => GestureDetector(
                 onTap: () {
@@ -1117,57 +1210,46 @@ class _DashboardScreenState extends State<DashboardScreen>
                   );
                 },
                 child: Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: AppColors.cardBackground,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.borderColor, width: 1),
                   ),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.warning.withValues(alpha: 0.2),
-                              AppColors.accent.withValues(alpha: 0.1),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(14),
+                          color: AppColors.warning.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.alarm_rounded,
                           color: AppColors.warning,
-                          size: 22,
+                          size: 20,
                         ),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               reminder.title,
-                              style: TextStyle(
+                              style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w600,
-                                fontSize: 15,
+                                fontSize: 14,
                                 color: AppColors.textPrimary,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 3),
                             Row(
                               children: [
                                 Icon(
                                   Icons.access_time_rounded,
-                                  size: 14,
+                                  size: 13,
                                   color: AppColors.textHint,
                                 ),
                                 const SizedBox(width: 4),
@@ -1175,8 +1257,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   DateFormat(
                                     'HH:mm - dd/MM',
                                   ).format(reminder.reminderTime),
-                                  style: TextStyle(
-                                    fontSize: 13,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
                                     color: AppColors.textSecondary,
                                   ),
                                 ),
@@ -1185,17 +1267,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ],
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.chevron_right_rounded,
-                          color: AppColors.textSecondary,
-                          size: 20,
-                        ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: AppColors.textHint,
+                        size: 20,
                       ),
                     ],
                   ),
@@ -1216,60 +1291,83 @@ class _DashboardScreenState extends State<DashboardScreen>
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppStrings.recentTransactions,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-                letterSpacing: -0.3,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  AppStrings.recentTransactions,
+                  style: GoogleFonts.inter(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                if (expenses.isNotEmpty)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ExpenseListScreen(),
+                        ),
+                      );
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(0, 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      AppStrings.viewAll,
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             if (expenses.isEmpty)
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 40),
+                padding: const EdgeInsets.symmetric(vertical: 36),
                 decoration: BoxDecoration(
                   color: AppColors.cardBackground,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.borderColor, width: 1),
                 ),
                 child: Center(
                   child: Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: AppColors.background,
+                          color: AppColors.surfaceVariant,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.receipt_long_rounded,
-                          size: 40,
+                          size: 36,
                           color: AppColors.textHint,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
                       Text(
                         AppStrings.noTransactions,
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           color: AppColors.textSecondary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       Text(
                         AppStrings.addFirstExpense,
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           color: AppColors.textHint,
-                          fontSize: 13,
+                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -1280,14 +1378,8 @@ class _DashboardScreenState extends State<DashboardScreen>
               Container(
                 decoration: BoxDecoration(
                   color: AppColors.cardBackground,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.borderColor, width: 1),
                 ),
                 child: Column(
                   children: expenses
@@ -1314,37 +1406,39 @@ class _DashboardScreenState extends State<DashboardScreen>
     final categoryColor = _getCategoryColor(expense.category);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         border: !isLast
-            ? Border(bottom: BorderSide(color: AppColors.background, width: 1))
+            ? Border(
+                bottom: BorderSide(color: AppColors.dividerColor, width: 0.5),
+              )
             : null,
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color:
                   (expense.hasBankSource
                           ? _getBankColor(expense.bankSource!)
                           : categoryColor)
-                      .withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
+                      .withValues(alpha: 0.1),
+              shape: BoxShape.circle,
             ),
             child: expense.hasBankSource
                 ? Icon(
                     _getBankIcon(expense.bankSource!),
                     color: _getBankColor(expense.bankSource!),
-                    size: 22,
+                    size: 20,
                   )
                 : Icon(
                     _getCategoryIcon(expense.category),
                     color: categoryColor,
-                    size: 22,
+                    size: 20,
                   ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1354,9 +1448,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                     Flexible(
                       child: Text(
                         expense.displayName,
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           fontWeight: FontWeight.w600,
-                          fontSize: 15,
+                          fontSize: 14,
                           color: AppColors.textPrimary,
                         ),
                         maxLines: 1,
@@ -1367,17 +1461,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                       const SizedBox(width: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
+                          horizontal: 5,
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
+                          color: AppColors.primary.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        child: const Text(
-                          'T\u1ef1 \u0111\u1ed9ng',
-                          style: TextStyle(
-                            fontSize: 10,
+                        child: Text(
+                          'Tự động',
+                          style: GoogleFonts.inter(
+                            fontSize: 9,
                             fontWeight: FontWeight.w600,
                             color: AppColors.primary,
                           ),
@@ -1386,12 +1480,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ],
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Text(
                   expense.description ??
                       DateFormat('dd/MM/yyyy').format(expense.date),
-                  style: TextStyle(
-                    fontSize: 13,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
                     color: AppColors.textSecondary,
                   ),
                   maxLines: 1,
@@ -1405,16 +1499,19 @@ class _DashboardScreenState extends State<DashboardScreen>
             children: [
               Text(
                 '${isExpense ? "-" : "+"}${currencyFormat.format(expense.amount)}',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
                   color: color,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 3),
               Text(
                 DateFormat('HH:mm').format(expense.date),
-                style: TextStyle(fontSize: 12, color: AppColors.textHint),
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: AppColors.textHint,
+                ),
               ),
             ],
           ),

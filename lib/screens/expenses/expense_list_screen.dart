@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -181,9 +182,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
           children: [
             Text(
               AppStrings.expenses,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+              style: GoogleFonts.inter(
+                fontSize: 26,
+                fontWeight: FontWeight.w800,
                 color: AppColors.textPrimary,
                 letterSpacing: -0.5,
               ),
@@ -191,7 +192,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
             const SizedBox(height: 4),
             Text(
               AppStrings.manageYourTransactions,
-              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+              style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -199,15 +200,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
           children: [
             Container(
               decoration: BoxDecoration(
-                color: AppColors.cardBackground,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: AppColors.surfaceVariant,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.borderColor, width: 1),
               ),
               child: Material(
                 color: Colors.transparent,
@@ -238,15 +233,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
             const SizedBox(width: 8),
             Container(
               decoration: BoxDecoration(
-                color: AppColors.cardBackground,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: AppColors.surfaceVariant,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.borderColor, width: 1),
               ),
               child: Material(
                 color: Colors.transparent,
@@ -522,14 +511,8 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.borderColor, width: 1),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -628,168 +611,264 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 .where((e) => e.type == ExpenseType.expense)
                 .fold(0.0, (sum, e) => sum + e.amount);
 
+        final isPositive = balance >= 0;
+
         return Column(
           children: [
             // Balance Card
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: balance >= 0
-                      ? [const Color(0xFF6366F1), const Color(0xFF8B5CF6)]
-                      : [const Color(0xFFEF4444), const Color(0xFFF97316)],
+                  colors: isPositive
+                      ? [
+                          const Color(0xFF0F172A),
+                          const Color(0xFF1E1B4B),
+                          const Color(0xFF312E81),
+                          const Color(0xFF2563EB),
+                        ]
+                      : [
+                          const Color(0xFF1F0712),
+                          const Color(0xFF4C0519),
+                          const Color(0xFF881337),
+                          const Color(0xFFE11D48),
+                        ],
+                  stops: const [0.0, 0.35, 0.7, 1.0],
                 ),
-                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.18),
+                  width: 1.2,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: (balance >= 0 ? AppColors.primary : AppColors.error)
-                        .withValues(alpha: 0.3),
-                    blurRadius: 20,
+                    color: (isPositive
+                            ? const Color(0xFF312E81)
+                            : const Color(0xFF881337))
+                        .withValues(alpha: 0.45),
+                    blurRadius: 24,
                     offset: const Offset(0, 10),
                   ),
+                  BoxShadow(
+                    color: (isPositive
+                            ? AppColors.primary
+                            : const Color(0xFFF43F5E))
+                        .withValues(alpha: 0.2),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Stack(
+                  children: [
+                    // Ambient luminous orb - Top Right
+                    Positioned(
+                      top: -30,
+                      right: -30,
+                      child: Container(
+                        width: 150,
+                        height: 150,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.account_balance_wallet_rounded,
-                              color: Colors.white.withValues(alpha: 0.9),
-                              size: 14,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              AppStrings.monthBalance,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _isBalanceVisible = !_isBalanceVisible;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            _isBalanceVisible
-                                ? Icons.visibility_rounded
-                                : Icons.visibility_off_rounded,
-                            color: Colors.white.withValues(alpha: 0.9),
-                            size: 20,
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              (isPositive
+                                      ? const Color(0xFF60A5FA)
+                                      : const Color(0xFFFB7185))
+                                  .withValues(alpha: 0.3),
+                              Colors.transparent,
+                            ],
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    height: 38,
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      switchInCurve: Curves.easeOut,
-                      switchOutCurve: Curves.easeIn,
-                      layoutBuilder: (currentChild, previousChildren) {
-                        return Stack(
-                          alignment: Alignment.centerLeft,
-                          children: [...previousChildren, ?currentChild],
-                        );
-                      },
-                      child: _isBalanceVisible
-                          ? Text(
-                              currencyFormat.format(balance),
-                              key: const ValueKey('visible'),
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: -1,
-                                height: 1.1,
+                    ),
+                    // Ambient luminous orb - Bottom Left
+                    Positioned(
+                      bottom: -40,
+                      left: -20,
+                      child: Container(
+                        width: 160,
+                        height: 160,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              (isPositive
+                                      ? const Color(0xFFA78BFA)
+                                      : const Color(0xFFF43F5E))
+                                  .withValues(alpha: 0.25),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Content Layer
+                    Padding(
+                      padding: const EdgeInsets.all(22),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.14),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.18),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.account_balance_wallet_rounded,
+                                      color: Colors.white.withValues(alpha: 0.9),
+                                      size: 14,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      AppStrings.monthBalance,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.white.withValues(alpha: 0.9),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            )
-                          : const Text(
-                              '••••••••',
-                              key: ValueKey('hidden'),
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: 4,
-                                height: 1.1,
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _isBalanceVisible = !_isBalanceVisible;
+                                  });
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    _isBalanceVisible
+                                        ? Icons.visibility_rounded
+                                        : Icons.visibility_off_rounded,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          SizedBox(
+                            height: 38,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              switchInCurve: Curves.easeOut,
+                              switchOutCurve: Curves.easeIn,
+                              layoutBuilder: (currentChild, previousChildren) {
+                                return Stack(
+                                  alignment: Alignment.centerLeft,
+                                  children: [...previousChildren, ?currentChild],
+                                );
+                              },
+                              child: _isBalanceVisible
+                                  ? Text(
+                                      currencyFormat.format(balance),
+                                      key: const ValueKey('visible'),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                        letterSpacing: -1,
+                                        height: 1.1,
+                                      ),
+                                    )
+                                  : Text(
+                                      '••••••••',
+                                      key: const ValueKey('hidden'),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                        letterSpacing: 4,
+                                        height: 1.1,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${expenses.length} ${AppStrings.transactionsThisMonth}',
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: Colors.white.withValues(alpha: 0.75),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                width: 1,
                               ),
                             ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${expenses.length} ${AppStrings.transactionsThisMonth}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.white.withValues(alpha: 0.7),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          AppStrings.totalBalance,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontWeight: FontWeight.w500,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  AppStrings.totalBalance,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: Colors.white.withValues(alpha: 0.85),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  _isBalanceVisible
+                                      ? currencyFormat.format(totalBalanceAllTime)
+                                      : '••••••',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Text(
-                          _isBalanceVisible
-                              ? currencyFormat.format(totalBalanceAllTime)
-                              : '••••••',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             // Income & Expense Cards
             Row(
               children: [
@@ -797,17 +876,19 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                   child: _buildMiniStatCard(
                     title: AppStrings.income,
                     amount: totalIncome,
-                    icon: Icons.arrow_downward_rounded,
+                    icon: Icons.south_west_rounded,
                     color: AppColors.success,
+                    gradient: AppColors.incomeGradient,
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: _buildMiniStatCard(
                     title: AppStrings.expense,
                     amount: totalExpense,
-                    icon: Icons.arrow_upward_rounded,
+                    icon: Icons.north_east_rounded,
                     color: AppColors.error,
+                    gradient: AppColors.expenseGradient,
                   ),
                 ),
               ],
@@ -823,16 +904,18 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
     required double amount,
     required IconData icon,
     required Color color,
+    required List<Color> gradient,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
+            color: AppColors.shadowColor,
+            blurRadius: 16,
             offset: const Offset(0, 4),
           ),
         ],
@@ -840,12 +923,23 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
+              gradient: LinearGradient(
+                colors: gradient,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.35),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: Icon(icon, color: color, size: 18),
+            child: Icon(icon, color: Colors.white, size: 16),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -854,18 +948,20 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: GoogleFonts.inter(
                     fontSize: 12,
                     color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   currencyFormat.format(amount),
-                  style: TextStyle(
+                  style: GoogleFonts.inter(
                     fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: color,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.2,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -886,13 +982,13 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
         _buildFilterChip(
           'income',
           AppStrings.income,
-          Icons.arrow_downward_rounded,
+          Icons.south_west_rounded,
         ),
         const SizedBox(width: 10),
         _buildFilterChip(
           'expense',
           AppStrings.expense,
-          Icons.arrow_upward_rounded,
+          Icons.north_east_rounded,
         ),
       ],
     );
@@ -911,15 +1007,23 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
               gradient: isSelected
-                  ? const LinearGradient(colors: AppColors.primaryGradient)
+                  ? const LinearGradient(
+                      colors: AppColors.primaryGradient,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
                   : null,
               color: isSelected ? null : AppColors.cardBackground,
               borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: isSelected ? Colors.transparent : AppColors.borderColor,
+                width: 1,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.3)
-                      : Colors.black.withValues(alpha: 0.04),
+                      ? AppColors.primary.withValues(alpha: 0.35)
+                      : AppColors.shadowColor,
                   blurRadius: isSelected ? 12 : 8,
                   offset: const Offset(0, 4),
                 ),
@@ -936,7 +1040,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 const SizedBox(width: 6),
                 Text(
                   label,
-                  style: TextStyle(
+                  style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: isSelected ? Colors.white : AppColors.textSecondary,
@@ -1029,17 +1133,11 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 .fold(0.0, (sum, e) => sum + e.amount);
 
             return Container(
-              margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
               decoration: BoxDecoration(
                 color: AppColors.cardBackground,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppColors.borderColor, width: 1),
               ),
               child: Column(
                 children: [
@@ -1058,9 +1156,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: AppColors.primaryGradient,
+                              colors: [Color(0xFF1E3A5F), Color(0xFF2563EB)],
                             ),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
                             DateFormat('dd').format(dateExpenses.first.date),

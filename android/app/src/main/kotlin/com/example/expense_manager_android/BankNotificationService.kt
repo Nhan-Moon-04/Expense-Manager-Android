@@ -608,6 +608,14 @@ class BankNotificationService : NotificationListenerService() {
         }, REFRESH_INTERVAL_MS)
     }
 
+    private fun normalizeNotificationText(text: String): String {
+        return text
+            .replace("−", "-") // U+2212 Minus Sign
+            .replace("–", "-") // En Dash
+            .replace("—", "-") // Em Dash
+            .replace("＋", "+") // Full-width Plus
+    }
+
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         sbn?.let { notification ->
             val packageName = notification.packageName
@@ -616,8 +624,10 @@ class BankNotificationService : NotificationListenerService() {
             val bankRule = supportedPackages[packageName] ?: return
 
             val extras = notification.notification.extras
-            val title = extras.getString("android.title") ?: ""
-            val text = extras.getCharSequence("android.text")?.toString() ?: ""
+            val rawTitle = extras.getString("android.title") ?: ""
+            val rawText = extras.getCharSequence("android.text")?.toString() ?: ""
+            val title = normalizeNotificationText(rawTitle)
+            val text = normalizeNotificationText(rawText)
             val fullText = "$title $text"
 
             // Check global ignore patterns (OTP, spam, ads, etc.)
