@@ -13,6 +13,7 @@ import '../../providers/settings_provider.dart';
 import '../../providers/wallet_provider.dart';
 import '../../models/expense_model.dart';
 import '../expenses/add_expense_screen.dart';
+import '../expenses/expense_detail_screen.dart';
 import '../expenses/expense_list_screen.dart';
 import '../reminders/reminders_screen.dart';
 import '../reminders/add_reminder_screen.dart';
@@ -829,16 +830,30 @@ class _DashboardScreenState extends State<DashboardScreen>
     required String label,
     required double percent,
   }) {
-    final badgeColor = isPositive ? const Color(0xFF34D399) : const Color(0xFFFB7185);
+    // High-contrast executive fintech pill colors
+    final gradientColors = isPositive
+        ? const [Color(0xFF059669), Color(0xFF10B981)] // Luminous Emerald
+        : const [Color(0xFFE11D48), Color(0xFFF43F5E)]; // Vibrant Rose Red
+    final shadowColor = isPositive
+        ? const Color(0xFF10B981)
+        : const Color(0xFFF43F5E);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.22),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: badgeColor.withValues(alpha: 0.4),
-          width: 1,
+        gradient: LinearGradient(
+          colors: gradientColors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withValues(alpha: 0.45),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -847,17 +862,17 @@ class _DashboardScreenState extends State<DashboardScreen>
             isPositive
                 ? Icons.trending_up_rounded
                 : Icons.trending_down_rounded,
-            color: badgeColor,
-            size: 14,
+            color: Colors.white,
+            size: 15,
           ),
           const SizedBox(width: 5),
           Text(
             '${percent.abs().toStringAsFixed(0)}% $label',
             style: GoogleFonts.inter(
-              fontSize: 11,
+              fontSize: 12,
               color: Colors.white,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.1,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.2,
             ),
           ),
         ],
@@ -1405,117 +1420,130 @@ class _DashboardScreenState extends State<DashboardScreen>
     final color = isExpense ? AppColors.expenseColor : AppColors.incomeColor;
     final categoryColor = _getCategoryColor(expense.category);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        border: !isLast
-            ? Border(
-                bottom: BorderSide(color: AppColors.dividerColor, width: 0.5),
-              )
-            : null,
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color:
-                  (expense.hasBankSource
-                          ? _getBankColor(expense.bankSource!)
-                          : categoryColor)
-                      .withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExpenseDetailScreen(expense: expense),
             ),
-            child: expense.hasBankSource
-                ? Icon(
-                    _getBankIcon(expense.bankSource!),
-                    color: _getBankColor(expense.bankSource!),
-                    size: 20,
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            border: !isLast
+                ? Border(
+                    bottom: BorderSide(color: AppColors.dividerColor, width: 0.5),
                   )
-                : Icon(
-                    _getCategoryIcon(expense.category),
-                    color: categoryColor,
-                    size: 20,
-                  ),
+                : null,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        expense.displayName,
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: AppColors.textPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color:
+                      (expense.hasBankSource
+                              ? _getBankColor(expense.bankSource!)
+                              : categoryColor)
+                          .withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: expense.hasBankSource
+                    ? Icon(
+                        _getBankIcon(expense.bankSource!),
+                        color: _getBankColor(expense.bankSource!),
+                        size: 20,
+                      )
+                    : Icon(
+                        _getCategoryIcon(expense.category),
+                        color: categoryColor,
+                        size: 20,
                       ),
-                    ),
-                    if (expense.isAutoAdded) ...[
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 5,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Text(
-                          'Tự động',
-                          style: GoogleFonts.inter(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            expense.displayName,
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: AppColors.textPrimary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        if (expense.isAutoAdded) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              'Tự động',
+                              style: GoogleFonts.inter(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      expense.description ??
+                          DateFormat('dd/MM/yyyy').format(expense.date),
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
                       ),
-                    ],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  expense.description ??
-                      DateFormat('dd/MM/yyyy').format(expense.date),
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${isExpense ? "-" : "+"}${currencyFormat.format(expense.amount)}',
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                  color: color,
-                ),
               ),
-              const SizedBox(height: 3),
-              Text(
-                DateFormat('HH:mm').format(expense.date),
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  color: AppColors.textHint,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${isExpense ? "-" : "+"}${currencyFormat.format(expense.amount)}',
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: color,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    DateFormat('HH:mm').format(expense.date),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: AppColors.textHint,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

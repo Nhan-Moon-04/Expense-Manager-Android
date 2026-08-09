@@ -139,24 +139,20 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildHeader(),
-                          const SizedBox(height: 12),
-                          _buildWalletSelector(),
                           if (_isSearching) ...[
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 10),
                             _buildSearchBar(),
                           ],
-                          const SizedBox(height: 20),
-                          _buildMonthSelector(),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 12),
                           _buildSummaryCards(),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 12),
                           _buildFilterChips(),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                         ],
                       ),
                     ),
@@ -175,87 +171,109 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
 
   Widget _buildHeader() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppStrings.expenses,
-              style: GoogleFonts.inter(
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
-                letterSpacing: -0.5,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              AppStrings.manageYourTransactions,
-              style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary),
-            ),
-          ],
+        Text(
+          AppStrings.expenses,
+          style: GoogleFonts.inter(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+            letterSpacing: -0.5,
+          ),
         ),
-        Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.borderColor, width: 1),
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      _isSearching = !_isSearching;
-                      if (!_isSearching) {
-                        _searchQuery = '';
-                        _searchController.clear();
-                      }
-                    });
-                  },
-                  borderRadius: BorderRadius.circular(14),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Icon(
-                      _isSearching
-                          ? Icons.search_off_rounded
-                          : Icons.search_rounded,
-                      color: AppColors.textPrimary,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ),
+        const SizedBox(width: 8),
+        _buildWalletSelector(),
+        const Spacer(),
+        _buildMonthSelectorButton(),
+        const SizedBox(width: 6),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _isSearching = !_isSearching;
+              if (!_isSearching) {
+                _searchQuery = '';
+                _searchController.clear();
+              }
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderColor, width: 1),
             ),
-            const SizedBox(width: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.borderColor, width: 1),
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: _showFilterDialog,
-                  borderRadius: BorderRadius.circular(14),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Icon(
-                      Icons.tune_rounded,
-                      color: AppColors.textPrimary,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ),
+            child: Icon(
+              _isSearching ? Icons.search_off_rounded : Icons.search_rounded,
+              color: AppColors.textPrimary,
+              size: 18,
             ),
-          ],
+          ),
+        ),
+        const SizedBox(width: 6),
+        GestureDetector(
+          onTap: _showFilterDialog,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderColor, width: 1),
+            ),
+            child: Icon(
+              Icons.tune_rounded,
+              color: AppColors.textPrimary,
+              size: 18,
+            ),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildMonthSelectorButton() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.borderColor, width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () => _changeMonth(-1),
+            borderRadius: BorderRadius.circular(8),
+            child: const Padding(
+              padding: EdgeInsets.all(2),
+              child: Icon(Icons.chevron_left_rounded, size: 18),
+            ),
+          ),
+          GestureDetector(
+            onTap: _showMonthPicker,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                DateFormat('MM/yy').format(_selectedMonth),
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () => _changeMonth(1),
+            borderRadius: BorderRadius.circular(8),
+            child: const Padding(
+              padding: EdgeInsets.all(2),
+              child: Icon(Icons.chevron_right_rounded, size: 18),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -313,17 +331,14 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
         return GestureDetector(
           onTap: () => _showWalletPicker(walletProvider),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.cardBackground,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.25),
+                width: 1,
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -331,22 +346,27 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 Icon(
                   Icons.account_balance_wallet_rounded,
                   color: AppColors.primary,
-                  size: 18,
+                  size: 14,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  displayName,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                const SizedBox(width: 5),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 85),
+                  child: Text(
+                    displayName,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 2),
                 Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  color: AppColors.textSecondary,
-                  size: 20,
+                  color: AppColors.primary,
+                  size: 16,
                 ),
               ],
             ),
@@ -506,87 +526,6 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
     );
   }
 
-  Widget _buildMonthSelector() {
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.borderColor, width: 1),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildMonthButton(
-            icon: Icons.chevron_left_rounded,
-            onTap: () => _changeMonth(-1),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: _showMonthPicker,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: AppColors.primaryGradient,
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.calendar_month_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      DateFormat('MMMM, yyyy', 'vi').format(_selectedMonth),
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          _buildMonthButton(
-            icon: Icons.chevron_right_rounded,
-            onTap: () => _changeMonth(1),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMonthButton({
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Icon(icon, color: AppColors.textPrimary, size: 24),
-        ),
-      ),
-    );
-  }
-
   Widget _buildSummaryCards() {
     return Consumer2<ExpenseProvider, WalletProvider>(
       builder: (context, expenseProvider, walletProvider, child) {
@@ -599,264 +538,172 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
             .fold(0.0, (sum, e) => sum + e.amount);
         final balance = totalIncome - totalExpense;
 
-        // Total balance across all time for selected wallet
-        final allExpenses = walletProvider.filterByWallet(
-          expenseProvider.expenses,
-        );
-        final totalBalanceAllTime =
-            allExpenses
-                .where((e) => e.type == ExpenseType.income)
-                .fold(0.0, (sum, e) => sum + e.amount) -
-            allExpenses
-                .where((e) => e.type == ExpenseType.expense)
-                .fold(0.0, (sum, e) => sum + e.amount);
-
         final isPositive = balance >= 0;
 
-        return Column(
-          children: [
-            // Balance Card
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isPositive
-                      ? [
-                          const Color(0xFF0F172A),
-                          const Color(0xFF1E1B4B),
-                          const Color(0xFF312E81),
-                          const Color(0xFF2563EB),
-                        ]
-                      : [
-                          const Color(0xFF1F0712),
-                          const Color(0xFF4C0519),
-                          const Color(0xFF881337),
-                          const Color(0xFFE11D48),
-                        ],
-                  stops: const [0.0, 0.35, 0.7, 1.0],
-                ),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.18),
-                  width: 1.2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: (isPositive
-                            ? const Color(0xFF312E81)
-                            : const Color(0xFF881337))
-                        .withValues(alpha: 0.45),
-                    blurRadius: 24,
-                    offset: const Offset(0, 10),
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isPositive
+                  ? const [
+                      Color(0xFF0F172A),
+                      Color(0xFF1E1B4B),
+                      Color(0xFF312E81),
+                      Color(0xFF2563EB),
+                    ]
+                  : const [
+                      Color(0xFF1F0712),
+                      Color(0xFF4C0519),
+                      Color(0xFF881337),
+                      Color(0xFFE11D48),
+                    ],
+              stops: const [0.0, 0.35, 0.7, 1.0],
+            ),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.18),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: (isPositive
+                        ? const Color(0xFF312E81)
+                        : const Color(0xFF881337))
+                    .withValues(alpha: 0.35),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Row: Month Balance & Eye Toggle
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${AppStrings.monthBalance} (${DateFormat('MM/yyyy').format(_selectedMonth)})',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: Colors.white.withValues(alpha: 0.75),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        child: _isBalanceVisible
+                            ? Text(
+                                currencyFormat.format(balance),
+                                key: const ValueKey('vis'),
+                                style: GoogleFonts.inter(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                  letterSpacing: -0.5,
+                                ),
+                              )
+                            : Text(
+                                '••••••••',
+                                key: const ValueKey('hid'),
+                                style: GoogleFonts.inter(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                  letterSpacing: 3,
+                                ),
+                              ),
+                      ),
+                    ],
                   ),
-                  BoxShadow(
-                    color: (isPositive
-                            ? AppColors.primary
-                            : const Color(0xFFF43F5E))
-                        .withValues(alpha: 0.2),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isBalanceVisible = !_isBalanceVisible;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        _isBalanceVisible
+                            ? Icons.visibility_rounded
+                            : Icons.visibility_off_rounded,
+                        color: Colors.white.withValues(alpha: 0.9),
+                        size: 16,
+                      ),
+                    ),
                   ),
                 ],
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: Stack(
-                  children: [
-                    // Ambient luminous orb - Top Right
-                    Positioned(
-                      top: -30,
-                      right: -30,
-                      child: Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            colors: [
-                              (isPositive
-                                      ? const Color(0xFF60A5FA)
-                                      : const Color(0xFFFB7185))
-                                  .withValues(alpha: 0.3),
-                              Colors.transparent,
-                            ],
-                          ),
+              const SizedBox(height: 12),
+              // Bottom Row: Compact Split Income & Expense Badges
+              Row(
+                children: [
+                  // Income Badge Pill
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          width: 1,
                         ),
                       ),
-                    ),
-                    // Ambient luminous orb - Bottom Left
-                    Positioned(
-                      bottom: -40,
-                      left: -20,
-                      child: Container(
-                        width: 160,
-                        height: 160,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            colors: [
-                              (isPositive
-                                      ? const Color(0xFFA78BFA)
-                                      : const Color(0xFFF43F5E))
-                                  .withValues(alpha: 0.25),
-                              Colors.transparent,
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Content Layer
-                    Padding(
-                      padding: const EdgeInsets.all(22),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.14),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.18),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.account_balance_wallet_rounded,
-                                      color: Colors.white.withValues(alpha: 0.9),
-                                      size: 14,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      AppStrings.monthBalance,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white.withValues(alpha: 0.9),
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _isBalanceVisible = !_isBalanceVisible;
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.2),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Icon(
-                                    _isBalanceVisible
-                                        ? Icons.visibility_rounded
-                                        : Icons.visibility_off_rounded,
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    size: 18,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 18),
-                          SizedBox(
-                            height: 38,
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 300),
-                              switchInCurve: Curves.easeOut,
-                              switchOutCurve: Curves.easeIn,
-                              layoutBuilder: (currentChild, previousChildren) {
-                                return Stack(
-                                  alignment: Alignment.centerLeft,
-                                  children: [...previousChildren, ?currentChild],
-                                );
-                              },
-                              child: _isBalanceVisible
-                                  ? Text(
-                                      currencyFormat.format(balance),
-                                      key: const ValueKey('visible'),
-                                      style: GoogleFonts.inter(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.w800,
-                                        color: Colors.white,
-                                        letterSpacing: -1,
-                                        height: 1.1,
-                                      ),
-                                    )
-                                  : Text(
-                                      '••••••••',
-                                      key: const ValueKey('hidden'),
-                                      style: GoogleFonts.inter(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.w800,
-                                        color: Colors.white,
-                                        letterSpacing: 4,
-                                        height: 1.1,
-                                      ),
-                                    ),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${expenses.length} ${AppStrings.transactionsThisMonth}',
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
-                              color: Colors.white.withValues(alpha: 0.75),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 14),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF10B981),
+                              shape: BoxShape.circle,
                             ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.15),
-                                width: 1,
-                              ),
+                            child: const Icon(
+                              Icons.south_west_rounded,
+                              color: Colors.white,
+                              size: 10,
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  AppStrings.totalBalance,
+                                  AppStrings.income,
                                   style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    color: Colors.white.withValues(alpha: 0.85),
+                                    fontSize: 10,
+                                    color: Colors.white.withValues(alpha: 0.75),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
                                 Text(
                                   _isBalanceVisible
-                                      ? currencyFormat.format(totalBalanceAllTime)
+                                      ? currencyFormat.format(totalIncome)
                                       : '••••••',
                                   style: GoogleFonts.inter(
-                                    fontSize: 14,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                    letterSpacing: -0.2,
+                                    color: const Color(0xFF34D399),
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
@@ -864,113 +711,72 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Expense Badge Pill
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF43F5E),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.north_east_rounded,
+                              color: Colors.white,
+                              size: 10,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppStrings.expense,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 10,
+                                    color: Colors.white.withValues(alpha: 0.75),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  _isBalanceVisible
+                                      ? currencyFormat.format(totalExpense)
+                                      : '••••••',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFFFB7185),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 16),
-            // Income & Expense Cards
-            Row(
-              children: [
-                Expanded(
-                  child: _buildMiniStatCard(
-                    title: AppStrings.income,
-                    amount: totalIncome,
-                    icon: Icons.south_west_rounded,
-                    color: AppColors.success,
-                    gradient: AppColors.incomeGradient,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildMiniStatCard(
-                    title: AppStrings.expense,
-                    amount: totalExpense,
-                    icon: Icons.north_east_rounded,
-                    color: AppColors.error,
-                    gradient: AppColors.expenseGradient,
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         );
       },
-    );
-  }
-
-  Widget _buildMiniStatCard({
-    required String title,
-    required double amount,
-    required IconData icon,
-    required Color color,
-    required List<Color> gradient,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderColor, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowColor,
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(9),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: gradient,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withValues(alpha: 0.35),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Icon(icon, color: Colors.white, size: 16),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  currencyFormat.format(amount),
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                    letterSpacing: -0.2,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 

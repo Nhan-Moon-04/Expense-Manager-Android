@@ -39,17 +39,20 @@ enum UpdateStatus {
   upToDate, // App đã mới nhất
   optionalUpdate, // Có bản mới, người dùng chọn cập nhật hoặc bỏ qua
   forceUpdate, // Bắt buộc cập nhật, không thể bỏ qua
+  error, // Không thể kết nối tới server
 }
 
 class VersionCheckResult {
   final UpdateStatus status;
   final VersionInfo? versionInfo;
   final String currentVersion;
+  final String? errorMessage;
 
   VersionCheckResult({
     required this.status,
     this.versionInfo,
     required this.currentVersion,
+    this.errorMessage,
   });
 }
 
@@ -83,9 +86,10 @@ class VersionService {
   /// Kiểm tra phiên bản từ Armbian server
   /// Fetch từ: http://nthiennhan.ddns.net:90/app/version.json
   Future<VersionCheckResult> checkForUpdate() async {
+    String currentVersion = '1.0.0';
     try {
       final packageInfo = await PackageInfo.fromPlatform();
-      final currentVersion = packageInfo.version; // vd: "1.0.0"
+      currentVersion = packageInfo.version; // vd: "1.0.0"
 
       debugPrint('🔍 Checking for updates...');
       debugPrint('📱 Current version: $currentVersion');
@@ -101,7 +105,8 @@ class VersionService {
       if (response.statusCode != 200) {
         debugPrint('❌ Server returned ${response.statusCode}');
         return VersionCheckResult(
-          status: UpdateStatus.upToDate,
+          status: UpdateStatus.error,
+          errorMessage: 'Máy chủ phản hồi lỗi (${response.statusCode})',
           currentVersion: currentVersion,
         );
       }
@@ -145,12 +150,12 @@ class VersionService {
         currentVersion: currentVersion,
       );
     } catch (e, stackTrace) {
-      // Nếu lỗi (offline, etc.) → bỏ qua, cho dùng app bình thường
       debugPrint('❌ Error checking for updates: $e');
       debugPrint('Stack trace: $stackTrace');
       return VersionCheckResult(
-        status: UpdateStatus.upToDate,
-        currentVersion: '?.?.?',
+        status: UpdateStatus.error,
+        errorMessage: 'Không thể kết nối máy chủ (Vui lòng kiểm tra lại mạng).',
+        currentVersion: currentVersion,
       );
     }
   }

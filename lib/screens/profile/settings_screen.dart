@@ -20,6 +20,7 @@ import '../../services/cloudinary_service.dart';
 import '../../services/push_notification_service.dart';
 import '../../services/backup_service.dart';
 import '../../services/version_service.dart';
+import '../../services/biometric_service.dart';
 import '../widgets/update_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -80,6 +81,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _buildHeader(),
                       const SizedBox(height: 28),
                       _buildAccountSection(),
+                      const SizedBox(height: 24),
+                      _buildSecuritySection(),
                       const SizedBox(height: 24),
                       _buildAutoExpenseSection(),
                       const SizedBox(height: 24),
@@ -175,6 +178,69 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: AppStrings.email,
                 subtitle: user.email,
                 onTap: () {}, // Email cannot be changed
+              ),
+            ]),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildSecuritySection() {
+    return Consumer<SettingsProvider>(
+      builder: (context, settingsProvider, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader('Bảo Mật & Khóa App', Icons.security_rounded),
+            const SizedBox(height: 12),
+            _buildSettingsCard([
+              _buildSwitchTile(
+                icon: Icons.fingerprint_rounded,
+                title: 'Đăng nhập bằng vân tay',
+                subtitle: 'Yêu cầu quét vân tay khi mở ứng dụng chuẩn ngân hàng',
+                value: settingsProvider.isBiometricEnabled,
+                onChanged: (value) async {
+                  if (value) {
+                    final biometricService = BiometricService();
+                    final available = await biometricService.isBiometricAvailable();
+                    if (!available) {
+                      _showErrorSnackBar(
+                        'Thiết bị chưa bật hoặc không hỗ trợ vân tay / khuôn mặt.',
+                      );
+                      return;
+                    }
+                    final authenticated = await biometricService.authenticate(
+                      localizedReason: 'Xác thực vân tay để kích hoạt khóa ứng dụng',
+                    );
+                    if (authenticated) {
+                      await settingsProvider.setBiometricEnabled(true);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Row(
+                              children: [
+                                Icon(Icons.check_circle, color: Colors.white),
+                                SizedBox(width: 12),
+                                Expanded(child: Text('Đã bật đăng nhập bằng vân tay')),
+                              ],
+                            ),
+                            backgroundColor: AppColors.success,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            margin: const EdgeInsets.all(16),
+                          ),
+                        );
+                      }
+                    } else {
+                      _showErrorSnackBar('Xác thực vân tay không thành công.');
+                    }
+                  } else {
+                    await settingsProvider.setBiometricEnabled(false);
+                  }
+                },
               ),
             ]),
           ],
@@ -2147,7 +2213,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-    if (result.status == UpdateStatus.upToDate) {
+    if (result.status == UpdateStatus.error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.wifi_off_rounded, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  result.errorMessage ?? 'Không thể kết nối tới máy chủ cập nhật.',
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: AppColors.warning,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    } else if (result.status == UpdateStatus.upToDate) {
       // Debug: Hiển thị thêm thông tin version
       final currentVer = result.currentVersion;
       final latestVer = result.versionInfo?.latestVersion ?? 'N/A';

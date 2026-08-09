@@ -397,15 +397,46 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
 
   @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> with WidgetsBindingObserver {
+  bool _isUnlocked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      final settings = Provider.of<SettingsProvider>(context, listen: false);
+      if (settings.isBiometricEnabled) {
+        setState(() {
+          _isUnlocked = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(
-      builder: (context, authProvider, child) {
-        // Show splash screen while checking auth state
-        if (!authProvider.isInitialized) {
+    return Consumer2<AuthProvider, SettingsProvider>(
+      builder: (context, authProvider, settingsProvider, child) {
+        // Show splash screen while checking auth & settings state
+        if (!authProvider.isInitialized || !settingsProvider.isLoaded) {
           return Scaffold(
             body: Container(
               decoration: const BoxDecoration(
@@ -451,12 +482,11 @@ class AuthWrapper extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 48),
-                    SizedBox(
+                    const SizedBox(
                       width: 28,
                       height: 28,
                       child: CircularProgressIndicator(
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         strokeWidth: 2.5,
                       ),
                     ),
@@ -467,12 +497,27 @@ class AuthWrapper extends StatelessWidget {
           );
         }
 
-        // Navigate based on auth state
+        // Navigate based on auth state & app lock state
         if (authProvider.user != null) {
+          if (!_isUnlocked) {
+            return LoginScreen(
+              onUnlocked: () {
+                setState(() {
+                  _isUnlocked = true;
+                });
+              },
+            );
+          }
           return const HomeScreen();
         }
 
-        return const LoginScreen();
+        return LoginScreen(
+          onUnlocked: () {
+            setState(() {
+              _isUnlocked = true;
+            });
+          },
+        );
       },
     );
   }

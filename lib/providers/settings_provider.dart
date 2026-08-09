@@ -12,12 +12,16 @@ class SettingsProvider extends ChangeNotifier {
   String _currency = 'VND';
   String _language = 'vi';
   ThemeMode _themeMode = ThemeMode.light;
+  bool _isBiometricEnabled = false;
+  bool _isRememberMe = false;
   bool _isLoaded = false;
 
   String get currency => _currency;
   String get language => _language;
   ThemeMode get themeMode => _themeMode;
   bool get isDarkMode => _themeMode == ThemeMode.dark;
+  bool get isBiometricEnabled => _isBiometricEnabled;
+  bool get isRememberMe => _isRememberMe;
   bool get isLoaded => _isLoaded;
 
   /// Currency format based on current setting
@@ -74,8 +78,24 @@ class SettingsProvider extends ChangeNotifier {
     AppLocalizations.setLanguage(_language);
     final themeStr = prefs.getString(_keyThemeMode) ?? 'light';
     _themeMode = _themeModeFromString(themeStr);
+    _isBiometricEnabled = prefs.getBool('biometric_enabled') ?? false;
+    _isRememberMe = prefs.getBool('remember_me') ?? false;
     AppColors.setDarkMode(_themeMode == ThemeMode.dark);
     _isLoaded = true;
+    notifyListeners();
+  }
+
+  Future<void> setBiometricEnabled(bool value) async {
+    _isBiometricEnabled = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('biometric_enabled', value);
+    notifyListeners();
+  }
+
+  Future<void> setRememberMe(bool value) async {
+    _isRememberMe = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('remember_me', value);
     notifyListeners();
   }
 
@@ -91,6 +111,12 @@ class SettingsProvider extends ChangeNotifier {
     AppLocalizations.setLanguage(_language);
     if (settings.containsKey('themeMode')) {
       _themeMode = _themeModeFromString(settings['themeMode'] as String);
+    }
+    if (settings.containsKey('isBiometricEnabled')) {
+      _isBiometricEnabled = settings['isBiometricEnabled'] as bool;
+    }
+    if (settings.containsKey('isRememberMe')) {
+      _isRememberMe = settings['isRememberMe'] as bool;
     }
     AppColors.setDarkMode(_themeMode == ThemeMode.dark);
     _isLoaded = true;
@@ -153,6 +179,8 @@ class SettingsProvider extends ChangeNotifier {
       'currency': _currency,
       'language': _language,
       'themeMode': _themeModeToString(_themeMode),
+      'isBiometricEnabled': _isBiometricEnabled,
+      'isRememberMe': _isRememberMe,
     };
   }
 
@@ -161,5 +189,7 @@ class SettingsProvider extends ChangeNotifier {
     await prefs.setString(_keyCurrency, _currency);
     await prefs.setString(_keyLanguage, _language);
     await prefs.setString(_keyThemeMode, _themeModeToString(_themeMode));
+    await prefs.setBool('biometric_enabled', _isBiometricEnabled);
+    await prefs.setBool('remember_me', _isRememberMe);
   }
 }

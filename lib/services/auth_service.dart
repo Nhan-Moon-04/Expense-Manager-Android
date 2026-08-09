@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
@@ -87,10 +88,17 @@ class AuthService {
   Future<UserModel?> signInWithGoogle() async {
     try {
       final googleProvider = GoogleAuthProvider();
+      googleProvider.addScope('email');
+      googleProvider.addScope('profile');
 
-      final UserCredential result = await _auth.signInWithProvider(
-        googleProvider,
-      );
+      final UserCredential result = await _auth
+          .signInWithProvider(googleProvider)
+          .timeout(
+            const Duration(seconds: 25),
+            onTimeout: () {
+              throw TimeoutException('Quá thời gian chờ đăng nhập Google.');
+            },
+          );
       final User? user = result.user;
 
       if (user != null) {

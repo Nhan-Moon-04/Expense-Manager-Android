@@ -4,10 +4,13 @@ import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/settings_provider.dart';
+import '../../services/biometric_service.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final VoidCallback? onUnlocked;
+  const LoginScreen({super.key, this.onUnlocked});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -17,8 +20,90 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final BiometricService _biometricService = BiometricService();
+
   bool _obscurePassword = true;
   bool _isGoogleLoading = false;
+  bool _rememberMe = false;
+  bool _isBiometricEnabled = false;
+  bool _isBiometricSupported = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometricAndSavedState();
+  }
+
+  Future<void> _checkBiometricAndSavedState() async {
+    final isSupported = await _biometricService.isBiometricAvailable();
+    final isEnabled = await _biometricService.isBiometricEnabled();
+    final isRemember = await _biometricService.isRememberMe();
+    final credentials = await _biometricService.getSavedCredentials();
+
+    if (mounted) {
+      setState(() {
+        _isBiometricSupported = isSupported;
+        _isBiometricEnabled = isEnabled;
+        _rememberMe = isRemember;
+        if (isRemember && credentials['email']!.isNotEmpty) {
+          _emailController.text = credentials['email']!;
+          _passwordController.text = credentials['password']!;
+        }
+      });
+
+      // Auto trigger biometric login if enabled
+      if (isSupported && isEnabled) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _loginWithBiometrics();
+        });
+      }
+    }
+  }
+
+  Future<void> _loginWithBiometrics() async {
+    final authenticated = await _biometricService.authenticate(
+      localizedReason: 'Quét vân tay / khuôn mặt để đăng nhập tài khoản',
+    );
+
+    if (authenticated && mounted) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      // If Firebase user is already logged in, unlock into app
+      if (authProvider.user != null) {
+        widget.onUnlocked?.call();
+        return;
+      }
+
+      // Try logging in with saved credentials
+      final credentials = await _biometricService.getSavedCredentials();
+      final email = credentials['email'];
+      final password = credentials['password'];
+
+      if (email != null && email.isNotEmpty && password != null && password.isNotEmpty) {
+        bool success = await authProvider.signIn(
+          email: email,
+          password: password,
+        );
+        if (success) {
+          widget.onUnlocked?.call();
+        } else if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.error ?? 'Đăng nhập bằng vân tay thất bại.'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Vui lòng đăng nhập tài khoản ít nhất một lần trước khi dùng vân tay.'),
+            backgroundColor: AppColors.warning,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -29,13 +114,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       bool success = await authProvider.signIn(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
+        email: email,
+        password: password,
       );
 
-      if (!success && mounted) {
+      if (success) {
+        if (mounted) {
+          final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+          await settingsProvider.setRememberMe(_rememberMe);
+          widget.onUnlocked?.call();
+        }
+        if (_rememberMe) {
+          await _biometricService.saveCredentials(email, password);
+        } else {
+          await _biometricService.clearSavedCredentials();
+        }
+      } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authProvider.error ?? AppStrings.loginFailed),
@@ -58,20 +157,47 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _loginWithGoogle() async {
+    if (_isGoogleLoading) return;
     setState(() => _isGoogleLoading = true);
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    bool success = await authProvider.signInWithGoogle();
 
-    if (!success && mounted) {
-      final error = authProvider.error;
-      if (error != null) {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      bool success = await authProvider.signInWithGoogle();
+
+      if (success && mounted) {
+        widget.onUnlocked?.call();
+      } else if (!success && mounted) {
+        final error = authProvider.error ?? 'Đăng nhập Google không thành công.';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(error),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
         );
       }
-    }
-    if (mounted) {
-      setState(() => _isGoogleLoading = false);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi kết nối Google: $e'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isGoogleLoading = false);
+      }
     }
   }
 
@@ -191,18 +317,59 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
 
-                  // Forgot password
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _forgotPassword,
-                      child: Text(
-                        AppStrings.forgotPassword,
-                        style: TextStyle(color: AppColors.primary),
+                  // Remember me & Forgot password
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: Checkbox(
+                              value: _rememberMe,
+                              onChanged: (value) {
+                                setState(() {
+                                  _rememberMe = value ?? false;
+                                });
+                              },
+                              activeColor: AppColors.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _rememberMe = !_rememberMe;
+                              });
+                            },
+                            child: Text(
+                              'Ghi nhớ đăng nhập',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                      TextButton(
+                        onPressed: _forgotPassword,
+                        child: Text(
+                          AppStrings.forgotPassword,
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
 
@@ -260,6 +427,44 @@ class _LoginScreenState extends State<LoginScreen> {
                       );
                     },
                   ),
+
+                  // Biometric login button
+                  if (_isBiometricSupported && _isBiometricEnabled) ...[
+                    const SizedBox(height: 12),
+                    OutlinedButton(
+                      onPressed: _loginWithBiometrics,
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        side: BorderSide(
+                          color: AppColors.primary.withValues(alpha: 0.6),
+                          width: 1.5,
+                        ),
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.fingerprint_rounded,
+                            color: AppColors.primary,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Đăng nhập bằng vân tay',
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 24),
 
                   // Divider

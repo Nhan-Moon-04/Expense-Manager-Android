@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
@@ -148,11 +149,24 @@ class AuthProvider with ChangeNotifier {
       _setLoading(false);
       return _user != null;
     } on FirebaseAuthException catch (e) {
-      _setError(_getAuthErrorMessage(e.code));
+      if (e.code == 'DEVELOPER_ERROR' || e.message?.contains('DEVELOPER_ERROR') == true) {
+        _setError('Lỗi cấu hình Google Sign-In (Xác thực DEVELOPER_ERROR).');
+      } else {
+        _setError(_getAuthErrorMessage(e.code));
+      }
+      _setLoading(false);
+      return false;
+    } on TimeoutException catch (e) {
+      _setError(e.message ?? 'Hết thời gian chờ đăng nhập Google.');
       _setLoading(false);
       return false;
     } catch (e) {
-      _setError('Đăng nhập Google thất bại. Vui lòng thử lại.');
+      final errStr = e.toString();
+      if (errStr.contains('DEVELOPER_ERROR') || errStr.contains('status=DEVELOPER_ERROR')) {
+        _setError('Lỗi xác thực Google Sign-In trên thiết bị (DEVELOPER_ERROR / SHA-1).');
+      } else {
+        _setError('Đăng nhập Google không thành công. Vui lòng thử lại.');
+      }
       _setLoading(false);
       return false;
     }
