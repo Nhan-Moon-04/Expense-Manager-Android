@@ -120,15 +120,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildHeader(),
-                          const SizedBox(height: 20),
-                          _buildBalanceCard(),
                           const SizedBox(height: 16),
-                          _buildIncomeExpenseCards(),
-                          const SizedBox(height: 24),
+                          _buildBalanceCard(),
+                          const SizedBox(height: 18),
                           _buildQuickActions(),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 20),
                           _buildUpcomingReminders(),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 20),
                           _buildRecentExpenses(),
                           const SizedBox(height: 100),
                         ],
@@ -719,13 +717,62 @@ class _DashboardScreenState extends State<DashboardScreen>
                             label: growthLabel,
                             percent: growthPercent,
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            AppStrings.comparedToLastMonth,
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: Colors.white.withValues(alpha: 0.7),
-                              fontWeight: FontWeight.w500,
+                          const Spacer(),
+                          // Inline Income indicator
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.south_west_rounded,
+                                  color: Color(0xFF34D399),
+                                  size: 11,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _isBalanceVisible
+                                      ? currencyFormat.format(expenseProvider.monthIncome)
+                                      : '••••••',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFF34D399),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          // Inline Expense indicator
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.north_east_rounded,
+                                  color: Color(0xFFFB7185),
+                                  size: 11,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _isBalanceVisible
+                                      ? currencyFormat.format(expenseProvider.monthTotal)
+                                      : '••••••',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFFFB7185),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -880,139 +927,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildIncomeExpenseCards() {
-    return Consumer<ExpenseProvider>(
-      builder: (context, expenseProvider, child) {
-        return Row(
-          children: [
-            Expanded(
-              child: _buildStatCard(
-                title: AppStrings.income,
-                amount: expenseProvider.monthIncome,
-                icon: Icons.south_west_rounded,
-                color: AppColors.success,
-                gradient: AppColors.incomeGradient,
-                isVisible: _isBalanceVisible,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildStatCard(
-                title: AppStrings.expense,
-                amount: expenseProvider.monthTotal,
-                icon: Icons.north_east_rounded,
-                color: AppColors.error,
-                gradient: AppColors.expenseGradient,
-                isVisible: _isBalanceVisible,
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
-  Widget _buildStatCard({
-    required String title,
-    required double amount,
-    required IconData icon,
-    required Color color,
-    required List<Color> gradient,
-    required bool isVisible,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderColor, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowColor,
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(9),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: gradient,
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withValues(alpha: 0.35),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Icon(icon, color: Colors.white, size: 16),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              switchInCurve: Curves.easeOut,
-              switchOutCurve: Curves.easeIn,
-              layoutBuilder: (currentChild, previousChildren) {
-                return Stack(
-                  alignment: Alignment.centerLeft,
-                  children: [...previousChildren, ?currentChild],
-                );
-              },
-              child: isVisible
-                  ? Text(
-                      currencyFormat.format(amount),
-                      key: const ValueKey('visible'),
-                      textAlign: TextAlign.left,
-                      style: GoogleFonts.inter(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.3,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )
-                  : Text(
-                      '••••••',
-                      key: const ValueKey('hidden'),
-                      textAlign: TextAlign.left,
-                      style: GoogleFonts.inter(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                        letterSpacing: 2,
-                      ),
-                    ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildQuickActions() {
     return Column(
