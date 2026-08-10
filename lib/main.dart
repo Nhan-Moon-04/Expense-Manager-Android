@@ -404,32 +404,8 @@ class AuthWrapper extends StatefulWidget {
   State<AuthWrapper> createState() => _AuthWrapperState();
 }
 
-class _AuthWrapperState extends State<AuthWrapper> with WidgetsBindingObserver {
+class _AuthWrapperState extends State<AuthWrapper> {
   bool _isUnlocked = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
-      final settings = Provider.of<SettingsProvider>(context, listen: false);
-      if (settings.isBiometricEnabled) {
-        setState(() {
-          _isUnlocked = false;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

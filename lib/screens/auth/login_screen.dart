@@ -165,6 +165,17 @@ class _LoginScreenState extends State<LoginScreen> {
       bool success = await authProvider.signInWithGoogle();
 
       if (success && mounted) {
+        final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+        await settingsProvider.setRememberMe(_rememberMe);
+
+        final userEmail = authProvider.user?.email;
+        if (userEmail != null && userEmail.isNotEmpty) {
+          if (_rememberMe) {
+            await _biometricService.saveCredentials(userEmail, '');
+          } else {
+            await _biometricService.clearSavedCredentials();
+          }
+        }
         widget.onUnlocked?.call();
       } else if (!success && mounted) {
         final error = authProvider.error ?? 'Đăng nhập Google không thành công.';
