@@ -6,13 +6,12 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.io.File
 
 class ExpenseWidgetProvider : AppWidgetProvider() {
 
@@ -108,9 +107,49 @@ class ExpenseWidgetProvider : AppWidgetProvider() {
                 Log.d(TAG, "👤 [WIDGET_DEBUG] Displaying user: $userName")
                 views.setTextViewText(R.id.widget_user_name, "👋 $userName")
 
-                // Clock - use simple text since TextClock can cause inflate issues
-                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-                views.setTextViewText(R.id.widget_clock, timeFormat.format(Date()))
+                // Clock: TextClock in layout auto-updates — no code needed here!
+
+                // ── QR Code Image ──
+                val qrImagePath = getStringVal("qr_widget_image_path", "")
+                Log.d(TAG, "🔲 [WIDGET_DEBUG] QR image path: '$qrImagePath'")
+                if (qrImagePath.isNotEmpty()) {
+                    val qrFile = File(qrImagePath)
+                    if (qrFile.exists()) {
+                        try {
+                            val bitmap = BitmapFactory.decodeFile(qrImagePath)
+                            if (bitmap != null) {
+                                views.setViewVisibility(R.id.widget_qr_container, View.VISIBLE)
+                                views.setImageViewBitmap(R.id.widget_qr_image, bitmap)
+                                Log.d(TAG, "✅ [WIDGET_DEBUG] QR image loaded successfully")
+
+                                // Click QR → open app to show full QR
+                                val qrIntent = Intent(context, MainActivity::class.java).apply {
+                                    action = Intent.ACTION_VIEW
+                                    data = Uri.parse("expense_manager://show_qr")
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                }
+                                val qrPendingIntent = PendingIntent.getActivity(
+                                    context,
+                                    103,
+                                    qrIntent,
+                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                )
+                                views.setOnClickPendingIntent(R.id.widget_qr_container, qrPendingIntent)
+                            } else {
+                                views.setViewVisibility(R.id.widget_qr_container, View.GONE)
+                                Log.w(TAG, "⚠️ [WIDGET_DEBUG] QR bitmap decode returned null")
+                            }
+                        } catch (e: Exception) {
+                            views.setViewVisibility(R.id.widget_qr_container, View.GONE)
+                            Log.e(TAG, "❌ [WIDGET_DEBUG] Error loading QR bitmap: ${e.message}", e)
+                        }
+                    } else {
+                        views.setViewVisibility(R.id.widget_qr_container, View.GONE)
+                        Log.w(TAG, "⚠️ [WIDGET_DEBUG] QR file does not exist: $qrImagePath")
+                    }
+                } else {
+                    views.setViewVisibility(R.id.widget_qr_container, View.GONE)
+                }
 
                 // PendingIntents for Quick Buttons
                 val expenseIntent = Intent(context, MainActivity::class.java).apply {
@@ -181,10 +220,11 @@ class ExpenseWidgetProvider : AppWidgetProvider() {
                             views.setTextViewText(nameId, "$name • $time")
                             views.setTextViewText(amountId, amount)
 
+                            // Light theme colors for amount
                             if (type == "income") {
-                                views.setTextColor(amountId, android.graphics.Color.parseColor("#10B981"))
+                                views.setTextColor(amountId, android.graphics.Color.parseColor("#059669"))
                             } else {
-                                views.setTextColor(amountId, android.graphics.Color.parseColor("#F43F5E"))
+                                views.setTextColor(amountId, android.graphics.Color.parseColor("#E11D48"))
                             }
                         } else {
                             views.setViewVisibility(layoutId, View.GONE)

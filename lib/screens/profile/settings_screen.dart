@@ -22,6 +22,7 @@ import '../../services/backup_service.dart';
 import '../../services/version_service.dart';
 import '../../services/biometric_service.dart';
 import '../widgets/update_dialog.dart';
+import 'qr_bank_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -89,6 +90,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _buildNotificationsSection(),
                       const SizedBox(height: 24),
                       _buildDisplaySection(),
+                      const SizedBox(height: 24),
+                      _buildQrBankSection(),
                       const SizedBox(height: 24),
                       _buildDataSection(),
                       const SizedBox(height: 24),
@@ -1151,6 +1154,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildQrBankSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader('QR Ngân Hàng', Icons.qr_code_rounded),
+        const SizedBox(height: 12),
+        _buildSettingsCard([
+          _buildListTile(
+            icon: Icons.qr_code_scanner_rounded,
+            title: 'Quản lý QR ngân hàng',
+            subtitle: 'Thêm QR Code để hiển thị trên widget',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const QrBankSettingsScreen(),
+                ),
+              );
+            },
+          ),
+        ]),
+      ],
     );
   }
 

@@ -60,4 +60,22 @@ class WidgetService {
       debugPrint('❌ Error updating HomeWidget: $e');
     }
   }
+
+  /// Update QR code image path for widget display
+  Future<void> updateQrWidgetData(String? qrImagePath) async {
+    try {
+      await HomeWidget.saveWidgetData<String>(
+        'qr_widget_image_path',
+        qrImagePath ?? '',
+      );
+
+      await HomeWidget.updateWidget(
+        name: androidWidgetName,
+        androidName: androidWidgetName,
+      );
+      debugPrint('✅ HomeWidget QR updated! Path: $qrImagePath');
+    } catch (e) {
+      debugPrint('❌ Error updating HomeWidget QR: $e');
+    }
+  }
 }
