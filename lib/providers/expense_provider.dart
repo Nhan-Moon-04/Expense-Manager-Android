@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../models/expense_model.dart';
 import '../services/expense_service.dart';
+import '../services/widget_service.dart';
 
 class ExpenseProvider with ChangeNotifier {
   final ExpenseService _expenseService = ExpenseService();
+  String _cachedUserName = '';
 
   List<ExpenseModel> _expenses = [];
   List<ExpenseModel> _todayExpenses = [];
@@ -75,11 +77,23 @@ class ExpenseProvider with ChangeNotifier {
     return ((monthNet - previousMonthNet) / previousMonthNet.abs()) * 100;
   }
 
+  // Sync data to Android Home Screen Widget
+  void syncWidgetData([String? userName]) {
+    if (userName != null && userName.isNotEmpty) {
+      _cachedUserName = userName;
+    }
+    WidgetService().updateWidgetData(
+      userName: _cachedUserName,
+      recentExpenses: _expenses,
+    );
+  }
+
   // Listen to expenses
   void listenToExpenses(String userId) {
     _expenseService.getUserExpenses(userId).listen((expenses) {
       _expenses = expenses;
       notifyListeners();
+      syncWidgetData();
     });
   }
 

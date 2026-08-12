@@ -89,6 +89,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
       expenseProvider.loadTodayExpenses(userId);
       expenseProvider.loadMonthExpenses(userId);
+      expenseProvider.syncWidgetData(authProvider.user!.fullName);
       reminderProvider.listenToReminders(userId);
       reminderProvider.loadUpcomingReminders(userId);
     }

@@ -9,11 +9,13 @@ import '../../providers/notification_provider.dart';
 import '../../providers/auto_expense_provider.dart';
 import '../../providers/wallet_provider.dart';
 import '../expenses/expense_list_screen.dart';
+import '../expenses/add_expense_screen.dart';
 import '../notes/notes_screen.dart';
 import '../groups/groups_screen.dart';
 import '../profile/profile_screen.dart';
 import '../widgets/update_dialog.dart';
 import 'dashboard_screen.dart';
+import 'package:home_widget/home_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,9 +41,35 @@ class _HomeScreenState extends State<HomeScreen> {
     // Delay initialization to after the build phase
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeData();
+      _setupHomeWidgetListener();
       // Kiểm tra phiên bản khi mở app
       UpdateDialog.checkAndShow(context);
     });
+  }
+
+  void _setupHomeWidgetListener() {
+    HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetUri);
+    HomeWidget.widgetClicked.listen(_handleWidgetUri);
+  }
+
+  void _handleWidgetUri(Uri? uri) {
+    if (uri == null || !mounted) return;
+    final path = uri.toString();
+    final isIncome = path.contains('add_income');
+    final isExpense = path.contains('add_expense');
+
+    if (isIncome || isExpense) {
+      final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddExpenseScreen(
+            isIncome: isIncome,
+            defaultWalletId: walletProvider.primaryWallet?.id,
+          ),
+        ),
+      );
+    }
   }
 
   void _initializeData() {
