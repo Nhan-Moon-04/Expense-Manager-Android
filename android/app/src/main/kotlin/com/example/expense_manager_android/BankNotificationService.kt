@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -21,6 +22,10 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.regex.Pattern
 
 class BankNotificationService : NotificationListenerService() {
@@ -302,8 +307,71 @@ class BankNotificationService : NotificationListenerService() {
                 Log.e(TAG, "Error parsing rules JSON: ${e.message}")
             }
         }
-    }
 
+                /**
+         * Update widget directly from native when Flutter is not running.
+         * Reads existing transactions, prepends the new one, and triggers widget refresh.
+         */
+        fun updateWidgetFromNative(context: Context, bankName: String, amount: Double, type: String) {
+            try {
+                val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
+                val editor = prefs.edit()
+                // Format amount like Flutter does
+                val currencyFormat = NumberFormat.getInstance(Locale("vi", "VN")).apply {
+                    maximumFractionDigits = 0
+                    minimumFractionDigits = 0
+                }
+                val sign = if (type == "expense") "-" else "+"
+                val amountText = "$sign${currencyFormat.format(amount)} ₫"
+                // Format time
+                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                val timeText = timeFormat.format(Date())
+                // Read existing transaction count
+                val oldCount = try {
+                    if (prefs.contains("tx_count")) {
+                        try { prefs.getInt("tx_count", 0) }
+                        catch (e: ClassCastException) { prefs.getLong("tx_count", 0).toInt() }
+                    } else 0
+                } catch (e: Exception) { 0 }
+                val newCount = (oldCount + 1).coerceAtMost(4)
+                // Shift existing transactions down (3→dropped, 2→3, 1→2, 0→1)
+                for (i in (newCount - 1) downTo 1) {
+                    val prevIdx = i - 1
+                    val prevName = prefs.getString("tx_${prevIdx}_name", "") ?: ""
+                    val prevAmount = prefs.getString("tx_${prevIdx}_amount", "") ?: ""
+                    val prevTime = prefs.getString("tx_${prevIdx}_time", "") ?: ""
+                    val prevType = prefs.getString("tx_${prevIdx}_type", "expense") ?: "expense"
+                    editor.putString("tx_${i}_name", prevName)
+                    editor.putString("tx_${i}_amount", prevAmount)
+                    editor.putString("tx_${i}_time", prevTime)
+                    editor.putString("tx_${i}_type", prevType)
+                }
+                // Insert new transaction at position 0
+                editor.putString("tx_0_name", bankName)
+                editor.putString("tx_0_amount", amountText)
+                editor.putString("tx_0_time", timeText)
+                editor.putString("tx_0_type", type)
+                editor.putInt("tx_count", newCount)
+                editor.apply()
+                // Trigger widget update
+                val widgetManager = AppWidgetManager.getInstance(context)
+                val componentName = ComponentName(context, ExpenseWidgetProvider::class.java)
+                val widgetIds = widgetManager.getAppWidgetIds(componentName)
+                if (widgetIds != null && widgetIds.isNotEmpty()) {
+                    val intent = Intent(context, ExpenseWidgetProvider::class.java).apply {
+                        action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
+                    }
+                    context.sendBroadcast(intent)
+                    ExpenseWidgetProvider().onUpdate(context, widgetManager, widgetIds)
+                    Log.d(TAG, "📱 Widget updated from native! $bankName $amountText")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Error updating widget from native: ${e.message}", e)
+            }
+        }
+    }
+    
     // Data classes for parsed rules
     data class BankRule(
         val id: String,
@@ -659,6 +727,16 @@ class BankNotificationService : NotificationListenerService() {
                     // Always save to pending queue first to guarantee no data loss
                     // Flutter side handles duplicate detection
                     savePendingNotification(this, result)
+
+                    // Update widget directly from native (works immediately even when Flutter app is killed)
+                    try {
+                        val bankName = result["bankName"] as? String ?: bankRule.name
+                        val amount = (result["amount"] as? Number)?.toDouble() ?: 0.0
+                        val type = result["type"] as? String ?: "expense"
+                        updateWidgetFromNative(this, bankName, amount, type)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "❌ Error updating widget from native in onNotificationPosted: ${e.message}")
+                    }
                     
                     // Also try to send to Flutter for real-time processing
                     if (eventSink != null) {
