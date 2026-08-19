@@ -97,6 +97,9 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
       '   - ExpenseProvider: ${_expenseProvider != null ? "Ready" : "NULL"}',
     );
 
+    // Cache userId to SharedPreferences so native Kotlin can read it
+    _cacheUserIdForNative(userId);
+
     // Always re-establish the stream listener (old subscription may be dead)
     if (_isEnabled) {
       debugPrint('   - Re-establishing notification listener...');
@@ -119,6 +122,8 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
   void setWalletProvider(WalletProvider provider) {
     _walletProvider = provider;
     debugPrint('✅ WalletProvider injected into AutoExpenseProvider');
+    // Cache primary wallet ID for native Kotlin usage
+    _cachePrimaryWalletIdForNative();
   }
 
   void setExpenseProvider(ExpenseProvider provider) {
@@ -528,6 +533,31 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
     return ExpenseCategory.other;
   }
 
+  /// Cache userId to SharedPreferences for native Kotlin access
+  Future<void> _cacheUserIdForNative(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('native_user_id', userId);
+      debugPrint('   📦 Cached userId for native: $userId');
+    } catch (e) {
+      debugPrint('⚠️ Error caching userId: $e');
+    }
+  }
+
+  /// Cache primary wallet ID to SharedPreferences for native Kotlin access
+  Future<void> _cachePrimaryWalletIdForNative() async {
+    try {
+      final walletId = _walletProvider?.primaryWallet?.id;
+      if (walletId != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('primary_wallet_id', walletId);
+        debugPrint('   📦 Cached primaryWalletId for native: $walletId');
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error caching walletId: $e');
+    }
+  }
+
   /// Check if a similar transaction already exists to prevent duplicates
   /// Returns true if duplicate found, false otherwise
   Future<bool> _checkDuplicate(BankNotification notification) async {
@@ -556,7 +586,7 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
       );
 
       for (final expense in recentExpenses) {
-        // Check if it's a very similar transaction
+        // Check if it's a very similar transaction (by amount, type, time)
         if (expense.isAutoAdded &&
             expense.amount == notification.amount &&
             expense.type ==
@@ -576,6 +606,21 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
               '      New: ${notification.description} at ${notification.timestamp}',
             );
             return true;
+          }
+        }
+
+        // Also check nativeAutoId (written by native Kotlin when app was killed)
+        if (expense.isAutoAdded && expense.metadata != null) {
+          final nativeAutoId = expense.metadata!['nativeAutoId'] as String?;
+          if (nativeAutoId != null && nativeAutoId.isNotEmpty) {
+            // Build the same nativeAutoId that native would generate
+            final ts = notification.timestamp.millisecondsSinceEpoch;
+            final dedupTs = (ts ~/ 30000) * 30000;
+            final expectedId = '${notification.source}_${notification.amount.toInt()}_$dedupTs';
+            if (nativeAutoId == expectedId) {
+              debugPrint('   🔍 Found native-saved duplicate: $nativeAutoId');
+              return true;
+            }
           }
         }
       }

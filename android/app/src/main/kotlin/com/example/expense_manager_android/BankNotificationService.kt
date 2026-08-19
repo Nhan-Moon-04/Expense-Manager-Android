@@ -17,6 +17,8 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import io.flutter.plugin.common.EventChannel
 import org.json.JSONArray
 import org.json.JSONObject
@@ -369,6 +371,141 @@ class BankNotificationService : NotificationListenerService() {
             } catch (e: Exception) {
                 Log.e(TAG, "❌ Error updating widget from native: ${e.message}", e)
             }
+        }
+
+        /**
+         * Save transaction directly to Firestore from native Kotlin.
+         * Called when Flutter app is killed but BankNotificationService is still running.
+         */
+        fun saveTransactionToFirestore(context: Context, result: Map<String, Any>) {
+            try {
+                // Get userId from FirebaseAuth (persisted even when app is killed)
+                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                if (userId == null) {
+                    Log.w(TAG, "⚠️ Cannot save to Firestore: no authenticated user")
+                    return
+                }
+
+                val bankName = result["bankName"] as? String ?: ""
+                val bankSource = result["source"] as? String ?: ""
+                val amount = (result["amount"] as? Number)?.toDouble() ?: 0.0
+                val type = result["type"] as? String ?: "expense"
+                val description = result["description"] as? String ?: ""
+                val ruleName = result["ruleName"] as? String ?: ""
+                val rawText = result["rawText"] as? String ?: ""
+                val timestamp = (result["timestamp"] as? Number)?.toLong() ?: System.currentTimeMillis()
+
+                // Read cached walletId from SharedPreferences (saved by Flutter)
+                val appPrefs = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+                val walletId = appPrefs.getString("flutter.primary_wallet_id", null)
+                    ?: appPrefs.getString("primary_wallet_id", null)
+
+                // Guess category from description text
+                val category = guessCategory(type, "$description $rawText")
+
+                // Create unique ID for dedup: source_amount_timestamp (rounded to 30s)
+                val dedupTimestamp = (timestamp / 30000) * 30000
+                val nativeAutoId = "${bankSource}_${amount.toLong()}_${dedupTimestamp}"
+
+                val now = com.google.firebase.Timestamp.now()
+                val txDate = com.google.firebase.Timestamp(Date(timestamp))
+
+                val expenseData = hashMapOf(
+                    "userId" to userId,
+                    "groupId" to null,
+                    "walletId" to walletId,
+                    "amount" to amount,
+                    "type" to type,
+                    "category" to category,
+                    "description" to "$bankName: $description",
+                    "date" to txDate,
+                    "createdAt" to now,
+                    "updatedAt" to now,
+                    "receiptUrl" to null,
+                    "isAutoAdded" to true,
+                    "metadata" to hashMapOf(
+                        "bankSource" to bankSource,
+                        "bankName" to bankName,
+                        "ruleName" to ruleName,
+                        "nativeAutoId" to nativeAutoId,
+                    )
+                )
+
+                val firestore = FirebaseFirestore.getInstance()
+
+                // Check for duplicate first (same nativeAutoId within last 2 minutes)
+                firestore.collection("expenses")
+                    .whereEqualTo("userId", userId)
+                    .whereEqualTo("metadata.nativeAutoId", nativeAutoId)
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        if (snapshot.isEmpty) {
+                            // No duplicate, save the transaction
+                            firestore.collection("expenses")
+                                .add(expenseData)
+                                .addOnSuccessListener { docRef ->
+                                    Log.d(TAG, "🔥 Saved to Firestore! ID: ${docRef.id} | $bankName $amount $type")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e(TAG, "❌ Firestore write failed: ${e.message}", e)
+                                }
+                        } else {
+                            Log.d(TAG, "⚠️ Duplicate detected in Firestore, skipping: $nativeAutoId")
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        // If dedup check fails, save anyway to avoid data loss
+                        Log.w(TAG, "⚠️ Dedup check failed, saving anyway: ${e.message}")
+                        firestore.collection("expenses")
+                            .add(expenseData)
+                            .addOnSuccessListener { docRef ->
+                                Log.d(TAG, "🔥 Saved to Firestore (after dedup fail)! ID: ${docRef.id}")
+                            }
+                            .addOnFailureListener { e2 ->
+                                Log.e(TAG, "❌ Firestore write failed: ${e2.message}", e2)
+                            }
+                    }
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Error saving to Firestore from native: ${e.message}", e)
+            }
+        }
+
+        /**
+         * Simple category guesser matching Flutter's _guessCategory logic
+         */
+        private fun guessCategory(type: String, text: String): String {
+            val lower = text.lowercase()
+
+            if (type == "income") {
+                if (lower.contains("lương") || lower.contains("salary")) return "salary"
+                if (lower.contains("thưởng") || lower.contains("bonus")) return "bonus"
+                return "other"
+            }
+
+            // Expense categories
+            if (lower.contains("ăn") || lower.contains("food") || lower.contains("nhà hàng") ||
+                lower.contains("quán") || lower.contains("grab food") || lower.contains("shopee food") ||
+                lower.contains("now") || lower.contains("baemin")) return "food"
+
+            if (lower.contains("grab") || lower.contains("taxi") || lower.contains("xe") ||
+                lower.contains("xăng") || lower.contains("gojek") || lower.contains("be")) return "transport"
+
+            if (lower.contains("shopee") || lower.contains("lazada") || lower.contains("tiki") ||
+                lower.contains("sendo") || lower.contains("mua") || lower.contains("shop")) return "shopping"
+
+            if (lower.contains("điện") || lower.contains("nước") || lower.contains("internet") ||
+                lower.contains("wifi") || lower.contains("thuê") || lower.contains("hóa đơn")) return "bills"
+
+            if (lower.contains("bệnh viện") || lower.contains("hospital") || lower.contains("thuốc") ||
+                lower.contains("khám") || lower.contains("phòng khám")) return "health"
+
+            if (lower.contains("học") || lower.contains("trường") || lower.contains("course") ||
+                lower.contains("khóa học")) return "education"
+
+            if (lower.contains("phim") || lower.contains("cinema") || lower.contains("game") ||
+                lower.contains("karaoke") || lower.contains("giải trí")) return "entertainment"
+
+            return "other"
         }
     }
     
@@ -745,9 +882,13 @@ class BankNotificationService : NotificationListenerService() {
                             Log.d(TAG, "✅ Sent to Flutter + saved to pending")
                         } catch (e: Exception) {
                             Log.e(TAG, "❌ Error sending to EventSink: ${e.message} (saved to pending)")
+                            // EventSink dead — save directly to Firestore
+                            saveTransactionToFirestore(this, result)
                         }
                     } else {
-                        Log.d(TAG, "💾 App not running, saved to pending queue")
+                        Log.d(TAG, "💾 App not running, saving directly to Firestore...")
+                        // App is killed → write directly to Firestore from native
+                        saveTransactionToFirestore(this, result)
                     }
                     return
                 }
