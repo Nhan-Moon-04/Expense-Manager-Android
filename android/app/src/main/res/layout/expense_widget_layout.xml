@@ -26,8 +26,8 @@
 
             <ImageView
                 android:id="@+id/widget_qr_image"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:scaleType="centerCrop"
                 android:background="@drawable/widget_qr_background"
                 android:padding="2dp"

@@ -156,6 +156,8 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
       if (_userId != null && _expenseProvider != null) {
         _processPendingNotifications();
       }
+      // Re-cache bank→wallet mapping (may have changed while app was open)
+      _cachePrimaryWalletIdForNative();
     }
   }
 
@@ -378,6 +380,8 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
     notifyListeners();
   }
 
+  final Set<String> _inFlightKeys = {};
+
   Future<void> _createExpenseFromNotification(
     BankNotification notification,
   ) async {
@@ -388,69 +392,98 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
       return;
     }
 
-    debugPrint('💰 Creating ${notification.type} from notification...');
-    debugPrint('   Source: ${notification.sourceName}');
-    debugPrint('   Amount: ${notification.amount}');
-    debugPrint('   Date: ${notification.timestamp}');
-
-    // Check for duplicates to avoid adding the same transaction multiple times
-    final isDuplicate = await _checkDuplicate(notification);
-    if (isDuplicate) {
-      debugPrint('⚠️ Duplicate transaction detected, skipping...');
+    // Check if specific bank is disabled
+    if (_disabledBanks.contains(notification.source)) {
       debugPrint(
-        '   Already exists: ${notification.sourceName} - ${notification.amount}đ',
+        '⚠️ Bank ${notification.sourceName} (${notification.source}) is disabled, skipping...',
       );
       return;
     }
 
-    // Determine wallet based on bank source
-    String? walletId;
-    if (_walletProvider != null) {
-      walletId = _walletProvider!.getWalletIdForBank(notification.source);
-      walletId ??= _walletProvider!.primaryWallet?.id;
+    // 15-second window time bucket key for in-flight dedup
+    final timeBucket = notification.timestamp.millisecondsSinceEpoch ~/ 15000;
+    final dedupKey =
+        '${notification.source}_${notification.amount.toInt()}_${notification.type}_$timeBucket';
+
+    // 1. Instant check in _inFlightKeys (SYNCHRONOUS, BEFORE ANY ASYNC WAIT!)
+    if (_inFlightKeys.contains(dedupKey)) {
+      debugPrint('⚠️ [RACE CONDITION PREVENTED] Notification already in-flight: $dedupKey');
+      return;
     }
 
-    final expense = ExpenseModel(
-      id: '',
-      userId: _userId!,
-      amount: notification.amount,
-      category: _guessCategory(notification),
-      type: notification.isExpense ? ExpenseType.expense : ExpenseType.income,
-      date: notification.timestamp,
-      description: '${notification.sourceName}: ${notification.description}',
-      isAutoAdded: true,
-      walletId: walletId,
-      metadata: {
-        'bankSource': notification.source,
-        'bankName': notification.sourceName,
-        'ruleName': notification.ruleName,
-      },
-    );
+    // 2. Instant check in _processedNotifications (SYNCHRONOUS, BEFORE ANY ASYNC WAIT!)
+    for (final processed in _processedNotifications) {
+      if (_isSameNotification(processed, notification)) {
+        debugPrint('⚠️ [DEDUP PREVENTED] Found duplicate in _processedNotifications list');
+        return;
+      }
+    }
+
+    // 3. Mark in-flight IMMEDIATELY before async calls
+    _inFlightKeys.add(dedupKey);
 
     try {
-      // Use ExpenseProvider instead of ExpenseService directly
-      // This ensures UI updates immediately
+      debugPrint('💰 Creating ${notification.type} from notification...');
+      debugPrint('   Source: ${notification.sourceName}');
+      debugPrint('   Amount: ${notification.amount}');
+      debugPrint('   Date: ${notification.timestamp}');
+
+      // 4. Async duplicate check in database / local memory
+      final isDuplicate = await _checkDuplicate(notification);
+      if (isDuplicate) {
+        debugPrint('⚠️ Duplicate transaction detected in DB/memory, skipping...');
+        return;
+      }
+
+      // Determine wallet based on bank source
+      String? walletId;
+      if (_walletProvider != null) {
+        walletId = _walletProvider!.getWalletIdForBank(notification.source);
+        walletId ??= _walletProvider!.primaryWallet?.id;
+      }
+
+      final expense = ExpenseModel(
+        id: '',
+        userId: _userId!,
+        amount: notification.amount,
+        category: _guessCategory(notification),
+        type: notification.isExpense ? ExpenseType.expense : ExpenseType.income,
+        date: notification.timestamp,
+        description: '${notification.sourceName}: ${notification.description}',
+        isAutoAdded: true,
+        walletId: walletId,
+        metadata: {
+          'bankSource': notification.source,
+          'bankName': notification.sourceName,
+          'ruleName': notification.ruleName,
+          'nativeAutoId':
+              '${notification.source}_${notification.amount.toInt()}_${(notification.timestamp.millisecondsSinceEpoch ~/ 30000) * 30000}',
+        },
+      );
+
       debugPrint('   📤 Adding to ExpenseProvider...');
       final success = await _expenseProvider!.addExpense(expense);
 
       if (success) {
+        // Record in processed list only after successfully adding
+        _processedNotifications.insert(0, notification);
+        if (_processedNotifications.length > 50) {
+          _processedNotifications.removeRange(50, _processedNotifications.length);
+        }
         debugPrint(
           '✅ Auto-added ${notification.isExpense ? "expense" : "income"}: ${notification.sourceName} - ${notification.amount}đ',
         );
-        // Add to processed list to track successful additions
-        _processedNotifications.insert(0, notification);
-        if (_processedNotifications.length > 50) {
-          _processedNotifications.removeRange(
-            50,
-            _processedNotifications.length,
-          );
-        }
       } else {
         debugPrint('❌ Failed to add expense: addExpense returned false');
       }
     } catch (e, stackTrace) {
       debugPrint('❌ Error auto-adding expense: $e');
-      debugPrint('   Stack trace: $stackTrace');
+      debugPrint('StackTrace: $stackTrace');
+    } finally {
+      // Remove from _inFlightKeys after 15 seconds
+      Future.delayed(const Duration(seconds: 15), () {
+        _inFlightKeys.remove(dedupKey);
+      });
     }
   }
 
@@ -544,14 +577,33 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
     }
   }
 
-  /// Cache primary wallet ID to SharedPreferences for native Kotlin access
+  /// Cache primary wallet ID and bank→wallet mapping to SharedPreferences for native Kotlin access
   Future<void> _cachePrimaryWalletIdForNative() async {
     try {
-      final walletId = _walletProvider?.primaryWallet?.id;
-      if (walletId != null) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('primary_wallet_id', walletId);
-        debugPrint('   📦 Cached primaryWalletId for native: $walletId');
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Cache primary wallet ID as fallback
+      final primaryId = _walletProvider?.primaryWallet?.id;
+      if (primaryId != null) {
+        await prefs.setString('primary_wallet_id', primaryId);
+        debugPrint('   📦 Cached primaryWalletId for native: $primaryId');
+      }
+
+      // Cache bank→wallet mapping as JSON: {"vietinbank": "walletId123", "vietcombank": "walletId456"}
+      if (_walletProvider != null) {
+        final mapping = <String, String>{};
+        for (final wallet in _walletProvider!.wallets) {
+          for (final bankId in wallet.linkedBankIds) {
+            mapping[bankId] = wallet.id;
+          }
+        }
+        if (mapping.isNotEmpty) {
+          final jsonStr = mapping.entries
+              .map((e) => '"${e.key}":"${e.value}"')
+              .join(',');
+          await prefs.setString('bank_wallet_mapping', '{$jsonStr}');
+          debugPrint('   📦 Cached bank→wallet mapping for native: $mapping');
+        }
       }
     } catch (e) {
       debugPrint('⚠️ Error caching walletId: $e');
@@ -566,11 +618,25 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
     }
 
     try {
-      // Check in recently processed notifications first (faster)
-      for (final processed in _processedNotifications) {
-        if (_isSameNotification(processed, notification)) {
-          debugPrint('   🔍 Found duplicate in processed list');
-          return true;
+      // Check in memory _expenseProvider!.expenses list (INSTANT, no network delay)
+      for (final expense in _expenseProvider!.expenses) {
+        if (expense.isAutoAdded &&
+            expense.amount == notification.amount &&
+            expense.type ==
+                (notification.isExpense
+                    ? ExpenseType.expense
+                    : ExpenseType.income)) {
+          final expenseBank = expense.metadata?['bankSource'] as String?;
+          final isSameBank =
+              expenseBank == null || expenseBank == notification.source;
+          if (isSameBank) {
+            final timeDiff =
+                expense.date.difference(notification.timestamp).abs();
+            if (timeDiff.inSeconds < 60) {
+              debugPrint('   🔍 Found duplicate in local expenses memory list!');
+              return true;
+            }
+          }
         }
       }
 
@@ -586,26 +652,30 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
       );
 
       for (final expense in recentExpenses) {
-        // Check if it's a very similar transaction (by amount, type, time)
+        // Check if it's a very similar transaction (by amount, type, time, bank)
         if (expense.isAutoAdded &&
             expense.amount == notification.amount &&
             expense.type ==
                 (notification.isExpense
                     ? ExpenseType.expense
                     : ExpenseType.income)) {
-          // Check if timestamps are within 30 seconds
-          final timeDiff = expense.date
-              .difference(notification.timestamp)
-              .abs();
-          if (timeDiff.inSeconds < 30) {
-            debugPrint('   🔍 Found duplicate in database');
-            debugPrint(
-              '      Existing: ${expense.description} at ${expense.date}',
-            );
-            debugPrint(
-              '      New: ${notification.description} at ${notification.timestamp}',
-            );
-            return true;
+          final expenseBank = expense.metadata?['bankSource'] as String?;
+          final isSameBank =
+              expenseBank == null || expenseBank == notification.source;
+          if (isSameBank) {
+            // Check if timestamps are within 30 seconds
+            final timeDiff =
+                expense.date.difference(notification.timestamp).abs();
+            if (timeDiff.inSeconds < 30) {
+              debugPrint('   🔍 Found duplicate in database');
+              debugPrint(
+                '      Existing: ${expense.description} at ${expense.date}',
+              );
+              debugPrint(
+                '      New: ${notification.description} at ${notification.timestamp}',
+              );
+              return true;
+            }
           }
         }
 
@@ -616,7 +686,8 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
             // Build the same nativeAutoId that native would generate
             final ts = notification.timestamp.millisecondsSinceEpoch;
             final dedupTs = (ts ~/ 30000) * 30000;
-            final expectedId = '${notification.source}_${notification.amount.toInt()}_$dedupTs';
+            final expectedId =
+                '${notification.source}_${notification.amount.toInt()}_$dedupTs';
             if (nativeAutoId == expectedId) {
               debugPrint('   🔍 Found native-saved duplicate: $nativeAutoId');
               return true;
@@ -635,8 +706,10 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
 
   /// Check if two notifications are the same
   bool _isSameNotification(BankNotification n1, BankNotification n2) {
-    // Same if amount, type match and timestamps are within 30 seconds
-    if (n1.amount != n2.amount || n1.type != n2.type) {
+    // Same if source, amount, type match and timestamps are within 30 seconds
+    if (n1.source != n2.source ||
+        n1.amount != n2.amount ||
+        n1.type != n2.type) {
       return false;
     }
     final timeDiff = n1.timestamp.difference(n2.timestamp).abs();
@@ -693,6 +766,15 @@ class AutoExpenseProvider with ChangeNotifier, WidgetsBindingObserver {
         debugPrint(
           '   - Processing: ${notification.bankName} ${notification.amount} ${notification.type}',
         );
+
+        // Check if specific bank is disabled
+        if (_disabledBanks.contains(notification.source)) {
+          debugPrint(
+            '     ⏭️ Skipped (bank ${notification.sourceName} is disabled)',
+          );
+          skipCount++;
+          continue;
+        }
 
         // Check if we should process based on type
         if (notification.isExpense && !_autoAddExpense) {

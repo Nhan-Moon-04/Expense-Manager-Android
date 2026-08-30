@@ -164,8 +164,8 @@ class GroupProvider with ChangeNotifier {
     _clearError();
 
     try {
-      ExpenseModel newExpense = await _expenseService.addExpense(expense);
-      _groupExpenses.insert(0, newExpense);
+      await _expenseService.addExpense(expense);
+      // Don't manually insert — Firestore stream (getGroupExpenses) updates it automatically.
 
       // Update member contribution
       if (expense.groupId != null) {

@@ -30,8 +30,9 @@ class NoteProvider with ChangeNotifier {
     _clearError();
 
     try {
-      NoteModel newNote = await _noteService.addNote(note);
-      _notes.insert(0, newNote);
+      await _noteService.addNote(note);
+      // Don't manually insert into _notes — the Firestore stream listener
+      // (listenToNotes) handles it automatically.
       _setLoading(false);
       return true;
     } catch (e) {

@@ -1,0 +1,252 @@
+🔥 Nên làm trước (giá trị cao, không quá khó)
+1. Thêm nhanh bằng AI
+
+Ví dụ người dùng nhập:
+
+"Ăn cơm trưa 35k"
+
+AI tự phân tích:
+
+Loại: Chi tiêu
+Danh mục: Ăn uống
+Số tiền: 35.000
+Ghi chú: cơm trưa
+
+Hoặc:
+
+"Lương tháng 8 15 triệu"
+
+=> Tạo giao dịch thu nhập.
+
+Cách làm
+
+Không nhất thiết dùng ChatGPT API lúc đầu.
+
+Có thể dùng:
+
+Plain Text
+1
+Regex + NLP đơn giản
+Show more lines
+
+Ví dụ:
+
+35k → 35000
+2tr → 2000000
+ăn, cafe, trà sữa → Ăn uống
+xăng → Di chuyển
+điện nước → Hóa đơn
+
+Sau này mới nâng cấp sang Gemini/OpenAI.
+
+✅ Khả thi: Rất cao
+ ✅ Chi phí: Gần như 0
+
+🎤 2. Nhập bằng giọng nói
+
+Ví dụ:
+
+Người dùng nhấn mic:
+
+"Cà phê 25 nghìn"
+
+App tự thêm:
+
+JSON
+1
+{
+2
+"amount": 25000,
+3
+"category": "Ăn uống",
+4
+"note": "Cà phê"
+5
+}
+Show more lines
+Flutter
+
+Có package:
+
+YAML
+1
+speech_to_text
+Show more lines
+
+Flow:
+
+Plain Text
+1
+Voice
+2
+↓
+3
+Text
+4
+↓
+5
+AI Parser
+6
+↓
+7
+Create Transaction
+Show more lines
+
+User trải nghiệm rất sướng.
+
+✅ Khả thi: Cao
+ ✅ Ít tốn công
+
+📷 3. Quét QR
+
+Cái này cần xác định bạn muốn quét QR gì.
+
+
+
+Trường hợp 3: Chụp hóa đơn (hay hơn QR)
+
+User chụp:
+
+Plain Text
+1
+Circle K
+2
+Bánh mì 20.000
+3
+Nước suối 10.000
+4
+Tổng 30.000
+Show more lines
+
+AI OCR đọc:
+
+Plain Text
+1
+30.000
+Show more lines
+
+=> Tạo giao dịch.
+
+Flutter:
+
+YAML
+1
+google_mlkit_text_recognition
+Show more lines
+
+Theo mình tính năng này đáng làm hơn QR nhiều.
+
+✅ Giá trị cao ✅ Đúng nhu cầu quản lý chi tiêu
+
+📊 4. Dashboard thống kê đẹp hơn
+
+Hiện tại nhìn app chưa khai thác hết dữ liệu.
+
+Có thể thêm:
+
+Biểu đồ theo danh mục
+Plain Text
+1
+Ăn uống 35%
+2
+Di chuyển 20%
+3
+Giải trí 15%
+4
+...
+Show more lines
+Chi tiêu theo ngày
+Plain Text
+1
+Biểu đồ cột 30 ngày
+Show more lines
+Chi tiêu theo tháng
+Plain Text
+1
+08/2026
+2
+09/2026
+3
+10/2026
+Show more lines
+🎯 5. Cảnh báo vượt ngân sách
+
+Ví dụ user đặt:
+
+Plain Text
+1
+Ăn uống:
+2
+1.500.000/tháng
+Show more lines
+
+Đã dùng:
+
+Plain Text
+1
+1.250.000
+Show more lines
+
+=> App báo:
+
+Bạn đã dùng 83% ngân sách ăn uống.
+
+Đây là tính năng rất đáng giá.
+
+
+👥 7. Nhóm chia tiền
+
+Tab "Nhóm" của bạn đang có sẵn.
+
+Có thể phát triển:
+
+Plain Text
+1
+Nhóm bạn bè
+2
+Nhóm gia đình
+3
+Nhóm lớp học
+Show more lines
+
+Ví dụ:
+
+Plain Text
+1
+Ăn lẩu 500k
+2
+4 người
+Show more lines
+
+=> Tự chia:
+
+Plain Text
+1
+125k/người
+Show more lines
+🏆 8. AI phân tích tài chính cá nhân
+
+Đây là tính năng "wow" nhất.
+
+Ví dụ:
+
+Tháng này bạn chi ăn uống nhiều hơn tháng trước 25%.
+
+Chi tiêu cà phê chiếm 18% tổng chi tiêu.
+
+Nếu tiếp tục tốc độ hiện tại, bạn sẽ vượt ngân sách 400.000đ.
+
+Chỉ cần tổng hợp dữ liệu rồi gửi cho AI phân tích.
+
+Nếu là đồ án hoặc dự án cá nhân
+
+Mình sẽ ưu tiên theo thứ tự:
+
+✅ Thêm nhanh bằng AI (text)
+✅ Giọng nói
+✅ Chụp hóa đơn OCR
+✅ Ngân sách & cảnh báo
+✅ Dashboard thống kê
+✅ AI phân tích chi tiêu
+✅ Giao dịch định kỳ
+✅ Quét QR

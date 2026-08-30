@@ -61,6 +61,26 @@ class BankNotificationService : NotificationListenerService() {
         private var globalIgnorePatterns: List<String> = emptyList()
         private var supportedPackages: Map<String, BankRule> = emptyMap()
 
+        // Native dedup cache (prevents duplicate notification processing in Android Native)
+        private val recentNotificationMap = java.util.concurrent.ConcurrentHashMap<String, Long>()
+        private val inFlightNativeAutoIds = java.util.Collections.synchronizedSet(HashSet<String>())
+
+        private fun isNativeDuplicate(bankId: String, amount: Double, type: String): Boolean {
+            val now = System.currentTimeMillis()
+            val windowSec = now / 20000
+            val dedupKey = "${bankId}_${amount.toLong()}_${type}_$windowSec"
+
+            recentNotificationMap.entries.removeIf { now - it.value > 60000 }
+
+            if (recentNotificationMap.containsKey(dedupKey)) {
+                Log.w(TAG, "⚠️ [NATIVE DEDUP] Ignored duplicate notification within 20s window: $dedupKey")
+                return true
+            }
+
+            recentNotificationMap[dedupKey] = now
+            return false
+        }
+
         fun setEventSink(sink: EventChannel.EventSink?) {
             eventSink = sink
             if (sink != null) {
@@ -395,10 +415,31 @@ class BankNotificationService : NotificationListenerService() {
                 val rawText = result["rawText"] as? String ?: ""
                 val timestamp = (result["timestamp"] as? Number)?.toLong() ?: System.currentTimeMillis()
 
-                // Read cached walletId from SharedPreferences (saved by Flutter)
+                // Look up walletId from bank→wallet mapping (cached by Flutter)
                 val appPrefs = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
-                val walletId = appPrefs.getString("flutter.primary_wallet_id", null)
-                    ?: appPrefs.getString("primary_wallet_id", null)
+                var walletId: String? = null
+                
+                // Try bank→wallet mapping first
+                val mappingJson = appPrefs.getString("flutter.bank_wallet_mapping", null)
+                    ?: appPrefs.getString("bank_wallet_mapping", null)
+                if (mappingJson != null && bankSource.isNotEmpty()) {
+                    try {
+                        val mapping = JSONObject(mappingJson)
+                        if (mapping.has(bankSource)) {
+                            walletId = mapping.getString(bankSource)
+                            Log.d(TAG, "💳 Found wallet for bank '$bankSource': $walletId")
+                        }
+                    } catch (e: Exception) {
+                        Log.w(TAG, "⚠️ Error parsing bank_wallet_mapping: ${e.message}")
+                    }
+                }
+                
+                // Fall back to primary wallet if no mapping found
+                if (walletId == null) {
+                    walletId = appPrefs.getString("flutter.primary_wallet_id", null)
+                        ?: appPrefs.getString("primary_wallet_id", null)
+                    Log.d(TAG, "💳 Using primary wallet as fallback: $walletId")
+                }
 
                 // Guess category from description text
                 val category = guessCategory(type, "$description $rawText")
@@ -407,12 +448,29 @@ class BankNotificationService : NotificationListenerService() {
                 val dedupTimestamp = (timestamp / 30000) * 30000
                 val nativeAutoId = "${bankSource}_${amount.toLong()}_${dedupTimestamp}"
 
-                val now = com.google.firebase.Timestamp.now()
-                val txDate = com.google.firebase.Timestamp(Date(timestamp))
+                if (inFlightNativeAutoIds.contains(nativeAutoId)) {
+                    Log.w(TAG, "⚠️ [FIRESTORE DEDUP] Direct Firestore write already in-flight: $nativeAutoId")
+                    return
+                }
+                inFlightNativeAutoIds.add(nativeAutoId)
 
-                val expenseData = hashMapOf(
+                val nowMillis = System.currentTimeMillis()
+                val nowSeconds = nowMillis / 1000
+                val nowNanos = ((nowMillis % 1000) * 1_000_000).toInt()
+                val txSeconds = timestamp / 1000
+                val txNanos = ((timestamp % 1000) * 1_000_000).toInt()
+                
+                val now = com.google.firebase.Timestamp(nowSeconds, nowNanos)
+                val txDate = com.google.firebase.Timestamp(txSeconds, txNanos)
+
+                Log.d(TAG, "📝 Preparing Firestore document:")
+                Log.d(TAG, "   userId=$userId, bank=$bankName, amount=$amount, type=$type")
+                Log.d(TAG, "   walletId=$walletId, category=$category")
+                Log.d(TAG, "   nativeAutoId=$nativeAutoId")
+
+                val expenseData = hashMapOf<String, Any?>(
                     "userId" to userId,
-                    "groupId" to null,
+                    "groupId" to null,  // MUST be null (not missing) — Flutter queries .where('groupId', isNull: true)
                     "walletId" to walletId,
                     "amount" to amount,
                     "type" to type,
@@ -421,7 +479,6 @@ class BankNotificationService : NotificationListenerService() {
                     "date" to txDate,
                     "createdAt" to now,
                     "updatedAt" to now,
-                    "receiptUrl" to null,
                     "isAutoAdded" to true,
                     "metadata" to hashMapOf(
                         "bankSource" to bankSource,
@@ -439,6 +496,7 @@ class BankNotificationService : NotificationListenerService() {
                     .whereEqualTo("metadata.nativeAutoId", nativeAutoId)
                     .get()
                     .addOnSuccessListener { snapshot ->
+                        inFlightNativeAutoIds.remove(nativeAutoId)
                         if (snapshot.isEmpty) {
                             // No duplicate, save the transaction
                             firestore.collection("expenses")
@@ -454,6 +512,7 @@ class BankNotificationService : NotificationListenerService() {
                         }
                     }
                     .addOnFailureListener { e ->
+                        inFlightNativeAutoIds.remove(nativeAutoId)
                         // If dedup check fails, save anyway to avoid data loss
                         Log.w(TAG, "⚠️ Dedup check failed, saving anyway: ${e.message}")
                         firestore.collection("expenses")
@@ -828,6 +887,18 @@ class BankNotificationService : NotificationListenerService() {
             // Find matching bank rule by package name
             val bankRule = supportedPackages[packageName] ?: return
 
+            // Check if user disabled this bank in settings
+            try {
+                val flutterPrefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+                val disabledBanks = flutterPrefs.getString("flutter.disabled_banks", null)
+                if (disabledBanks != null && (disabledBanks.contains(bankRule.id) || disabledBanks.contains(bankRule.name.lowercase()))) {
+                    Log.d(TAG, "Ignored notification from ${bankRule.name}: bank is disabled in settings")
+                    return
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error checking disabled banks: ${e.message}")
+            }
+
             val extras = notification.notification.extras
             val rawTitle = extras.getString("android.title") ?: ""
             val rawText = extras.getCharSequence("android.text")?.toString() ?: ""
@@ -854,6 +925,14 @@ class BankNotificationService : NotificationListenerService() {
             for (rule in bankRule.rules) {
                 val result = applyRule(bankRule, rule, title, text)
                 if (result != null) {
+                    val amount = (result["amount"] as? Number)?.toDouble() ?: 0.0
+                    val type = result["type"] as? String ?: "expense"
+
+                    // Check Native Dedup FIRST before processing!
+                    if (isNativeDuplicate(bankRule.id, amount, type)) {
+                        return
+                    }
+
                     Log.d(TAG, "Matched rule '${rule.name}' for ${bankRule.name}: $result")
                     Log.d(TAG, "EventSink status: ${if (eventSink != null) "CONNECTED" else "NULL"}")
                     
@@ -861,10 +940,6 @@ class BankNotificationService : NotificationListenerService() {
                     transactionCount++
                     updateForegroundNotification()
                     
-                    // Always save to pending queue first to guarantee no data loss
-                    // Flutter side handles duplicate detection
-                    savePendingNotification(this, result)
-
                     // Update widget directly from native (works immediately even when Flutter app is killed)
                     try {
                         val bankName = result["bankName"] as? String ?: bankRule.name
@@ -872,22 +947,20 @@ class BankNotificationService : NotificationListenerService() {
                         val type = result["type"] as? String ?: "expense"
                         updateWidgetFromNative(this, bankName, amount, type)
                     } catch (e: Exception) {
-                        Log.e(TAG, "❌ Error updating widget from native in onNotificationPosted: ${e.message}")
+                        Log.e(TAG, "❌ Error updating widget from native: ${e.message}")
                     }
-                    
-                    // Also try to send to Flutter for real-time processing
+
+                    // Route transaction: if Flutter is running send via eventSink; otherwise save to Firestore natively.
                     if (eventSink != null) {
                         try {
                             eventSink?.success(result)
-                            Log.d(TAG, "✅ Sent to Flutter + saved to pending")
+                            Log.d(TAG, "✅ Sent to Flutter via EventSink")
                         } catch (e: Exception) {
-                            Log.e(TAG, "❌ Error sending to EventSink: ${e.message} (saved to pending)")
-                            // EventSink dead — save directly to Firestore
+                            Log.e(TAG, "❌ Error sending to EventSink: ${e.message}")
                             saveTransactionToFirestore(this, result)
                         }
                     } else {
                         Log.d(TAG, "💾 App not running, saving directly to Firestore...")
-                        // App is killed → write directly to Firestore from native
                         saveTransactionToFirestore(this, result)
                     }
                     return

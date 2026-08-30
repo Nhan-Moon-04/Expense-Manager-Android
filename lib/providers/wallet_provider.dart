@@ -139,8 +139,9 @@ class WalletProvider with ChangeNotifier {
       if (_wallets.isEmpty || !_wallets.any((w) => w.isPrimary)) {
         wallet = wallet.copyWith(isPrimary: true);
       }
-      final created = await _walletService.createWallet(wallet);
-      _wallets.add(created);
+      await _walletService.createWallet(wallet);
+      // Don't manually add to _wallets — the Firestore stream listener
+      // (listenToWallets) handles it automatically without double insertion.
       _isLoading = false;
       notifyListeners();
       return true;

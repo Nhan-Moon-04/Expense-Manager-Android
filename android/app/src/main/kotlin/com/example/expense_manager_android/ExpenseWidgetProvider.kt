@@ -105,7 +105,7 @@ class ExpenseWidgetProvider : AppWidgetProvider() {
                 // User Name
                 val userName = getStringVal("user_name", "Người dùng")
                 Log.d(TAG, "👤 [WIDGET_DEBUG] Displaying user: $userName")
-                views.setTextViewText(R.id.widget_user_name, "👋 $userName")
+                views.setTextViewText(R.id.widget_user_name, userName)
 
                 // Clock: TextClock in layout auto-updates — no code needed here!
 

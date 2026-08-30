@@ -18,6 +18,9 @@ import '../expenses/expense_list_screen.dart';
 import '../reminders/reminders_screen.dart';
 import '../reminders/add_reminder_screen.dart';
 import '../notifications/notifications_screen.dart';
+import '../wallets/wallet_management_screen.dart';
+import '../wallets/wallet_detail_screen.dart';
+import '../../models/wallet_model.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -123,6 +126,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                           _buildHeader(),
                           const SizedBox(height: 16),
                           _buildBalanceCard(),
+                          const SizedBox(height: 14),
+                          _buildMomoStyleWalletsCard(),
                           const SizedBox(height: 18),
                           _buildQuickActions(),
                           const SizedBox(height: 20),
@@ -1565,5 +1570,286 @@ class _DashboardScreenState extends State<DashboardScreen>
       default:
         return AppColors.primary;
     }
+  }
+
+  Widget _buildMomoStyleWalletsCard() {
+    return Consumer2<WalletProvider, ExpenseProvider>(
+      builder: (context, walletProvider, expenseProvider, child) {
+        final wallets = walletProvider.wallets;
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppColors.borderColor.withValues(alpha: 0.8),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Horizontal Scrollable Row of Wallets with vertical dividers
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: [
+                    for (int i = 0; i < wallets.length; i++) ...[
+                      if (i > 0)
+                        Container(
+                          width: 1,
+                          height: 38,
+                          margin: const EdgeInsets.symmetric(horizontal: 12),
+                          color: AppColors.borderColor.withValues(alpha: 0.7),
+                        ),
+                      _buildWalletRowItem(
+                        context,
+                        wallets[i],
+                        expenseProvider,
+                        walletProvider,
+                      ),
+                    ],
+                    // Add wallet button at the end
+                    Container(
+                      width: 1,
+                      height: 38,
+                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                      color: AppColors.borderColor.withValues(alpha: 0.7),
+                    ),
+                    _buildAddWalletRowItem(context),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Bottom MoMo-style Highlight Button ("Trung Tâm Quản Lý Ví của...")
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const WalletManagementScreen(),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 14,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Trung Tâm Quản Lý Tài Chính',
+                        style: GoogleFonts.inter(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildWalletRowItem(
+    BuildContext context,
+    WalletModel wallet,
+    ExpenseProvider expenseProvider,
+    WalletProvider walletProvider,
+  ) {
+    final balance = walletProvider.getWalletBalance(
+      wallet.id,
+      expenseProvider.expenses,
+    );
+
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WalletDetailScreen(wallet: wallet),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top Row: Wallet Icon/Logo + Name
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: (wallet.isPrimary
+                            ? AppColors.primary
+                            : const Color(0xFF10B981))
+                        .withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    wallet.isPrimary
+                        ? Icons.account_balance_wallet_rounded
+                        : Icons.account_balance_rounded,
+                    size: 12,
+                    color: wallet.isPrimary
+                        ? AppColors.primary
+                        : const Color(0xFF10B981),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  wallet.name,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                if (wallet.isPrimary) ...[
+                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'Chính',
+                      style: GoogleFonts.inter(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 4),
+
+            // Bottom Row: Balance + Chevron >
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _isBalanceVisible
+                      ? currencyFormat.format(balance)
+                      : '••••••',
+                  style: GoogleFonts.inter(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(width: 2),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddWalletRowItem(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const WalletManagementScreen(),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.add_circle_outline_rounded,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Thêm ví',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Tùy chỉnh',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

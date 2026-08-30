@@ -197,6 +197,7 @@ class ExpenseProvider with ChangeNotifier {
       }
 
       _setLoading(false);
+      syncWidgetData();
       return true;
     } catch (e) {
       _setError('Không thể thêm chi tiêu.');
@@ -219,6 +220,7 @@ class ExpenseProvider with ChangeNotifier {
       }
 
       _setLoading(false);
+      syncWidgetData();
       return true;
     } catch (e) {
       _setError('Không thể cập nhật chi tiêu.');
@@ -239,6 +241,7 @@ class ExpenseProvider with ChangeNotifier {
       _monthExpenses.removeWhere((e) => e.id == expenseId);
 
       _setLoading(false);
+      syncWidgetData();
       return true;
     } catch (e) {
       _setError('Không thể xóa chi tiêu.');
@@ -288,5 +291,6 @@ class ExpenseProvider with ChangeNotifier {
     _categoryExpenses.clear();
     _dailySummary.clear();
     notifyListeners();
+    syncWidgetData();
   }
 }

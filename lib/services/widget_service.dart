@@ -28,27 +28,35 @@ class WidgetService {
       final count = recentExpenses.length > 4 ? 4 : recentExpenses.length;
       await HomeWidget.saveWidgetData<int>('tx_count', count);
 
-      for (int i = 0; i < count; i++) {
-        final tx = recentExpenses[i];
-        final isExpense = tx.type == ExpenseType.expense;
-        final amountText =
-            '${isExpense ? "-" : "+"}${currencyFormat.format(tx.amount)}';
+      for (int i = 0; i < 4; i++) {
+        if (i < count) {
+          final tx = recentExpenses[i];
+          final isExpense = tx.type == ExpenseType.expense;
+          final amountText =
+              '${isExpense ? "-" : "+"}${currencyFormat.format(tx.amount)}';
 
-        final now = DateTime.now();
-        final isToday = tx.date.year == now.year &&
-            tx.date.month == now.month &&
-            tx.date.day == now.day;
-        final timeText = isToday
-            ? timeFormat.format(tx.date)
-            : dateFormat.format(tx.date);
+          final now = DateTime.now();
+          final isToday = tx.date.year == now.year &&
+              tx.date.month == now.month &&
+              tx.date.day == now.day;
+          final timeText = isToday
+              ? timeFormat.format(tx.date)
+              : dateFormat.format(tx.date);
 
-        await HomeWidget.saveWidgetData<String>('tx_${i}_name', tx.displayName);
-        await HomeWidget.saveWidgetData<String>('tx_${i}_amount', amountText);
-        await HomeWidget.saveWidgetData<String>('tx_${i}_time', timeText);
-        await HomeWidget.saveWidgetData<String>(
-          'tx_${i}_type',
-          isExpense ? 'expense' : 'income',
-        );
+          await HomeWidget.saveWidgetData<String>('tx_${i}_name', tx.displayName);
+          await HomeWidget.saveWidgetData<String>('tx_${i}_amount', amountText);
+          await HomeWidget.saveWidgetData<String>('tx_${i}_time', timeText);
+          await HomeWidget.saveWidgetData<String>(
+            'tx_${i}_type',
+            isExpense ? 'expense' : 'income',
+          );
+        } else {
+          // Dọn dẹp ô dữ liệu cũ nếu số lượng giao dịch giảm (hoặc bị xóa)
+          await HomeWidget.saveWidgetData<String>('tx_${i}_name', '');
+          await HomeWidget.saveWidgetData<String>('tx_${i}_amount', '');
+          await HomeWidget.saveWidgetData<String>('tx_${i}_time', '');
+          await HomeWidget.saveWidgetData<String>('tx_${i}_type', '');
+        }
       }
 
       await HomeWidget.updateWidget(
