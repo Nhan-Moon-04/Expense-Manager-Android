@@ -163,9 +163,36 @@ class ExpenseModel {
   bool get hasBankSource =>
       isAutoAdded && bankSource != null && bankSource!.isNotEmpty;
 
-  /// Get display name: bank name for auto-added, category name otherwise
+  /// Check if description is a user-entered note (e.g. "mua bút", "đá me", not raw bank SMS)
+  bool get hasCustomNote {
+    if (description == null || description!.trim().isEmpty) return false;
+    final desc = description!.trim();
+    if (bankName != null && desc.toLowerCase().startsWith('${bankName!.toLowerCase()}:')) {
+      return false;
+    }
+    if (bankSource != null && desc.toLowerCase().startsWith('${bankSource!.toLowerCase()}:')) {
+      return false;
+    }
+    if (desc.startsWith('SDC:') || desc.startsWith('GD:')) return false;
+    return true;
+  }
+
+  /// Get display name: custom note (e.g. "mua bút") if available, else bank name for auto, else category name
   String get displayName {
+    if (hasCustomNote) return description!.trim();
     if (hasBankSource) return bankName!;
     return getCategoryName(category);
+  }
+
+  /// Subtitle info for transaction lists
+  String? get subtitleText {
+    if (hasCustomNote) {
+      if (hasBankSource) return bankName!;
+      return getCategoryName(category);
+    }
+    if (description != null && description!.trim().isNotEmpty) {
+      return description!.trim();
+    }
+    return null;
   }
 }

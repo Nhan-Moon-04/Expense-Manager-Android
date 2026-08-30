@@ -1134,10 +1134,10 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                         ],
                       ],
                     ),
-                    if (expense.description != null &&
-                        expense.description!.isNotEmpty)
+                    if (expense.subtitleText != null &&
+                        expense.subtitleText!.isNotEmpty)
                       Text(
-                        expense.description!,
+                        expense.subtitleText!,
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,

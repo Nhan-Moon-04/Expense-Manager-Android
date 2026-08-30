@@ -1429,7 +1429,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      expense.description ??
+                      expense.subtitleText ??
                           DateFormat('dd/MM/yyyy').format(expense.date),
                       style: GoogleFonts.inter(
                         fontSize: 12,

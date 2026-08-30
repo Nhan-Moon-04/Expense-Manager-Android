@@ -10,6 +10,7 @@ import '../../providers/auto_expense_provider.dart';
 import '../../providers/wallet_provider.dart';
 import '../expenses/expense_list_screen.dart';
 import '../expenses/add_expense_screen.dart';
+import '../expenses/scanner_screen.dart';
 import '../notes/notes_screen.dart';
 import '../groups/groups_screen.dart';
 import '../profile/profile_screen.dart';
@@ -105,6 +106,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _openScannerScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ScannerScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -144,12 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   activeIcon: Icons.receipt_long_rounded,
                   label: AppStrings.expenses,
                 ),
-                _buildNavItem(
-                  index: 2,
-                  icon: Icons.sticky_note_2_outlined,
-                  activeIcon: Icons.sticky_note_2_rounded,
-                  label: AppStrings.notes,
-                ),
+                _buildCenterScanButton(),
                 _buildNavItem(
                   index: 3,
                   icon: Icons.people_outline_rounded,
@@ -165,6 +170,53 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCenterScanButton() {
+    return GestureDetector(
+      onTap: _openScannerScreen,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: AppColors.primaryGradient,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.qr_code_scanner_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              'Quét & Chụp',
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
         ),
       ),
     );

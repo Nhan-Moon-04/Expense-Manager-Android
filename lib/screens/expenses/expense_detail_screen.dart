@@ -1,8 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../l10n/app_localizations.dart';
@@ -11,16 +15,193 @@ import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/wallet_provider.dart';
 import '../../models/expense_model.dart';
+import '../../services/vps_upload_service.dart';
 import 'add_expense_screen.dart';
+import 'widgets/quick_edit_auto_expense_sheet.dart';
 
-class ExpenseDetailScreen extends StatelessWidget {
+class ExpenseDetailScreen extends StatefulWidget {
   final ExpenseModel expense;
 
   const ExpenseDetailScreen({super.key, required this.expense});
 
   @override
+  State<ExpenseDetailScreen> createState() => _ExpenseDetailScreenState();
+}
+
+class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
+  bool _isUploading = false;
+  final VpsUploadService _vpsUploadService = VpsUploadService();
+
+  Future<void> _captureAndUploadReceipt(ExpenseModel currentExpense) async {
+    final picker = ImagePicker();
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.dividerColor,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Chụp / Chọn Ảnh Hóa Đơn',
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.camera_alt_rounded, color: AppColors.primary),
+                ),
+                title: Text('Chụp ảnh ngay', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                subtitle: const Text('Mở camera chụp biên lai / hóa đơn'),
+                onTap: () => Navigator.pop(ctx, ImageSource.camera),
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.photo_library_rounded, color: AppColors.accent),
+                ),
+                title: Text('Chọn từ thư viện', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                subtitle: const Text('Chọn ảnh đã chụp sẵn trong máy'),
+                onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
+    try {
+      final picked = await picker.pickImage(source: source, imageQuality: 85, maxWidth: 1920);
+      if (picked == null) return;
+
+      setState(() => _isUploading = true);
+
+      final url = await _vpsUploadService.uploadImage(
+        File(picked.path),
+        folder: 'receipts',
+      );
+
+      if (mounted) {
+        setState(() => _isUploading = false);
+        if (url != null) {
+          final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+          final updated = currentExpense.copyWith(
+            receiptUrl: url,
+            updatedAt: DateTime.now(),
+          );
+          await expenseProvider.updateExpense(updated);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Đã lưu ảnh hóa đơn lên VPS thành công!'),
+                backgroundColor: AppColors.success,
+              ),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Không thể tải ảnh lên VPS. Vui lòng thử lại.'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isUploading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    }
+  }
+
+  void _showFullScreenImage(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(12),
+        child: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            InteractiveViewer(
+              panEnabled: true,
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.contain,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+                  errorWidget: (context, url, error) => const Center(
+                    child: Icon(Icons.broken_image_rounded, size: 60, color: Colors.white70),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(ctx),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final currencyFormat = context.watch<SettingsProvider>().currencyFormat;
+    final allExpenses = context.watch<ExpenseProvider>().expenses;
+    final expense = allExpenses.firstWhere(
+      (e) => e.id == widget.expense.id,
+      orElse: () => widget.expense,
+    );
+
     final isExpense = expense.type == ExpenseType.expense;
     final accentColor = isExpense ? AppColors.expenseColor : AppColors.incomeColor;
     final categoryColor = _getCategoryColor(expense.category);
@@ -43,6 +224,14 @@ class ExpenseDetailScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          if (expense.isAutoAdded)
+            IconButton(
+              icon: const Icon(Icons.edit_note_rounded, color: AppColors.primary),
+              tooltip: 'Bổ sung ghi chú & ảnh',
+              onPressed: () => QuickEditAutoExpenseSheet.show(context, expense),
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -238,7 +427,7 @@ class ExpenseDetailScreen extends StatelessWidget {
                         ),
                         _buildReceiptRow(
                           label: AppStrings.category,
-                          value: expense.displayName,
+                          value: ExpenseModel.getCategoryName(expense.category),
                         ),
                         Consumer<WalletProvider>(
                           builder: (context, walletProvider, _) {
@@ -264,6 +453,8 @@ class ExpenseDetailScreen extends StatelessWidget {
                             AppLocalizations.currentLanguage,
                           ).format(expense.date),
                         ),
+
+                        // Ghi chú người dùng
                         if (expense.description != null &&
                             expense.description!.isNotEmpty) ...[
                           const SizedBox(height: 10),
@@ -281,13 +472,23 @@ class ExpenseDetailScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  AppStrings.description,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11,
-                                    color: AppColors.textSecondary,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      AppStrings.description,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        color: AppColors.textSecondary,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    if (expense.isAutoAdded)
+                                      GestureDetector(
+                                        onTap: () => QuickEditAutoExpenseSheet.show(context, expense),
+                                        child: const Icon(Icons.edit_outlined, size: 16, color: AppColors.primary),
+                                      ),
+                                  ],
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -302,6 +503,43 @@ class ExpenseDetailScreen extends StatelessWidget {
                             ),
                           ),
                         ],
+
+                        // Hiển thị nội dung gốc từ tin nhắn ngân hàng nếu đã sửa ghi chú
+                        if (expense.metadata?['originalBankDescription'] != null &&
+                            expense.metadata!['originalBankDescription'] != expense.description) ...[
+                          const SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceVariant.withValues(alpha: 0.4),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppColors.borderColor),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Nội dung gốc ngân hàng:',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    color: AppColors.textSecondary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  expense.metadata!['originalBankDescription'],
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+
                         const SizedBox(height: 12),
                         // Transaction ID with Copy Button
                         _buildReceiptRow(
@@ -340,6 +578,113 @@ class ExpenseDetailScreen extends StatelessWidget {
                             ],
                           ),
                         ),
+
+                        // ─── Image Receipt Section ───
+                        const SizedBox(height: 16),
+                        if (expense.receiptUrl != null && expense.receiptUrl!.isNotEmpty) ...[
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Ảnh hóa đơn / Biên lai (Lưu trên VPS):',
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: () => _showFullScreenImage(expense.receiptUrl!),
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: Container(
+                                    height: 180,
+                                    width: double.infinity,
+                                    color: AppColors.surfaceVariant,
+                                    child: CachedNetworkImage(
+                                      imageUrl: expense.receiptUrl!,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => const Center(
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      ),
+                                      errorWidget: (context, url, error) => const Center(
+                                        child: Icon(Icons.broken_image_rounded, size: 40, color: Colors.grey),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 8,
+                                  right: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.65),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.zoom_in_rounded, size: 14, color: Colors.white),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          'Xem đầy đủ',
+                                          style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton.icon(
+                                onPressed: () => _captureAndUploadReceipt(expense),
+                                icon: const Icon(Icons.camera_alt_rounded, size: 16),
+                                label: const Text('Đổi ảnh khác'),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppColors.primary,
+                                  textStyle: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ] else ...[
+                          if (_isUploading)
+                            Container(
+                              height: 60,
+                              alignment: Alignment.center,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(strokeWidth: 2.5),
+                                  SizedBox(width: 12),
+                                  Text('Đang tải ảnh lên VPS...'),
+                                ],
+                              ),
+                            )
+                          else
+                            OutlinedButton.icon(
+                              onPressed: () => _captureAndUploadReceipt(expense),
+                              icon: const Icon(Icons.add_a_photo_rounded, size: 18),
+                              label: const Text('Chụp / Đính kèm hóa đơn (Lưu lên VPS)'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.primary,
+                                side: const BorderSide(color: AppColors.primary, width: 1.2),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                minimumSize: const Size(double.infinity, 44),
+                              ),
+                            ),
+                        ],
                       ],
                     ),
                   ),
@@ -354,7 +699,7 @@ class ExpenseDetailScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () => _showDeleteDialog(context),
+                    onPressed: () => _showDeleteDialog(context, expense),
                     icon: const Icon(Icons.delete_outline_rounded, size: 18),
                     label: Text(AppStrings.delete),
                     style: OutlinedButton.styleFrom(
@@ -391,19 +736,27 @@ class ExpenseDetailScreen extends StatelessWidget {
                     ),
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddExpenseScreen(
-                              expense: expense,
-                              isIncome: expense.type == ExpenseType.income,
+                        if (expense.isAutoAdded) {
+                          QuickEditAutoExpenseSheet.show(context, expense);
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddExpenseScreen(
+                                expense: expense,
+                                isIncome: expense.type == ExpenseType.income,
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        }
                       },
-                      icon: const Icon(Icons.edit_rounded, size: 18, color: Colors.white),
+                      icon: Icon(
+                        expense.isAutoAdded ? Icons.edit_note_rounded : Icons.edit_rounded,
+                        size: 18,
+                        color: Colors.white,
+                      ),
                       label: Text(
-                        AppStrings.edit,
+                        expense.isAutoAdded ? 'Sửa & Thêm ảnh' : AppStrings.edit,
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -472,7 +825,7 @@ class ExpenseDetailScreen extends StatelessWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context) {
+  void _showDeleteDialog(BuildContext context, ExpenseModel expense) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(

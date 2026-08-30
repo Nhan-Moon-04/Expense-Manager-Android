@@ -13,12 +13,18 @@ class AddExpenseScreen extends StatefulWidget {
   final bool isIncome;
   final ExpenseModel? expense; // Cho việc chỉnh sửa
   final String? defaultWalletId; // Ví mặc định
+  final double? initialAmount;
+  final String? initialDescription;
+  final String? initialReceiptUrl;
 
   const AddExpenseScreen({
     super.key,
     this.isIncome = false,
     this.expense,
     this.defaultWalletId,
+    this.initialAmount,
+    this.initialDescription,
+    this.initialReceiptUrl,
   });
 
   @override
@@ -34,6 +40,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   ExpenseCategory _category = ExpenseCategory.other;
   DateTime _selectedDate = DateTime.now();
   String? _selectedWalletId;
+  String? _receiptUrl;
   bool _isLoading = false;
 
   final NumberFormat _currencyFormatter = NumberFormat('#,###', 'vi_VN');
@@ -70,7 +77,15 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       _category = widget.expense!.category;
       _selectedDate = widget.expense!.date;
       _selectedWalletId = widget.expense!.walletId;
+      _receiptUrl = widget.expense!.receiptUrl;
     } else {
+      if (widget.initialAmount != null && widget.initialAmount! > 0) {
+        _amountController.text = _formatNumber(widget.initialAmount!.toInt().toString());
+      }
+      if (widget.initialDescription != null && widget.initialDescription!.isNotEmpty) {
+        _descriptionController.text = widget.initialDescription!;
+      }
+      _receiptUrl = widget.initialReceiptUrl;
       _category = widget.isIncome
           ? ExpenseCategory.salary
           : ExpenseCategory.food;
@@ -196,6 +211,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       createdAt: widget.expense?.createdAt ?? now,
       updatedAt: now,
       walletId: walletId,
+      receiptUrl: _receiptUrl,
     );
 
     bool success;

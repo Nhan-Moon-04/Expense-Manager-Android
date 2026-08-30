@@ -1,315 +1,882 @@
-Error launching application on 2201116SG.
-PS D:\Expense Manager Android\expense_manager_android> flutter run
-Launching lib\main.dart on 2201116SG in debug mode...
-I/flutter (31683): 🔍 Checking for updates...
-I/flutter (31683): 📱 Current version: 1.0.29
-I/flutter (31683): 🌐 Fetching from: http://nthiennhan.ddns.net:90/app/version.json
-I/flutter (31683): 📡 Response status: 200
-I/flutter (31683): 📄 Response body: {
-I/flutter (31683):     "latestVersion":  "1.0.29",
-I/flutter (31683):     "minVersion":  "1.0.0",
-I/flutter (31683):     "releaseNotes":  "- Sua loi nho\n- Cai thien hieu suat",
-I/flutter (31683):     "downloadUrl":  "http://nthiennhan.ddns.net:90/app/expense_manager_v1.0.29.apk",
-I/flutter (31683):     "releaseDate":  "2026-03-05",
-I/flutter (31683):     "forceUpdate":  false
-I/flutter (31683): }
-I/flutter (31683):
-I/flutter (31683): 🆕 Latest version: 1.0.29
-I/flutter (31683): ⚙️  Min version: 1.0.0
-I/flutter (31683): ✅ Already up to date
-I/flutter (31683): 🗑️ Cleared pending notifications
-I/flutter (31683): ✅ No pending notifications to process
-I/flutter (31683): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (31683): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter (31683): 🔍 Checking for pending notifications from when app was killed...
-I/flutter (31683):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter (31683):    ✅ ExpenseProvider: Ready
-I/flutter (31683): ✅ WalletProvider injected into AutoExpenseProvider
-I/flutter (31683): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (31683): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter (31683): ⏭️ Already processing pending notifications, skipping
-I/flutter (31683): ✅ WalletProvider injected into AutoExpenseProvider
-I/flutter (31683): Scheduling repeating notification: id=605386173, title=⏰ Thêm chi tiêu cho ngày hôm nay, time=2026-03-06 20:00:00.000+0700, repeat=DateTimeComponents.time
-I/flutter (31683): 🗑️ Cleared pending notifications
-I/flutter (31683): ✅ No pending notifications to process
-I/flutter (31683): Repeating notification scheduled: id=605386173
-I/flutter (31683): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (31683): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter (31683): 🔍 Checking for pending notifications from when app was killed...
-I/flutter (31683):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter (31683):    ✅ ExpenseProvider: Ready
-I/flutter (31683): ✅ WalletProvider injected into AutoExpenseProvider
-I/flutter (31683): 🗑️ Cleared pending notifications
-I/flutter (31683): ✅ No pending notifications to process
-I/flutter (31683): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (31683): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter (31683): 🔍 Checking for pending notifications from when app was killed...
-I/flutter (31683):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter (31683):    ✅ ExpenseProvider: Ready
-I/flutter (31683): ✅ WalletProvider injected into AutoExpenseProvider
-I/flutter (31683): 🗑️ Cleared pending notifications
-I/flutter (31683): ✅ No pending notifications to process
-I/flutter (31683): Scheduling repeating notification: id=605386173, title=⏰ Thêm chi tiêu cho ngày hôm nay, time=2026-03-06 20:00:00.000+0700, repeat=DateTimeComponents.time
-I/flutter (31683): Repeating notification scheduled: id=605386173
-I/flutter (31683): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (31683): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter (31683): 🔍 Checking for pending notifications from when app was killed...
-I/flutter (31683):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter (31683):    ✅ ExpenseProvider: Ready
-I/flutter (31683): ✅ WalletProvider injected into AutoExpenseProvider
-I/flutter (31683): 🗑️ Cleared pending notifications
-I/flutter (31683): ✅ No pending notifications to process
-I/flutter (31683): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (31683): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter (31683): 🔍 Checking for pending notifications from when app was killed...
-I/flutter (31683):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter (31683):    ✅ ExpenseProvider: Ready
-I/flutter (31683): ✅ WalletProvider injected into AutoExpenseProvider
-I/flutter (31683): 🗑️ Cleared pending notifications
-I/flutter (31683): ✅ No pending notifications to process
-Running Gradle task 'assembleDebug'...                              7.9s
-√ Built build\app\outputs\flutter-apk\app-debug.apk
-I/flutter (31683): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (31683): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter (31683): 🔍 Checking for pending notifications from when app was killed...
-I/flutter (31683):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter (31683):    ✅ ExpenseProvider: Ready
-I/flutter (31683): ✅ WalletProvider injected into AutoExpenseProvider
-I/flutter (31683): 🗑️ Cleared pending notifications
-I/flutter (31683): ✅ No pending notifications to process
-I/flutter (31683): Scheduling repeating notification: id=605386173, title=⏰ Thêm chi tiêu cho ngày hôm nay, time=2026-03-06 20:00:00.000+0700, repeat=DateTimeComponents.time
-I/flutter (31683): Repeating notification scheduled: id=605386173
-I/flutter (31683): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter (31683): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter (31683): 🔍 Checking for pending notifications from when app was killed...
-I/flutter (31683):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter (31683):    ✅ ExpenseProvider: Ready
-I/flutter (31683): ✅ WalletProvider injected into AutoExpenseProvider
-Installing build\app\outputs\flutter-apk\app-debug.apk...           7.0s
-D/FlutterJNI( 5481): Beginning load of flutter...
-D/FlutterJNI( 5481): flutter (null) was loaded normally!
-I/flutter ( 5481): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(62)] Using the Impeller rendering backend (Vulkan).
-I/FLTFireBGExecutor( 5481): Creating background FlutterEngine instance, with args: [--enable-dart-profiling]
-I/AdrenoVK-0( 5481): QUALCOMM build          : 3e33337ce3, I07ee46fc66
-I/AdrenoVK-0( 5481): Build Date              : 10/08/21
-I/AdrenoVK-0( 5481): Shader Compiler Version : EV031.35.01.10
-I/AdrenoVK-0( 5481): Local Branch            :
-I/AdrenoVK-0( 5481): Remote Branch           :
-I/AdrenoVK-0( 5481): Remote Branch           :
-I/AdrenoVK-0( 5481): Reconstruct Branch      :
-I/AdrenoVK-0( 5481): Build Config            : S P 10.0.7 AArch64
-I/AdrenoVK-0( 5481): Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
-D/FLTFireContextHolder( 5481): received application context.
-I/flutter ( 5481): [IMPORTANT:flutter/shell/platform/android/android_context_vk_impeller.cc(62)] Using the Impeller rendering backend (Vulkan).
-Syncing files to device 2201116SG...                               116ms
-I/Choreographer( 5481): Skipped 59 frames!  The application may be doing too much work on its main thread.
-W/Looper  ( 5481): PerfMonitor doFrame : time=1ms vsyncFrame=0 latency=500ms procState=-1 historyMsgCount=2
-I/SmartPower.com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0background->idle(3127ms) R(service end com.miui.global.packageinstaller/org.chromium.content.app.SandboxedProcessService0:0) adj=905.
-
-Flutter run key commands.
-r Hot reload.
-R Hot restart.
-h List all available interactive commands.
-d Detach (terminate "flutter run" but leave application running).
-c Clear the screen
-q Quit (terminate the application on the device).
-
-A Dart VM Service on 2201116SG is available at: http://127.0.0.1:64500/YqK_tH2sOL4=/
-The Flutter DevTools debugger and profiler on 2201116SG is available at:
-http://127.0.0.1:64500/YqK_tH2sOL4=/devtools/?uri=ws://127.0.0.1:64500/YqK_tH2sOL4=/ws
-I/FLTFireMsgService( 5481): FlutterFirebaseMessagingBackgroundService started!
-I/flutter ( 5481): PushNotificationService initialized with timezone: Asia/Ho_Chi_Minh
-I/flutter ( 5481): FCM permission status: AuthorizationStatus.authorized
-I/flutter ( 5481): FCM Token: d0PmZS2-TXSPfGRmcq72AK:APA91bGkzB5xfPVcCyC3rA5cjGzlgOALHlUCnkYboRdz91tYOqfGpfxHw_QbJCceMbceDnooWsb4uy4VCLggqBkG71xRjY6OXG_pM_a-mM_VALkyNyql-kY
-I/flutter ( 5481): Subscribed to topic: all_users
-I/flutter ( 5481): Subscribed to topic: promotions
-I/flutter ( 5481): FCM Service initialized
-I/Choreographer( 5481): Skipped 142 frames!  The application may be doing too much work on its main thread.
-W/Looper  ( 5481): PerfMonitor doFrame : time=1ms vsyncFrame=0 latency=1190ms procState=-1
-D/DecorView[]( 5481): getWindowModeFromSystem  windowmode is 1
-D/DecorView[]( 5481): updateDecorCaptionStatus windowMode is 1
-D/VRI[MainActivity]( 5481): vri.reportNextDraw android.view.ViewRootImpl.performTraversals:4013 android.view.ViewRootImpl.doTraversal:2725 android.view.ViewRootImpl$TraversalRunnable.run:9812 android.view.Choreographer$CallbackRecord.run:1505 android.view.Choreographer$CallbackRecord.run:1513
-D/VRI[MainActivity]( 5481): vri.Setup new sync id=0 syncSeqId=0
-D/manager_android( 5481): MiuiProcessManagerServiceStub setSchedFifo
-I/MiuiProcessManagerImpl( 5481): setSchedFifo pid:5481, mode:3
-E/libEGL  ( 5481): pre_cache appList: com.sina.weibo,com.ss.android.article.news,com.taobao.taobao,com.smile.gifmaker,com.ss.android.ugc.aweme,com.tencent.mm,tv.danmaku.bili,,
-E/perf_hint( 5481): Session creation failed, mPreferredRateNanos: -1
-D/VRI[MainActivity]( 5481): vri.reportDrawFinished syncSeqId=0 android.view.ViewRootImpl.lambda$createSyncIfNeeded$4$android-view-ViewRootImpl:4081 android.view.ViewRootImpl$$ExternalSyntheticLambda2.run:6 android.os.Handler.handleCallback:942 android.os.Handler.dispatchMessage:99 android.os.Looper.loopOnce:211
-D/DecorView[]( 5481): onWindowFocusChanged hasWindowFocus true
-I/HandWritingStubImpl( 5481): refreshLastKeyboardType: 1
-I/HandWritingStubImpl( 5481): getCurrentKeyboardType: 1
-W/DynamiteModule( 5481): Local module descriptor class for com.google.android.gms.providerinstaller.dynamite not found.
-I/HandWritingStubImpl( 5481): getCurrentKeyboardType: 1
-I/DynamiteModule( 5481): Considering local module com.google.android.gms.providerinstaller.dynamite:0 and remote module com.google.android.gms.providerinstaller.dynamite:0
-W/ProviderInstaller( 5481): Failed to load providerinstaller module: No acceptable module com.google.android.gms.providerinstaller.dynamite found. Local version is 0 and remote version is 0.
-D/nativeloader( 5481): Configuring clns-5 for other apk /system/framework/org.apache.http.legacy.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/lib/arm64:/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
-D/nativeloader( 5481): Extending system_exposed_libraries: libmisys_jni.xiaomi.so:libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libQOC.qti.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libQOC.qti.so:libdiag_system.qti.so:libqape.qti.so:liblistenjni.qti.so
-D/nativeloader( 5481): Configuring clns-6 for other apk /system/framework/com.android.location.provider.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/lib/arm64:/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
-D/nativeloader( 5481): Extending system_exposed_libraries: libmisys_jni.xiaomi.so:libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libQOC.qti.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libQOC.qti.so:libdiag_system.qti.so:libqape.qti.so:liblistenjni.qti.so
-D/nativeloader( 5481): Configuring clns-7 for other apk /system/framework/com.android.media.remotedisplay.jar. target_sdk_version=36, uses_libraries=ALL, library_path=/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/lib/arm64:/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
-D/nativeloader( 5481): Extending system_exposed_libraries: libmisys_jni.xiaomi.so:libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libQOC.qti.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libQOC.qti.so:libdiag_system.qti.so:libqape.qti.so:liblistenjni.qti.so
-D/nativeloader( 5481): Configuring clns-8 for other apk /data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/lib/arm64:/data/app/~~yKt_o_OCImdwWv6wCqcOlQ==/com.google.android.gms-UYnOeqDm_tZN16ixOWju_A==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gms
-V/NativeCrypto( 5481): Registering com/google/android/gms/org/conscrypt/NativeCrypto's 334 native methods...
-E/GoogleApiManager( 5481): Failed to get service from broker. 
-E/GoogleApiManager( 5481): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
-E/GoogleApiManager( 5481):      at android.os.Parcel.createExceptionOrNull(Parcel.java:3011)
-E/GoogleApiManager( 5481):      at android.os.Parcel.createException(Parcel.java:2995)
-E/GoogleApiManager( 5481):      at android.os.Parcel.readException(Parcel.java:2978)
-E/GoogleApiManager( 5481):      at android.os.Parcel.readException(Parcel.java:2920)
-E/GoogleApiManager( 5481):      at bgaa.a(:com.google.android.gms@260834029@26.08.34 (190400-876566425):36)
-E/GoogleApiManager( 5481):      at bfyb.z(:com.google.android.gms@260834029@26.08.34 (190400-876566425):143)
-E/GoogleApiManager( 5481):      at bfef.run(:com.google.android.gms@260834029@26.08.34 (190400-876566425):42)
-E/GoogleApiManager( 5481):      at android.os.Handler.handleCallback(Handler.java:942)
-E/GoogleApiManager( 5481):      at android.os.Handler.dispatchMessage(Handler.java:99)
-E/GoogleApiManager( 5481):      at ctti.mv(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
-E/GoogleApiManager( 5481):      at ctti.dispatchMessage(:com.google.android.gms@260834029@26.08.34 (190400-876566425):5)
-E/GoogleApiManager( 5481):      at android.os.Looper.loopOnce(Looper.java:211)
-E/GoogleApiManager( 5481):      at android.os.Looper.loop(Looper.java:300)
-E/GoogleApiManager( 5481):      at android.os.HandlerThread.run(HandlerThread.java:67)
-W/GoogleApiManager( 5481): Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
-W/manager_android( 5481): Accessing hidden method Ljava/security/spec/ECParameterSpec;->getCurveName()Ljava/lang/String; (unsupported, reflection, allowed)
-W/FlagRegistrar( 5481): Failed to register com.google.android.gms.providerinstaller#com.example.expense_manager_android
-W/FlagRegistrar( 5481): gbqd: 17: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
-W/FlagRegistrar( 5481):         at gbqf.a(:com.google.android.gms@260834029@26.08.34 (190400-876566425):13)
-W/FlagRegistrar( 5481):         at haar.d(:com.google.android.gms@260834029@26.08.34 (190400-876566425):3)
-W/FlagRegistrar( 5481):         at haat.run(:com.google.android.gms@260834029@26.08.34 (190400-876566425):130)
-W/FlagRegistrar( 5481):         at hada.execute(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
-W/FlagRegistrar( 5481):         at habb.f(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
-W/FlagRegistrar( 5481):         at habb.m(:com.google.android.gms@260834029@26.08.34 (190400-876566425):99)
-W/FlagRegistrar( 5481):         at habb.r(:com.google.android.gms@260834029@26.08.34 (190400-876566425):17)
-W/FlagRegistrar( 5481):         at fuec.hA(:com.google.android.gms@260834029@26.08.34 (190400-876566425):35)
-W/FlagRegistrar( 5481):         at fgvk.run(:com.google.android.gms@260834029@26.08.34 (190400-876566425):12)
-W/FlagRegistrar( 5481):         at hada.execute(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
-W/FlagRegistrar( 5481):         at fgvl.b(:com.google.android.gms@260834029@26.08.34 (190400-876566425):18)
-W/FlagRegistrar( 5481):         at fgwa.b(:com.google.android.gms@260834029@26.08.34 (190400-876566425):34)
-W/FlagRegistrar( 5481):         at fgwc.d(:com.google.android.gms@260834029@26.08.34 (190400-876566425):25)
-W/FlagRegistrar( 5481):         at bfbo.c(:com.google.android.gms@260834029@26.08.34 (190400-876566425):9)
-W/FlagRegistrar( 5481):         at bfed.q(:com.google.android.gms@260834029@26.08.34 (190400-876566425):48)
-W/FlagRegistrar( 5481):         at bfed.d(:com.google.android.gms@260834029@26.08.34 (190400-876566425):10)
-W/FlagRegistrar( 5481):         at bfed.g(:com.google.android.gms@260834029@26.08.34 (190400-876566425):191)
-W/FlagRegistrar( 5481):         at bfed.onConnectionFailed(:com.google.android.gms@260834029@26.08.34 (190400-876566425):2)
-W/FlagRegistrar( 5481):         at bfef.run(:com.google.android.gms@260834029@26.08.34 (190400-876566425):70)
-W/FlagRegistrar( 5481):         at android.os.Handler.handleCallback(Handler.java:942)
-W/FlagRegistrar( 5481):         at android.os.Handler.dispatchMessage(Handler.java:99)
-W/FlagRegistrar( 5481):         at ctti.mv(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
-W/FlagRegistrar( 5481):         at ctti.dispatchMessage(:com.google.android.gms@260834029@26.08.34 (190400-876566425):5)
-W/FlagRegistrar( 5481):         at android.os.Looper.loopOnce(Looper.java:211)
-W/FlagRegistrar( 5481):         at android.os.Looper.loop(Looper.java:300)
-W/FlagRegistrar( 5481):         at android.os.HandlerThread.run(HandlerThread.java:67)
-W/FlagRegistrar( 5481): Caused by: bezv: 17: API: Phenotype.API is not available on this device. Connection failed with: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
-W/FlagRegistrar( 5481):         at bfxn.a(:com.google.android.gms@260834029@26.08.34 (190400-876566425):15)
-W/FlagRegistrar( 5481):         at bfbr.a(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
-W/FlagRegistrar( 5481):         at bfbo.c(:com.google.android.gms@260834029@26.08.34 (190400-876566425):5)
-W/FlagRegistrar( 5481):         ... 12 more
-W/manager_android( 5481): Accessing hidden method Ldalvik/system/VMStack;->getStackClass2()Ljava/lang/Class; (unsupported, reflection, allowed)
-I/ProviderInstaller( 5481): Installed default security provider GmsCore_OpenSSL
-D/TrafficStats( 5481): tagSocket(173) with statsTag=0xffffffff, statsUid=-1
-W/manager_android( 5481): Accessing hidden field Ljava/net/Socket;->impl:Ljava/net/SocketImpl; (unsupported, reflection, allowed)
-W/manager_android( 5481): Accessing hidden method Ljava/security/spec/ECParameterSpec;->setCurveName(Ljava/lang/String;)V (unsupported, reflection, allowed)
-D/ProfileInstaller( 5481): Installing profile for com.example.expense_manager_android
-I/flutter ( 5481): FCM token saved for user: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter ( 5481): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter ( 5481): ✅ WalletProvider injected into AutoExpenseProvider
-I/flutter ( 5481): ✅ User ID set: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter ( 5481):    - isEnabled: false
-I/flutter ( 5481):    - ExpenseProvider: Ready
-I/flutter ( 5481): 🔍 Checking for pending notifications from when app was killed...
-I/flutter ( 5481):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter ( 5481):    ✅ ExpenseProvider: Ready
-I/flutter ( 5481): ⏱️ Pending notification poll timer started (every 30s)
-I/flutter ( 5481): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter ( 5481): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter ( 5481): ⏭️ Already processing pending notifications, skipping
-I/flutter ( 5481): ✅ WalletProvider injected into AutoExpenseProvider
-I/flutter ( 5481): 🔍 Checking for updates...
-I/flutter ( 5481): 📱 Current version: 1.0.29
-I/flutter ( 5481): 🌐 Fetching from: http://nthiennhan.ddns.net:90/app/version.json
-I/flutter ( 5481): 📡 Response status: 200
-I/flutter ( 5481): 📄 Response body: {
-I/flutter ( 5481):     "latestVersion":  "1.0.29",
-I/flutter ( 5481):     "minVersion":  "1.0.0",
-I/flutter ( 5481):     "releaseNotes":  "- Sua loi nho\n- Cai thien hieu suat",
-I/flutter ( 5481):     "downloadUrl":  "http://nthiennhan.ddns.net:90/app/expense_manager_v1.0.29.apk",
-I/flutter ( 5481):     "releaseDate":  "2026-03-05",
-I/flutter ( 5481):     "forceUpdate":  false
-I/flutter ( 5481): }
-I/flutter ( 5481):
-I/flutter ( 5481): 🆕 Latest version: 1.0.29
-I/flutter ( 5481): ⚙️  Min version: 1.0.0
-I/flutter ( 5481): ✅ Already up to date
-D/BankNotificationService( 5481): Cleared pending notifications
-I/flutter ( 5481): 🗑️ Cleared pending notifications
-I/flutter ( 5481): ✅ No pending notifications to process
-I/flutter ( 5481): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter ( 5481): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter ( 5481): 🔍 Checking for pending notifications from when app was killed...
-I/flutter ( 5481):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter ( 5481):    ✅ ExpenseProvider: Ready
-I/flutter ( 5481): ✅ WalletProvider injected into AutoExpenseProvider
-I/flutter ( 5481): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter ( 5481): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter ( 5481): ⏭️ Already processing pending notifications, skipping
-I/flutter ( 5481): ✅ WalletProvider injected into AutoExpenseProvider
-I/flutter ( 5481): Scheduling repeating notification: id=605386173, title=⏰ Thêm chi tiêu cho ngày hôm nay, time=2026-03-06 20:00:00.000+0700, repeat=DateTimeComponents.time
-D/BankNotificationService( 5481): Cleared pending notifications
-I/flutter ( 5481): 🗑️ Cleared pending notifications
-I/flutter ( 5481): ✅ No pending notifications to process
-I/flutter ( 5481): Repeating notification scheduled: id=605386173
-I/flutter ( 5481): ✅ ExpenseProvider injected into AutoExpenseProvider
-I/flutter ( 5481): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
-I/flutter ( 5481): 🔍 Checking for pending notifications from when app was killed...
-I/flutter ( 5481):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter ( 5481):    ✅ ExpenseProvider: Ready
-I/flutter ( 5481): ✅ WalletProvider injected into AutoExpenseProvider
-D/BankNotificationService( 5481): Cleared pending notifications
-I/flutter ( 5481): 🗑️ Cleared pending notifications
-I/flutter ( 5481): ✅ No pending notifications to process
-W/MirrorManager( 5481): this model don't Support
-E/GoogleApiManager( 5481): Failed to get service from broker. 
-E/GoogleApiManager( 5481): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
-E/GoogleApiManager( 5481):      at android.os.Parcel.createExceptionOrNull(Parcel.java:3011)
-E/GoogleApiManager( 5481):      at android.os.Parcel.createException(Parcel.java:2995)
-E/GoogleApiManager( 5481):      at android.os.Parcel.readException(Parcel.java:2978)
-E/GoogleApiManager( 5481):      at android.os.Parcel.readException(Parcel.java:2920)
-E/GoogleApiManager( 5481):      at bgaa.a(:com.google.android.gms@260834029@26.08.34 (190400-876566425):36)
-E/GoogleApiManager( 5481):      at bfyb.z(:com.google.android.gms@260834029@26.08.34 (190400-876566425):143)
-E/GoogleApiManager( 5481):      at bfef.run(:com.google.android.gms@260834029@26.08.34 (190400-876566425):42)
-E/GoogleApiManager( 5481):      at android.os.Handler.handleCallback(Handler.java:942)
-E/GoogleApiManager( 5481):      at android.os.Handler.dispatchMessage(Handler.java:99)
-E/GoogleApiManager( 5481):      at ctti.mv(:com.google.android.gms@260834029@26.08.34 (190400-876566425):1)
-E/GoogleApiManager( 5481):      at ctti.dispatchMessage(:com.google.android.gms@260834029@26.08.34 (190400-876566425):5)
-E/GoogleApiManager( 5481):      at android.os.Looper.loopOnce(Looper.java:211)
-E/GoogleApiManager( 5481):      at android.os.Looper.loop(Looper.java:300)
-E/GoogleApiManager( 5481):      at android.os.HandlerThread.run(HandlerThread.java:67)
-W/GoogleApiManager( 5481): Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
-D/DecorView[]( 5481): getWindowModeFromSystem  windowmode is 1
-D/DecorView[]( 5481): updateDecorCaptionStatus windowMode is 1
-W/OnBackInvokedCallback( 5481): OnBackInvokedCallback is not enabled for the application.
-W/OnBackInvokedCallback( 5481): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
-D/DecorView[]( 5481): getWindowModeFromSystem  windowmode is 1
-D/DecorView[]( 5481): updateDecorCaptionStatus windowMode is 1
-W/OnBackInvokedCallback( 5481): OnBackInvokedCallback is not enabled for the application.
-W/OnBackInvokedCallback( 5481): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
-D/DecorView[]( 5481): getWindowModeFromSystem  windowmode is 1
-D/DecorView[]( 5481): updateDecorCaptionStatus windowMode is 1
-I/flutter ( 5481): 🔍 Checking for pending notifications from when app was killed...
-I/flutter ( 5481):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
-I/flutter ( 5481):    ✅ ExpenseProvider: Ready
-D/BankNotificationService( 5481): Cleared pending notifications
-I/flutter ( 5481): 🗑️ Cleared pending notifications
-I/flutter ( 5481): ✅ No pending notifications to process
-D/MIUIInput( 5481): [KeyEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_BACK, scanCode=0, metaState=0, flags=0x48, repeatCount=0, eventTime=59277675000000, downTime=59277675000000, deviceId=-1, source=0x101, displayId=-1 }, phoneEventTime=20:28:17.086
-D/MIUIInput( 5481): [KeyEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', KeyEvent { action=ACTION_UP, keyCode=KEYCODE_BACK, scanCode=0, metaState=0, flags=0x48, repeatCount=0, eventTime=59277684000000, downTime=59277684000000, deviceId=-1, source=0x101, displayId=-1 }, phoneEventTime=20:28:17.095
-D/DecorView[]( 5481): getWindowModeFromSystem  windowmode is 1
-D/DecorView[]( 5481): updateDecorCaptionStatus windowMode is 1
-D/DecorView[]( 5481): getWindowModeFromSystem  windowmode is 1
-D/DecorView[]( 5481): updateDecorCaptionStatus windowMode is 1
-D/DecorView[]( 5481): getWindowModeFromSystem  windowmode is 1
-D/DecorView[]( 5481): updateDecorCaptionStatus windowMode is 1
-D/DecorView[]( 5481): getWindowModeFromSystem  windowmode is 1
-D/DecorView[]( 5481): updateDecorCaptionStatus windowMode is 1
-E/LongScreenshotUtils( 5481): inLargeScreen false
-I/LongScreenshotUtils( 5481):  focus:true
-I/LongScreenshotUtils( 5481): current ratio width:1.0, height:1.0
+I/flutter (25350):     "downloadUrl":  "http://nthiennhan.ddns.net:90/app/expense_manager_v1.0.61.apk",
+I/flutter (25350):     "releaseDate":  "2026-08-24",
+I/flutter (25350):     "forceUpdate":  false
+I/flutter (25350): }
+I/flutter (25350):
+I/flutter (25350): 🆕 Latest version: 1.0.61
+I/flutter (25350): ⚙️  Min version: 1.0.0
+I/flutter (25350): ✅ Already up to date
+I/flutter (25350): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (25350): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (25350): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (25350):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (25350):    ✅ ExpenseProvider: Ready
+I/flutter (25350): ✅ WalletProvider injected into AutoExpenseProvider
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+I/flutter (25350): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (25350): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (25350): ⏭️ Already processing pending notifications, skipping
+I/flutter (25350): ✅ WalletProvider injected into AutoExpenseProvider
+I/flutter (25350):    📦 Cached primaryWalletId for native: I54letChuupnGrPUDsDo
+I/flutter (25350):    📦 Cached bank→wallet mapping for native: {vcb: I54letChuupnGrPUDsDo, vietinbank: 4owvXhwdUZnvdm2obZZM, momo: 8hPpbe3IVlp2mWBAC578}
+D/BankNotificationService(25350): Cleared pending notifications
+I/flutter (25350): 🗑️ Cleared pending notifications
+I/flutter (25350): ✅ No pending notifications to process
+I/flutter (25350): ✅ HomeWidget updated successfully! Recent tx count: 4
+D/WIDGET_DEBUG(25350): 🔍 [WIDGET_DEBUG] onReceive triggered with action: android.appwidget.action.APPWIDGET_UPDATE
+D/WIDGET_DEBUG(25350): 🚀 [WIDGET_DEBUG] onUpdate called for 1 widgets
+D/WIDGET_DEBUG(25350): 📦 [WIDGET_DEBUG] HomeWidgetPreferences has 38 keys: [home_widget.double.tx_1_amount, tx_2_type, home_widget.double.tx_0_amount, home_widget.double.tx_2_amount, tx_0_name, tx_3_time, home_widget.double.tx_0_type, user_name, tx_3_name, tx_3_amount, home_widget.double.tx_1_name, home_widget.double.tx_1_time, tx_0_time, home_widget.double.tx_3_name, home_widget.double.qr_widget_image_path, tx_3_type, tx_2_time, home_widget.double.tx_2_name, home_widget.double.tx_2_time, home_widget.double.tx_3_amount, tx_0_type, home_widget.double.tx_3_type, home_widget.double.tx_count, tx_count, tx_2_name, tx_1_type, home_widget.double.tx_0_name, home_widget.double.tx_0_time, home_widget.double.tx_2_type, home_widget.double.tx_3_time, tx_1_amount, tx_0_amount, tx_2_amount, home_widget.double.user_name, home_widget.double.tx_1_type, tx_1_time, qr_widget_image_path, tx_1_name]
+D/WIDGET_DEBUG(25350): 🛠️ [WIDGET_DEBUG] Updating widget ID: 19
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'user_name': HomeWidget='Nguyễn Thiện Nhân', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 👤 [WIDGET_DEBUG] Displaying user: Nguyễn Thiện Nhân
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'qr_widget_image_path': HomeWidget='/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔲 [WIDGET_DEBUG] QR image path: '/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg'
+I/SkJpegCodec(25350): [mId: 27] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 27] skia-debug SkJpegCodec::ReadHeader: width = 480, height = 470, color = 10
+I/SkJpegCodec(25350): [mId: 27] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 27] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1920,
+I/SkJpegCodec(25350): dstInfo: SkImageInfo: {IsRGB = 0, ColorType = 4, AlphaType = 1, Dimensions.width = 480, Dimensions.height = 470};
+I/JpegXmCodec(25350):  skia-debug JpegXmCodec::isSupported returns false for small resolution
+I/SkJpegCodec(25350): [mId: 27] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 470
+I/SkJpegCodec(25350): [mId: 27] skia-debug onGetGainmapInfo returns false
+W/HWUI    (25350): Image decoding logging dropped!
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] QR image loaded successfully
+D/WIDGET_DEBUG(25350): 📊 [WIDGET_DEBUG] Recent transactions count: 4
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_amount': HomeWidget='+190.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_amount': HomeWidget='+700.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] Successfully updated app widget ID: 19
+D/WIDGET_DEBUG(25350): 🔍 [WIDGET_DEBUG] Active widget IDs count: 1
+D/WIDGET_DEBUG(25350): 🚀 [WIDGET_DEBUG] onUpdate called for 1 widgets
+D/WIDGET_DEBUG(25350): 📦 [WIDGET_DEBUG] HomeWidgetPreferences has 38 keys: [home_widget.double.tx_1_amount, tx_2_type, home_widget.double.tx_0_amount, home_widget.double.tx_2_amount, tx_0_name, tx_3_time, home_widget.double.tx_0_type, user_name, tx_3_name, tx_3_amount, home_widget.double.tx_1_name, home_widget.double.tx_1_time, tx_0_time, home_widget.double.tx_3_name, home_widget.double.qr_widget_image_path, tx_3_type, tx_2_time, home_widget.double.tx_2_name, home_widget.double.tx_2_time, home_widget.double.tx_3_amount, tx_0_type, home_widget.double.tx_3_type, home_widget.double.tx_count, tx_count, tx_2_name, tx_1_type, home_widget.double.tx_0_name, home_widget.double.tx_0_time, home_widget.double.tx_2_type, home_widget.double.tx_3_time, tx_1_amount, tx_0_amount, tx_2_amount, home_widget.double.user_name, home_widget.double.tx_1_type, tx_1_time, qr_widget_image_path, tx_1_name]
+D/WIDGET_DEBUG(25350): 🛠️ [WIDGET_DEBUG] Updating widget ID: 19
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'user_name': HomeWidget='Nguyễn Thiện Nhân', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 👤 [WIDGET_DEBUG] Displaying user: Nguyễn Thiện Nhân
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'qr_widget_image_path': HomeWidget='/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔲 [WIDGET_DEBUG] QR image path: '/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg'
+I/SkJpegCodec(25350): [mId: 28] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 28] skia-debug SkJpegCodec::ReadHeader: width = 480, height = 470, color = 10
+I/SkJpegCodec(25350): [mId: 28] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 28] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1920,
+I/SkJpegCodec(25350): dstInfo: SkImageInfo: {IsRGB = 0, ColorType = 4, AlphaType = 1, Dimensions.width = 480, Dimensions.height = 470};
+I/JpegXmCodec(25350):  skia-debug JpegXmCodec::isSupported returns false for small resolution
+I/SkJpegCodec(25350): [mId: 28] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 470
+I/SkJpegCodec(25350): [mId: 28] skia-debug onGetGainmapInfo returns false
+W/HWUI    (25350): Image decoding logging dropped!
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] QR image loaded successfully
+D/WIDGET_DEBUG(25350): 📊 [WIDGET_DEBUG] Recent transactions count: 4
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_amount': HomeWidget='+190.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_amount': HomeWidget='+700.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] Successfully updated app widget ID: 19
+I/flutter (25350): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (25350): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (25350): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (25350):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (25350):    ✅ ExpenseProvider: Ready
+I/flutter (25350): ✅ WalletProvider injected into AutoExpenseProvider
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+W/MirrorManager(25350): this model don't Support
+D/BankNotificationService(25350): Cleared pending notifications
+I/flutter (25350):    📦 Cached primaryWalletId for native: I54letChuupnGrPUDsDo
+I/flutter (25350): 🗑️ Cleared pending notifications
+I/flutter (25350): ✅ No pending notifications to process
+I/flutter (25350):    📦 Cached bank→wallet mapping for native: {vcb: I54letChuupnGrPUDsDo, vietinbank: 4owvXhwdUZnvdm2obZZM, momo: 8hPpbe3IVlp2mWBAC578}
+I/flutter (25350): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (25350): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (25350): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (25350):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (25350):    ✅ ExpenseProvider: Ready
+I/flutter (25350): ✅ WalletProvider injected into AutoExpenseProvider
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+D/BankNotificationService(25350): Cleared pending notifications
+I/flutter (25350):    📦 Cached primaryWalletId for native: I54letChuupnGrPUDsDo
+I/flutter (25350): 🗑️ Cleared pending notifications
+I/flutter (25350): ✅ No pending notifications to process
+I/flutter (25350):    📦 Cached bank→wallet mapping for native: {vcb: I54letChuupnGrPUDsDo, vietinbank: 4owvXhwdUZnvdm2obZZM, momo: 8hPpbe3IVlp2mWBAC578}
+I/manager_android(25350): ProcessProfilingInfo new_methods=94 is saved saved_to_disk=1
+E/GoogleApiManager(25350): Failed to get service from broker. 
+E/GoogleApiManager(25350): java.lang.SecurityException: Unknown calling package name 'com.google.android.gms'.
+E/GoogleApiManager(25350):      at android.os.Parcel.createExceptionOrNull(Parcel.java:3361)
+E/GoogleApiManager(25350):      at android.os.Parcel.createException(Parcel.java:3345)
+E/GoogleApiManager(25350):      at android.os.Parcel.readException(Parcel.java:3328)
+E/GoogleApiManager(25350):      at android.os.Parcel.readException(Parcel.java:3270)
+E/GoogleApiManager(25350):      at bmrj.a(:com.google.android.gms@263234035@26.32.34 (260400-968093310):36)
+E/GoogleApiManager(25350):      at bmpc.y(:com.google.android.gms@263234035@26.32.34 (260400-968093310):143)
+E/GoogleApiManager(25350):      at bluz.run(:com.google.android.gms@263234035@26.32.34 (260400-968093310):42)
+E/GoogleApiManager(25350):      at android.os.Handler.handleCallback(Handler.java:1029)
+E/GoogleApiManager(25350):      at android.os.Handler.dispatchMessage(Handler.java:107)
+E/GoogleApiManager(25350):      at dhsb.lJ(:com.google.android.gms@263234035@26.32.34 (260400-968093310):1)
+E/GoogleApiManager(25350):      at dhsb.dispatchMessage(:com.google.android.gms@263234035@26.32.34 (260400-968093310):5)
+E/GoogleApiManager(25350):      at android.os.Looper.loopOnce(Looper.java:274)
+E/GoogleApiManager(25350):      at android.os.Looper.loop(Looper.java:369)
+E/GoogleApiManager(25350):      at android.os.HandlerThread.run(HandlerThread.java:85)
+W/GoogleApiManager(25350): Not showing notification since connectionResult is not user-facing: ConnectionResult{statusCode=DEVELOPER_ERROR, resolution=null, message=null, clientMethodKey=null}
+I/MIUIInput(25350): [KeyEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_SPACE, scanCode=0, metaState=0, flags=0x0, repeatCount=0, eventTime=291865372000000, downTime=291865372000000, deviceId=-1, source=0x101, displayId=-1 }, phoneEventTime=1788060245821
+I/HandWritingStubImpl(25350): refreshLastKeyboardType: 1
+I/HandWritingStubImpl(25350): getCurrentKeyboardType: 1
+I/manager_android(25350): This is non sticky GC, maxfree is 33554432 minfree is 8388608
+I/MIUIInput(25350): [KeyEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', KeyEvent { action=ACTION_UP, keyCode=KEYCODE_SPACE, scanCode=0, metaState=0, flags=0x0, repeatCount=0, eventTime=291865483000000, downTime=291865483000000, deviceId=-1, source=0x101, displayId=-1 }, phoneEventTime=1788060245931
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291873442, downTime=291873442, phoneEventTime=1788060253890 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291873470, downTime=291873442, phoneEventTime=1788060253919 } moveCount:0
+Another exception was thrown: A RenderFlex overflowed by 35 pixels on the right.
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291874222, downTime=291874222, phoneEventTime=1788060254670 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291874983, downTime=291874222, phoneEventTime=1788060255431 } moveCount:89
+D/CompatChangeReporter(25350): Compat change id reported: 351566728; UID 10507; state: ENABLED
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291875312, downTime=291875312, phoneEventTime=1788060255761 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291875347, downTime=291875312, phoneEventTime=1788060255795 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+D/FlutterJNI(25350): Sending viewport metrics to the engine.
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291876110, downTime=291876110, phoneEventTime=1788060256559 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291876696, downTime=291876110, phoneEventTime=1788060257145 } moveCount:69
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291878205, downTime=291878205, phoneEventTime=1788060258654 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291878301, downTime=291878205, phoneEventTime=1788060258749 } moveCount:0
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291881178, downTime=291881178, phoneEventTime=1788060261627 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291881206, downTime=291881178, phoneEventTime=1788060261655 } moveCount:0
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291882623, downTime=291882623, phoneEventTime=1788060263072 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291882695, downTime=291882623, phoneEventTime=1788060263144 } moveCount:0
+Another exception was thrown: A RenderFlex overflowed by 8.9 pixels on the right.
+I/manager_android(25350): AssetManager2(0xb400007badaab018) locale list changing from [] to [en-US]
+I/manager_android(25350): AssetManager2(0xb400007badab3fd8) locale list changing from [] to [en-US]
+I/manager_android(25350): AssetManager2(0xb400007badab0ab8) locale list changing from [] to [en-US]
+I/manager_android(25350): AssetManager2(0xb400007badab1a58) locale list changing from [] to [en-US]
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291885325, downTime=291885325, phoneEventTime=1788060265774 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_CANCEL, id[0]=0, id[1]=1, id[2]=2, pointerCount=3, eventTime=291885364, downTime=291885325, phoneEventTime=1788060265813 } moveCount:1
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291886488, downTime=291886488, phoneEventTime=1788060266936 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291886755, downTime=291886488, phoneEventTime=1788060267204 } moveCount:24
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291887216, downTime=291887216, phoneEventTime=1788060267665 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291887267, downTime=291887216, phoneEventTime=1788060267715 } moveCount:0
+I/flutter (25350): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (25350):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (25350):    ✅ ExpenseProvider: Ready
+D/BankNotificationService(25350): Cleared pending notifications
+I/flutter (25350): 🗑️ Cleared pending notifications
+I/flutter (25350): ✅ No pending notifications to process
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291888044, downTime=291888044, phoneEventTime=1788060268493 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291888110, downTime=291888044, phoneEventTime=1788060268558 } moveCount:0
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291888415, downTime=291888415, phoneEventTime=1788060268864 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291888697, downTime=291888415, phoneEventTime=1788060269146 } moveCount:31
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291890189, downTime=291890189, phoneEventTime=1788060270637 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291890224, downTime=291890189, phoneEventTime=1788060270673 } moveCount:0
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291891079, downTime=291891079, phoneEventTime=1788060271527 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291891138, downTime=291891079, phoneEventTime=1788060271587 } moveCount:0
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291891570, downTime=291891570, phoneEventTime=1788060272019 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291891606, downTime=291891570, phoneEventTime=1788060272054 } moveCount:0
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291891905, downTime=291891905, phoneEventTime=1788060272354 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291891970, downTime=291891905, phoneEventTime=1788060272419 } moveCount:0
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291892544, downTime=291892544, phoneEventTime=1788060272993 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291892573, downTime=291892544, phoneEventTime=1788060273022 } moveCount:0
+I/flutter (25350): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (25350): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (25350): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (25350):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (25350):    ✅ ExpenseProvider: Ready
+I/flutter (25350): ✅ WalletProvider injected into AutoExpenseProvider
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+I/flutter (25350):    📦 Cached primaryWalletId for native: I54letChuupnGrPUDsDo
+I/flutter (25350):    📦 Cached bank→wallet mapping for native: {vcb: I54letChuupnGrPUDsDo, vietinbank: 4owvXhwdUZnvdm2obZZM, momo: 8hPpbe3IVlp2mWBAC578}
+D/BankNotificationService(25350): Cleared pending notifications
+I/flutter (25350): 🗑️ Cleared pending notifications
+I/flutter (25350): ✅ No pending notifications to process
+I/flutter (25350): ✅ HomeWidget updated successfully! Recent tx count: 4
+D/WIDGET_DEBUG(25350): 🔍 [WIDGET_DEBUG] onReceive triggered with action: android.appwidget.action.APPWIDGET_UPDATE
+D/WIDGET_DEBUG(25350): 🚀 [WIDGET_DEBUG] onUpdate called for 1 widgets
+D/WIDGET_DEBUG(25350): 📦 [WIDGET_DEBUG] HomeWidgetPreferences has 38 keys: [home_widget.double.tx_1_amount, tx_2_type, home_widget.double.tx_0_amount, home_widget.double.tx_2_amount, tx_0_name, tx_3_time, home_widget.double.tx_0_type, user_name, tx_3_name, tx_3_amount, home_widget.double.tx_1_name, home_widget.double.tx_1_time, tx_0_time, home_widget.double.tx_3_name, home_widget.double.qr_widget_image_path, tx_3_type, tx_2_time, home_widget.double.tx_2_name, home_widget.double.tx_2_time, home_widget.double.tx_3_amount, tx_0_type, home_widget.double.tx_3_type, home_widget.double.tx_count, tx_count, tx_2_name, tx_1_type, home_widget.double.tx_0_name, home_widget.double.tx_0_time, home_widget.double.tx_2_type, home_widget.double.tx_3_time, tx_1_amount, tx_0_amount, tx_2_amount, home_widget.double.user_name, home_widget.double.tx_1_type, tx_1_time, qr_widget_image_path, tx_1_name]
+D/WIDGET_DEBUG(25350): 🛠️ [WIDGET_DEBUG] Updating widget ID: 19
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'user_name': HomeWidget='Nguyễn Thiện Nhân', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 👤 [WIDGET_DEBUG] Displaying user: Nguyễn Thiện Nhân
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'qr_widget_image_path': HomeWidget='/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔲 [WIDGET_DEBUG] QR image path: '/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg'
+I/SkJpegCodec(25350): [mId: 29] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 29] skia-debug SkJpegCodec::ReadHeader: width = 480, height = 470, color = 10
+I/SkJpegCodec(25350): [mId: 29] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 29] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1920,
+I/SkJpegCodec(25350): dstInfo: SkImageInfo: {IsRGB = 0, ColorType = 4, AlphaType = 1, Dimensions.width = 480, Dimensions.height = 470};
+I/JpegXmCodec(25350):  skia-debug JpegXmCodec::isSupported returns false for small resolution
+I/SkJpegCodec(25350): [mId: 29] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 470
+I/SkJpegCodec(25350): [mId: 29] skia-debug onGetGainmapInfo returns false
+W/HWUI    (25350): Image decoding logging dropped!
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] QR image loaded successfully
+D/WIDGET_DEBUG(25350): 📊 [WIDGET_DEBUG] Recent transactions count: 4
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_amount': HomeWidget='+190.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_amount': HomeWidget='+700.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] Successfully updated app widget ID: 19
+D/WIDGET_DEBUG(25350): 🔍 [WIDGET_DEBUG] Active widget IDs count: 1
+D/WIDGET_DEBUG(25350): 🚀 [WIDGET_DEBUG] onUpdate called for 1 widgets
+D/WIDGET_DEBUG(25350): 📦 [WIDGET_DEBUG] HomeWidgetPreferences has 38 keys: [home_widget.double.tx_1_amount, tx_2_type, home_widget.double.tx_0_amount, home_widget.double.tx_2_amount, tx_0_name, tx_3_time, home_widget.double.tx_0_type, user_name, tx_3_name, tx_3_amount, home_widget.double.tx_1_name, home_widget.double.tx_1_time, tx_0_time, home_widget.double.tx_3_name, home_widget.double.qr_widget_image_path, tx_3_type, tx_2_time, home_widget.double.tx_2_name, home_widget.double.tx_2_time, home_widget.double.tx_3_amount, tx_0_type, home_widget.double.tx_3_type, home_widget.double.tx_count, tx_count, tx_2_name, tx_1_type, home_widget.double.tx_0_name, home_widget.double.tx_0_time, home_widget.double.tx_2_type, home_widget.double.tx_3_time, tx_1_amount, tx_0_amount, tx_2_amount, home_widget.double.user_name, home_widget.double.tx_1_type, tx_1_time, qr_widget_image_path, tx_1_name]
+D/WIDGET_DEBUG(25350): 🛠️ [WIDGET_DEBUG] Updating widget ID: 19
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'user_name': HomeWidget='Nguyễn Thiện Nhân', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 👤 [WIDGET_DEBUG] Displaying user: Nguyễn Thiện Nhân
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'qr_widget_image_path': HomeWidget='/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔲 [WIDGET_DEBUG] QR image path: '/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg'
+I/SkJpegCodec(25350): [mId: 30] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 30] skia-debug SkJpegCodec::ReadHeader: width = 480, height = 470, color = 10
+I/SkJpegCodec(25350): [mId: 30] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 30] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1920,
+I/SkJpegCodec(25350): dstInfo: SkImageInfo: {IsRGB = 0, ColorType = 4, AlphaType = 1, Dimensions.width = 480, Dimensions.height = 470};
+I/JpegXmCodec(25350):  skia-debug JpegXmCodec::isSupported returns false for small resolution
+I/SkJpegCodec(25350): [mId: 30] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 470
+I/SkJpegCodec(25350): [mId: 30] skia-debug onGetGainmapInfo returns false
+W/HWUI    (25350): Image decoding logging dropped!
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] QR image loaded successfully
+D/WIDGET_DEBUG(25350): 📊 [WIDGET_DEBUG] Recent transactions count: 4
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_amount': HomeWidget='+190.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_amount': HomeWidget='+700.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] Successfully updated app widget ID: 19
+I/flutter (25350): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (25350): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (25350): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (25350):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (25350):    ✅ ExpenseProvider: Ready
+I/flutter (25350): ✅ WalletProvider injected into AutoExpenseProvider
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+D/BankNotificationService(25350): Cleared pending notifications
+I/flutter (25350): 🗑️ Cleared pending notifications
+I/flutter (25350): ✅ No pending notifications to process
+I/flutter (25350):    📦 Cached primaryWalletId for native: I54letChuupnGrPUDsDo
+I/flutter (25350):    📦 Cached bank→wallet mapping for native: {vcb: I54letChuupnGrPUDsDo, vietinbank: 4owvXhwdUZnvdm2obZZM, momo: 8hPpbe3IVlp2mWBAC578}
+I/flutter (25350): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (25350): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (25350): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (25350):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (25350):    ✅ ExpenseProvider: Ready
+I/flutter (25350): ✅ WalletProvider injected into AutoExpenseProvider
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+I/flutter (25350):    📦 Cached primaryWalletId for native: I54letChuupnGrPUDsDo
+I/flutter (25350):    📦 Cached bank→wallet mapping for native: {vcb: I54letChuupnGrPUDsDo, vietinbank: 4owvXhwdUZnvdm2obZZM, momo: 8hPpbe3IVlp2mWBAC578}
+D/BankNotificationService(25350): Cleared pending notifications
+I/flutter (25350): 🗑️ Cleared pending notifications
+I/flutter (25350): ✅ No pending notifications to process
+I/flutter (25350): ✅ HomeWidget updated successfully! Recent tx count: 4
+D/WIDGET_DEBUG(25350): 🔍 [WIDGET_DEBUG] onReceive triggered with action: android.appwidget.action.APPWIDGET_UPDATE
+D/WIDGET_DEBUG(25350): 🚀 [WIDGET_DEBUG] onUpdate called for 1 widgets
+D/WIDGET_DEBUG(25350): 📦 [WIDGET_DEBUG] HomeWidgetPreferences has 38 keys: [home_widget.double.tx_1_amount, tx_2_type, home_widget.double.tx_0_amount, home_widget.double.tx_2_amount, tx_0_name, tx_3_time, home_widget.double.tx_0_type, user_name, tx_3_name, tx_3_amount, home_widget.double.tx_1_name, home_widget.double.tx_1_time, tx_0_time, home_widget.double.tx_3_name, home_widget.double.qr_widget_image_path, tx_3_type, tx_2_time, home_widget.double.tx_2_name, home_widget.double.tx_2_time, home_widget.double.tx_3_amount, tx_0_type, home_widget.double.tx_3_type, home_widget.double.tx_count, tx_count, tx_2_name, tx_1_type, home_widget.double.tx_0_name, home_widget.double.tx_0_time, home_widget.double.tx_2_type, home_widget.double.tx_3_time, tx_1_amount, tx_0_amount, tx_2_amount, home_widget.double.user_name, home_widget.double.tx_1_type, tx_1_time, qr_widget_image_path, tx_1_name]
+D/WIDGET_DEBUG(25350): 🛠️ [WIDGET_DEBUG] Updating widget ID: 19
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'user_name': HomeWidget='Nguyễn Thiện Nhân', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 👤 [WIDGET_DEBUG] Displaying user: Nguyễn Thiện Nhân
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'qr_widget_image_path': HomeWidget='/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔲 [WIDGET_DEBUG] QR image path: '/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg'
+I/SkJpegCodec(25350): [mId: 31] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 31] skia-debug SkJpegCodec::ReadHeader: width = 480, height = 470, color = 10
+I/SkJpegCodec(25350): [mId: 31] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 31] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1920,
+I/SkJpegCodec(25350): dstInfo: SkImageInfo: {IsRGB = 0, ColorType = 4, AlphaType = 1, Dimensions.width = 480, Dimensions.height = 470};
+I/JpegXmCodec(25350):  skia-debug JpegXmCodec::isSupported returns false for small resolution
+I/SkJpegCodec(25350): [mId: 31] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 470
+I/SkJpegCodec(25350): [mId: 31] skia-debug onGetGainmapInfo returns false
+W/HWUI    (25350): Image decoding logging dropped!
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] QR image loaded successfully
+D/WIDGET_DEBUG(25350): 📊 [WIDGET_DEBUG] Recent transactions count: 4
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_amount': HomeWidget='+190.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_amount': HomeWidget='+700.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] Successfully updated app widget ID: 19
+D/WIDGET_DEBUG(25350): 🔍 [WIDGET_DEBUG] Active widget IDs count: 1
+D/WIDGET_DEBUG(25350): 🚀 [WIDGET_DEBUG] onUpdate called for 1 widgets
+D/WIDGET_DEBUG(25350): 📦 [WIDGET_DEBUG] HomeWidgetPreferences has 38 keys: [home_widget.double.tx_1_amount, tx_2_type, home_widget.double.tx_0_amount, home_widget.double.tx_2_amount, tx_0_name, tx_3_time, home_widget.double.tx_0_type, user_name, tx_3_name, tx_3_amount, home_widget.double.tx_1_name, home_widget.double.tx_1_time, tx_0_time, home_widget.double.tx_3_name, home_widget.double.qr_widget_image_path, tx_3_type, tx_2_time, home_widget.double.tx_2_name, home_widget.double.tx_2_time, home_widget.double.tx_3_amount, tx_0_type, home_widget.double.tx_3_type, home_widget.double.tx_count, tx_count, tx_2_name, tx_1_type, home_widget.double.tx_0_name, home_widget.double.tx_0_time, home_widget.double.tx_2_type, home_widget.double.tx_3_time, tx_1_amount, tx_0_amount, tx_2_amount, home_widget.double.user_name, home_widget.double.tx_1_type, tx_1_time, qr_widget_image_path, tx_1_name]
+D/WIDGET_DEBUG(25350): 🛠️ [WIDGET_DEBUG] Updating widget ID: 19
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'user_name': HomeWidget='Nguyễn Thiện Nhân', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 👤 [WIDGET_DEBUG] Displaying user: Nguyễn Thiện Nhân
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'qr_widget_image_path': HomeWidget='/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔲 [WIDGET_DEBUG] QR image path: '/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg'
+I/SkJpegCodec(25350): [mId: 32] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 32] skia-debug SkJpegCodec::ReadHeader: width = 480, height = 470, color = 10
+I/SkJpegCodec(25350): [mId: 32] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 32] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1920,
+I/SkJpegCodec(25350): dstInfo: SkImageInfo: {IsRGB = 0, ColorType = 4, AlphaType = 1, Dimensions.width = 480, Dimensions.height = 470};
+I/JpegXmCodec(25350):  skia-debug JpegXmCodec::isSupported returns false for small resolution
+I/SkJpegCodec(25350): [mId: 32] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 470
+I/SkJpegCodec(25350): [mId: 32] skia-debug onGetGainmapInfo returns false
+W/HWUI    (25350): Image decoding logging dropped!
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] QR image loaded successfully
+D/WIDGET_DEBUG(25350): 📊 [WIDGET_DEBUG] Recent transactions count: 4
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_amount': HomeWidget='+190.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_amount': HomeWidget='+700.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] Successfully updated app widget ID: 19
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291893829, downTime=291893829, phoneEventTime=1788060274277 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291894081, downTime=291893829, phoneEventTime=1788060274529 } moveCount:28
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+W/WindowOnBackDispatcher(25350): sendCancelIfRunning: isInProgress=false callback=androidx.navigationevent.OnBackInvokedInput$createOnBackAnimationCallback$1@99ddad2
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+D/FlutterJNI(25350): Sending viewport metrics to the engine.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291896270, downTime=291896270, phoneEventTime=1788060276719 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291896337, downTime=291896270, phoneEventTime=1788060276786 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+D/FlutterJNI(25350): Sending viewport metrics to the engine.
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291896873, downTime=291896873, phoneEventTime=1788060277321 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291897316, downTime=291896873, phoneEventTime=1788060277765 } moveCount:54
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291898299, downTime=291898299, phoneEventTime=1788060278747 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291898387, downTime=291898299, phoneEventTime=1788060278836 } moveCount:0
+Another exception was thrown: A RenderFlex overflowed by 8.9 pixels on the right.
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291900409, downTime=291900409, phoneEventTime=1788060280858 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291900430, downTime=291900409, phoneEventTime=1788060280879 } moveCount:0
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291901300, downTime=291901300, phoneEventTime=1788060281749 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291901343, downTime=291901300, phoneEventTime=1788060281792 } moveCount:0
+I/ContentCatcher(25350): SettingTrigger : unregister status observer com.example.expense_manager_android.MainActivity
+I/ContentCatcher(25350): SettingTrigger : unregisterUIAgentListener com.example.expense_manager_android.MainActivity, uid:10507
+W/InsetsSource(25350): Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+D/BufferQueueProducer(25350): [264fb6f SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity]#1(BLAST Consumer)1](id:630600000001,api:1,p:25350,c:25350) disconnect: api 1 (caller=25350)
+D/BufferQueueProducer(25350): [264fb6f SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity]#1(BLAST Consumer)1](id:630600000001,api:0,p:-1,c:25350) disconnect: api -1 (caller=25350)
+D/BufferQueueConsumer(25350): [264fb6f SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity]#1(BLAST Consumer)1](id:630600000001,api:0,p:-1,c:25350) disconnect: caller 25350
+D/ViewRootImplStubImpl(25350): onSurfaceViewDetached:
+D/ViewRootImplStubImpl(25350): , vri:android.view.ViewRootImpl@75107c, com.example.expense_manager_android/com.example.expense_manager_android.MainActivity
+D/ViewRootImplStubImpl(25350): , vri size:1080x2400
+D/ViewRootImplStubImpl(25350): , surfaceView:io.flutter.embedding.android.FlutterSurfaceView{264fb6f V.E...... ........ 0,0-1080,2400}, SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity]
+D/ViewRootImplStubImpl(25350): , surfaceView size:1080x2400
+D/ViewRootImplStubImpl(25350): , surfaceControl:Surface(name=264fb6f SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity](BLAST)#111206)/@0x8c5fd05
+W/WindowOnBackDispatcher(25350): sendCancelIfRunning: isInProgress=false callback=androidx.navigationevent.OnBackInvokedInput$createOnBackAnimationCallback$1@99ddad2        
+D/BufferQueueProducer(25350): [VRI[MainActivity]#0(BLAST Consumer)0](id:630600000000,api:1,p:25350,c:25350) disconnect: api 1 (caller=25350)
+D/BufferQueueConsumer(25350): [VRI[MainActivity]#0(BLAST Consumer)0](id:630600000000,api:0,p:-1,c:25350) disconnect: caller 25350
+W/manager_android(25350): Binder 0xb400007bcd9cd380 destroyed after setInheritRt before being parceled.
+W/InsetsSource(25350): Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/library_loader.cc(296)] 
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/hyper_engine.cc(465)] hyper_flutter_pre_load_resource
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/hyper_engine.cc(461)] Hyper Flutter Engine Commit: 05399be527e
+I/flutter (26872): [IMPORTANT:flutter/third_party/txt/src/txt/platform_android.cc(38)] GetDefaultFontManager
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/library_loader.cc(18)] 
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/hyper_engine.cc(122)] rust flutter version 3.29.0-release-mi.1.48.7
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] flutter
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --icu-symbol-prefix=_binary_icudtl_dat
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --enable-impeller
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --enable-dart-profiling
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --impeller-backend=vulkan
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --trace-systrace
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --trace-startup
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --domain-network-policy=
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --old-gen-heap-size=5857
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --resource-cache-max-bytes-threshold=117262080
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --prefetched-default-font-manager
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --leak-vm=true
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --icu-native-lib-path=/data/app/~~jfdMZ2SHEelxRnZQOulWFQ==/com.miui.gallery-IIfLEYr5sTkLcuoNMF3g6w==/lib/arm64/libhyper_os_flutter.so
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --aot-shared-library-name=libapp.so
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --no-enable-merged-platform-ui-thread
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --aot-shared-library-name=/data/app/~~jfdMZ2SHEelxRnZQOulWFQ==/com.miui.gallery-IIfLEYr5sTkLcuoNMF3g6w==/lib/arm64/libapp.so
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/flutter_main.cc(104)] --cache-dir-path=/data/user/0/com.miui.gallery/code_cache
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/library_loader.cc(38)]
+I/flutter (26872): [IMPORTANT:flutter/third_party/txt/src/txt/platform_android.cc(38)] GetDefaultFontManager
+I/flutter (26872): [IMPORTANT:flutter/shell/platform/android/library_loader.cc(53)] 
+D/Activity(25350): Activity = ActivityInfo{5617ec com.example.expense_manager_android.MainActivity}, Resume onConfigurationChanged = {1.0 452mcc4mnc [en_US] ldltr sw384dp w384dp h853dp 450dpi nrml long hdr widecg port night finger -keyb/v/h -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 2400) mAppBounds=Rect(0, 0 - 1080, 2400) mMaxBounds=Rect(0, 0 - 1080, 2400) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_0 mInSplitScreen=false letterBoxed=false foScaled=false isSpecificEmbedded=false embeddingScale=1.0} s.2 fontWeightAdjustment=0/d/o themeChanged=0 themeChangedFlags=0 display=0 extraData = Bundle[{}] screenType=0/o}
+I/ContentCatcher(25350): SettingTrigger : register screen QA observer failed for com.example.expense_manager_android.MainActivity, because no aicr provider support
+I/ContentCatcher(25350): SettingTrigger : register global collect observer failed for com.example.expense_manager_android.MainActivity, because no aicr provider support     
+I/ContentCatcher(25350): SettingTrigger : registerUIAgentListener com.example.expense_manager_android.MainActivity, uid:10507
+W/InsetsSource(25350): Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+D/FlutterJNI(25350): Sending viewport metrics to the engine.
+D/ViewRootImplStubImpl(25350): onSurfaceViewAttached:
+D/ViewRootImplStubImpl(25350): , vri:android.view.ViewRootImpl@75107c, com.example.expense_manager_android/com.example.expense_manager_android.MainActivity
+D/ViewRootImplStubImpl(25350): , vri size:1080x2400
+D/ViewRootImplStubImpl(25350): , surfaceView:io.flutter.embedding.android.FlutterSurfaceView{264fb6f V.E...... ......ID 0,0-1080,2400}, SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity]
+D/ViewRootImplStubImpl(25350): , surfaceView size:1080x2400
+D/ViewRootImplStubImpl(25350): , surfaceControl:Surface(name=264fb6f SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity](BLAST)#111269)/@0xea9a1e6
+W/manager_android(25350): Binder 0xb400007bcd9c8100 destroyed after setInheritRt before being parceled.
+D/SurfaceView(25350): UPDATE Surface(name=264fb6f SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity]#111268)/@0x25fd9d4, mIsProjectionMode = false
+D/VRI[MainActivity](25350): vri.Setup new sync=wmsSync-VRI[MainActivity]#4
+W/InsetsSource(25350): Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+D/InsetsController(25350): com.example.expense_manager_android/com.example.expense_manager_android.MainActivity  show: statusBars android.view.InsetsController@ecabf40 android.view.InsetsController.applyAnimation:2241 android.view.InsetsController.applyAnimation:2212 android.view.InsetsController.onControlsChanged:1147 android.view.ViewRootImpl.onActiveControlsChanged:3360 android.view.ViewRootImpl.handleInsetsControlChanged:3314 android.view.ViewRootImpl$W.insetsControlChanged:13894
+D/InsetsController(25350): default animation onReady types: 1 controller=android.view.InsetsAnimationControlImpl@29107be
+D/ViewRootImplStubImpl(25350): requestedTypes: 1
+D/ViewRootImplStubImpl(25350): notifyImeAnimEvent: isForShow = true, isAnimStart = true, has context = true, has AutofillManager = true, isMiuiAnim = false
+D/VRI[MainActivity](25350): vri.Setup new sync=wmsSync-VRI[MainActivity]#6
+D/VRI[MainActivity](25350): vri.reportDrawFinished 0 0 Rect(0, 0 - 1080, 2400)
+D/VRI[MainActivity](25350): vri.reportDrawFinished 0 0 Rect(0, 0 - 1080, 2400)
+I/flutter (25350): 📱 App resumed - re-checking notification access & listener
+I/flutter (25350): 🔄 Restarting notification listener...
+I/flutter (25350): 🔇 Stopping EventChannel stream...
+I/flutter (25350): ✅ EventChannel stream stopped
+I/flutter (25350): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (25350):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (25350):    ✅ ExpenseProvider: Ready
+I/HandWritingStubImpl(25350): refreshLastKeyboardType: 1
+I/HandWritingStubImpl(25350): getCurrentKeyboardType: 1
+I/flutter (25350):    📦 Cached primaryWalletId for native: I54letChuupnGrPUDsDo
+I/flutter (25350):    📦 Cached bank→wallet mapping for native: {vcb: I54letChuupnGrPUDsDo, vietinbank: 4owvXhwdUZnvdm2obZZM, momo: 8hPpbe3IVlp2mWBAC578}
+D/BankNotificationService(25350): 🔌 EventSink DISCONNECTED - Flutter app stopped listening
+D/BankNotificationService(25350): ✅ Service already running
+I/flutter (25350): 🔄 ensureServiceRunning called
+I/flutter (25350): 🎧 Starting notification listener...
+D/BankNotificationService(25350): 🎧 Starting foreground service from Flutter...
+D/BankNotificationService(25350): ✅ Started as foreground service with channel: bank_listener_service_v3
+D/BankNotificationService(25350): ✅ Foreground service notification started
+D/BankNotificationService(25350): Cleared pending notifications
+I/flutter (25350): ✅ Native foreground service started
+I/flutter (25350): 🎧 Starting EventChannel stream...
+I/flutter (25350): ✅ EventChannel stream started
+I/flutter (25350): ✅ Notification listener started
+I/flutter (25350): 🗑️ Cleared pending notifications
+I/flutter (25350): ✅ No pending notifications to process
+D/BankNotificationService(25350): 🔌 EventSink CONNECTED - Flutter app is listening
+D/InsetsController(25350): hide(ime(), fromIme=false)
+I/ImeTracker(25350): com.example.expense_manager_android:c5b4b662: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+D/MediaScannerConnection(25350): Scanned /data/user/0/com.example.expense_manager_android/cache/6cfd2fb6-fd83-4c3c-b16b-5318683967598447709624507959179.jpg to null
+I/SkJpegCodec(25350): [mId: 33] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 33] skia-debug SkJpegCodec::ReadHeader: width = 3072, height = 4096, color = 10
+I/SkJpegCodec(25350): [mId: 33] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 34] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 34] skia-debug SkJpegCodec::ReadHeader: width = 3072, height = 4096, color = 10
+I/SkJpegCodec(25350): [mId: 34] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 34] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 12288, 
+I/SkJpegCodec(25350): dstInfo: SkImageInfo: {IsRGB = 0, ColorType = 4, AlphaType = 1, Dimensions.width = 3072, Dimensions.height = 4096};
+I/JpegXmCodec(25350):  skia-debug JpegXmCodec::isSupported returns true
+I/SkJpegCodec(25350): [mId: 34] skia-debug SkJpegCodec::onGetPixels XmCodec start
+D/skia    (25350): [mid: 34] SkJpegBufferedSourceMgr::fillInputBuffer: full buffer with size = 1980312
+I/JpegXmCodec(25350): [mId: 34] skia-debug JpegXmCodec::decode: prepare ends
+I/JpegXmCodec(25350): [mId: 34] skia-debug JpegXmCodec::decode: done
+I/SkJpegCodec(25350): [mId: 34] skia-debug SkJpegCodec::onGetPixels XmCodec ends with output size = 50331648
+I/SkJpegCodec(25350): [mId: 34] skia-debug onGetGainmapInfo returns false
+W/HWUI    (25350): Image decoding logging dropped!
+I/SkJpegEncoder(25350): [mId: 430] skia-debug Enter SkJpegEncoder::Encode.
+I/SkJpegEncoder(25350): [mId: 430] skia-debug Enter SkJpegEncoder::Make and Options: { fQuality = 85 fDownsample = 0 fAlphaOption = 0};.
+I/SkJpegEncoder(25350): [mId: 430] skia-debug src.info is SkImageInfo: {IsRGB = 1, ColorType = 4, AlphaType = 1, Dimensions.width = 1920, Dimensions.height = 2560};.        
+I/SkJpegEncoder(25350): [mId: 0] skia-debug Create a new SkJpegEncoderImpl for parallel optimazition.
+I/SkJpegEncoder(25350): [mId: 0] skia-debug Enter EncodeRows with numRows 2560, total iMCU rows 160.
+I/SkJpegEncoder(25350): [mId: 0] skia-debug Going to write output data.
+I/SkJpegEncoder(25350): [mId: 0] skia-debug Write output data done.
+I/SkJpegEncoder(25350): [mId: 0] skia-debug Out EncodeRows.
+I/SkJpegEncoder(25350): [mId: 430] skia-debug Out SkJpegEncoder::Encode with parallelOptimize.
+I/flutter (25350): 🚀 Đang upload ảnh lên VPS: http://nthiennhan.ddns.net:90/api/upload.php (folder: receipts)...
+I/flutter (25350): ! VPS upload trả về mã lỗi: 404, body: <html>
+I/flutter (25350): <head><title>404 Not Found</title></head>
+I/flutter (25350): <body>
+I/flutter (25350): <center><h1>404 Not Found</h1></center>
+I/flutter (25350): <hr><center>nginx/1.18.0 (Ubuntu)</center>
+I/flutter (25350): </body>
+I/flutter (25350): </html>
+I/flutter (25350):
+I/flutter (25350): 🔄 Đang thử fallback upload sang Cloudinary...
+D/InsetsController(25350): onAnimationFinish showOnFinish: true
+W/InteractionJankMonitor(25350): Initializing without READ_DEVICE_CONFIG permission. enabled=false, interval=1, missedFrameThreshold=3, frameTimeThreshold=64, package=com.example.expense_manager_android
+D/ViewRootImplStubImpl(25350): notifyImeAnimEvent: isForShow = true, isAnimStart = false, has context = true, has AutofillManager = true, isMiuiAnim = false
+D/InsetsAnimationCtrlImpl(25350): notifyFinished shown: true, currentAlpha: 1.000000, currentInsets: Insets{left=0, top=127, right=0, bottom=0}
+D/InsetsController(25350): cancelAnimation of types:1 animType:0 host:com.example.expense_manager_android/com.example.expense_manager_android.MainActivity invokeCallback=false
+D/InsetsController(25350): notifyFinished. shown: true runner=android.view.InsetsAnimationControlImpl@29107be
+D/InsetsAnimationCtrlImpl(25350): Animation finished abruptly.
+I/flutter (25350): ✅ Fallback upload Cloudinary thành công: https://res.cloudinary.com/dfjf8fez3/image/upload/v1788060287/expense_manager/receipts/r5kcfa9nxzymf5ash6yh.jpg
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291909270, downTime=291909270, phoneEventTime=1788060289719 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291909297, downTime=291909270, phoneEventTime=1788060289745 } moveCount:0
+I/flutter (25350): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (25350): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (25350): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (25350):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (25350):    ✅ ExpenseProvider: Ready
+I/flutter (25350): ✅ WalletProvider injected into AutoExpenseProvider
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+I/flutter (25350):    📦 Cached primaryWalletId for native: I54letChuupnGrPUDsDo
+I/flutter (25350):    📦 Cached bank→wallet mapping for native: {vcb: I54letChuupnGrPUDsDo, vietinbank: 4owvXhwdUZnvdm2obZZM, momo: 8hPpbe3IVlp2mWBAC578}
+I/flutter (25350): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (25350): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (25350): ⏭️ Already processing pending notifications, skipping
+I/flutter (25350): ✅ WalletProvider injected into AutoExpenseProvider
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+D/BankNotificationService(25350): Cleared pending notifications
+I/flutter (25350):    📦 Cached primaryWalletId for native: I54letChuupnGrPUDsDo
+I/flutter (25350): 🗑️ Cleared pending notifications
+I/flutter (25350): ✅ No pending notifications to process
+I/flutter (25350):    📦 Cached bank→wallet mapping for native: {vcb: I54letChuupnGrPUDsDo, vietinbank: 4owvXhwdUZnvdm2obZZM, momo: 8hPpbe3IVlp2mWBAC578}
+I/flutter (25350): ✅ HomeWidget updated successfully! Recent tx count: 4
+D/WIDGET_DEBUG(25350): 🔍 [WIDGET_DEBUG] onReceive triggered with action: android.appwidget.action.APPWIDGET_UPDATE
+D/WIDGET_DEBUG(25350): 🚀 [WIDGET_DEBUG] onUpdate called for 1 widgets
+D/WIDGET_DEBUG(25350): 📦 [WIDGET_DEBUG] HomeWidgetPreferences has 38 keys: [home_widget.double.tx_1_amount, tx_2_type, home_widget.double.tx_0_amount, home_widget.double.tx_2_amount, tx_0_name, tx_3_time, home_widget.double.tx_0_type, user_name, tx_3_name, tx_3_amount, home_widget.double.tx_1_name, home_widget.double.tx_1_time, tx_0_time, home_widget.double.tx_3_name, home_widget.double.qr_widget_image_path, tx_3_type, tx_2_time, home_widget.double.tx_2_name, home_widget.double.tx_2_time, home_widget.double.tx_3_amount, tx_0_type, home_widget.double.tx_3_type, home_widget.double.tx_count, tx_count, tx_2_name, tx_1_type, home_widget.double.tx_0_name, home_widget.double.tx_0_time, home_widget.double.tx_2_type, home_widget.double.tx_3_time, tx_1_amount, tx_0_amount, tx_2_amount, home_widget.double.user_name, home_widget.double.tx_1_type, tx_1_time, qr_widget_image_path, tx_1_name]
+D/WIDGET_DEBUG(25350): 🛠️ [WIDGET_DEBUG] Updating widget ID: 19
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'user_name': HomeWidget='Nguyễn Thiện Nhân', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 👤 [WIDGET_DEBUG] Displaying user: Nguyễn Thiện Nhân
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'qr_widget_image_path': HomeWidget='/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔲 [WIDGET_DEBUG] QR image path: '/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg'
+I/SkJpegCodec(25350): [mId: 35] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 35] skia-debug SkJpegCodec::ReadHeader: width = 480, height = 470, color = 10
+I/SkJpegCodec(25350): [mId: 35] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 35] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1920,
+I/SkJpegCodec(25350): dstInfo: SkImageInfo: {IsRGB = 0, ColorType = 4, AlphaType = 1, Dimensions.width = 480, Dimensions.height = 470};
+I/JpegXmCodec(25350):  skia-debug JpegXmCodec::isSupported returns false for small resolution
+I/SkJpegCodec(25350): [mId: 35] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 470
+I/SkJpegCodec(25350): [mId: 35] skia-debug onGetGainmapInfo returns false
+W/HWUI    (25350): Image decoding logging dropped!
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] QR image loaded successfully
+D/WIDGET_DEBUG(25350): 📊 [WIDGET_DEBUG] Recent transactions count: 4
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_amount': HomeWidget='+190.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_amount': HomeWidget='+700.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] Successfully updated app widget ID: 19
+D/WIDGET_DEBUG(25350): 🔍 [WIDGET_DEBUG] Active widget IDs count: 1
+D/WIDGET_DEBUG(25350): 🚀 [WIDGET_DEBUG] onUpdate called for 1 widgets
+D/WIDGET_DEBUG(25350): 📦 [WIDGET_DEBUG] HomeWidgetPreferences has 38 keys: [home_widget.double.tx_1_amount, tx_2_type, home_widget.double.tx_0_amount, home_widget.double.tx_2_amount, tx_0_name, tx_3_time, home_widget.double.tx_0_type, user_name, tx_3_name, tx_3_amount, home_widget.double.tx_1_name, home_widget.double.tx_1_time, tx_0_time, home_widget.double.tx_3_name, home_widget.double.qr_widget_image_path, tx_3_type, tx_2_time, home_widget.double.tx_2_name, home_widget.double.tx_2_time, home_widget.double.tx_3_amount, tx_0_type, home_widget.double.tx_3_type, home_widget.double.tx_count, tx_count, tx_2_name, tx_1_type, home_widget.double.tx_0_name, home_widget.double.tx_0_time, home_widget.double.tx_2_type, home_widget.double.tx_3_time, tx_1_amount, tx_0_amount, tx_2_amount, home_widget.double.user_name, home_widget.double.tx_1_type, tx_1_time, qr_widget_image_path, tx_1_name]
+D/WIDGET_DEBUG(25350): 🛠️ [WIDGET_DEBUG] Updating widget ID: 19
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'user_name': HomeWidget='Nguyễn Thiện Nhân', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 👤 [WIDGET_DEBUG] Displaying user: Nguyễn Thiện Nhân
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'qr_widget_image_path': HomeWidget='/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔲 [WIDGET_DEBUG] QR image path: '/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg'
+I/SkJpegCodec(25350): [mId: 36] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 36] skia-debug SkJpegCodec::ReadHeader: width = 480, height = 470, color = 10
+I/SkJpegCodec(25350): [mId: 36] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 36] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1920,
+I/SkJpegCodec(25350): dstInfo: SkImageInfo: {IsRGB = 0, ColorType = 4, AlphaType = 1, Dimensions.width = 480, Dimensions.height = 470};
+I/JpegXmCodec(25350):  skia-debug JpegXmCodec::isSupported returns false for small resolution
+I/SkJpegCodec(25350): [mId: 36] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 470
+I/SkJpegCodec(25350): [mId: 36] skia-debug onGetGainmapInfo returns false
+W/HWUI    (25350): Image decoding logging dropped!
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] QR image loaded successfully
+D/WIDGET_DEBUG(25350): 📊 [WIDGET_DEBUG] Recent transactions count: 4
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_amount': HomeWidget='+190.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_amount': HomeWidget='+700.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] Successfully updated app widget ID: 19
+I/flutter (25350): ✅ ExpenseProvider injected into AutoExpenseProvider
+I/flutter (25350): 🔄 Both userId and ExpenseProvider ready, processing pending notifications...
+I/flutter (25350): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (25350):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (25350):    ✅ ExpenseProvider: Ready
+I/flutter (25350): ✅ WalletProvider injected into AutoExpenseProvider
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+I/flutter (25350):    📦 Cached primaryWalletId for native: I54letChuupnGrPUDsDo
+I/flutter (25350):    📦 Cached bank→wallet mapping for native: {vcb: I54letChuupnGrPUDsDo, vietinbank: 4owvXhwdUZnvdm2obZZM, momo: 8hPpbe3IVlp2mWBAC578}
+D/BankNotificationService(25350): Cleared pending notifications
+I/flutter (25350): 🗑️ Cleared pending notifications
+I/flutter (25350): ✅ No pending notifications to process
+I/flutter (25350): ✅ HomeWidget updated successfully! Recent tx count: 4
+D/WIDGET_DEBUG(25350): 🔍 [WIDGET_DEBUG] onReceive triggered with action: android.appwidget.action.APPWIDGET_UPDATE
+D/WIDGET_DEBUG(25350): 🚀 [WIDGET_DEBUG] onUpdate called for 1 widgets
+D/WIDGET_DEBUG(25350): 📦 [WIDGET_DEBUG] HomeWidgetPreferences has 38 keys: [home_widget.double.tx_1_amount, tx_2_type, home_widget.double.tx_0_amount, home_widget.double.tx_2_amount, tx_0_name, tx_3_time, home_widget.double.tx_0_type, user_name, tx_3_name, tx_3_amount, home_widget.double.tx_1_name, home_widget.double.tx_1_time, tx_0_time, home_widget.double.tx_3_name, home_widget.double.qr_widget_image_path, tx_3_type, tx_2_time, home_widget.double.tx_2_name, home_widget.double.tx_2_time, home_widget.double.tx_3_amount, tx_0_type, home_widget.double.tx_3_type, home_widget.double.tx_count, tx_count, tx_2_name, tx_1_type, home_widget.double.tx_0_name, home_widget.double.tx_0_time, home_widget.double.tx_2_type, home_widget.double.tx_3_time, tx_1_amount, tx_0_amount, tx_2_amount, home_widget.double.user_name, home_widget.double.tx_1_type, tx_1_time, qr_widget_image_path, tx_1_name]
+D/WIDGET_DEBUG(25350): 🛠️ [WIDGET_DEBUG] Updating widget ID: 19
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'user_name': HomeWidget='Nguyễn Thiện Nhân', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 👤 [WIDGET_DEBUG] Displaying user: Nguyễn Thiện Nhân
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'qr_widget_image_path': HomeWidget='/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔲 [WIDGET_DEBUG] QR image path: '/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg'
+I/SkJpegCodec(25350): [mId: 37] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 37] skia-debug SkJpegCodec::ReadHeader: width = 480, height = 470, color = 10
+I/SkJpegCodec(25350): [mId: 37] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 37] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1920,
+I/SkJpegCodec(25350): dstInfo: SkImageInfo: {IsRGB = 0, ColorType = 4, AlphaType = 1, Dimensions.width = 480, Dimensions.height = 470};
+I/JpegXmCodec(25350):  skia-debug JpegXmCodec::isSupported returns false for small resolution
+I/SkJpegCodec(25350): [mId: 37] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 470
+I/SkJpegCodec(25350): [mId: 37] skia-debug onGetGainmapInfo returns false
+W/HWUI    (25350): Image decoding logging dropped!
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] QR image loaded successfully
+D/WIDGET_DEBUG(25350): 📊 [WIDGET_DEBUG] Recent transactions count: 4
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_amount': HomeWidget='+190.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_amount': HomeWidget='+700.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] Successfully updated app widget ID: 19
+D/WIDGET_DEBUG(25350): 🔍 [WIDGET_DEBUG] Active widget IDs count: 1
+D/WIDGET_DEBUG(25350): 🚀 [WIDGET_DEBUG] onUpdate called for 1 widgets
+D/WIDGET_DEBUG(25350): 📦 [WIDGET_DEBUG] HomeWidgetPreferences has 38 keys: [home_widget.double.tx_1_amount, tx_2_type, home_widget.double.tx_0_amount, home_widget.double.tx_2_amount, tx_0_name, tx_3_time, home_widget.double.tx_0_type, user_name, tx_3_name, tx_3_amount, home_widget.double.tx_1_name, home_widget.double.tx_1_time, tx_0_time, home_widget.double.tx_3_name, home_widget.double.qr_widget_image_path, tx_3_type, tx_2_time, home_widget.double.tx_2_name, home_widget.double.tx_2_time, home_widget.double.tx_3_amount, tx_0_type, home_widget.double.tx_3_type, home_widget.double.tx_count, tx_count, tx_2_name, tx_1_type, home_widget.double.tx_0_name, home_widget.double.tx_0_time, home_widget.double.tx_2_type, home_widget.double.tx_3_time, tx_1_amount, tx_0_amount, tx_2_amount, home_widget.double.user_name, home_widget.double.tx_1_type, tx_1_time, qr_widget_image_path, tx_1_name]
+D/WIDGET_DEBUG(25350): 🛠️ [WIDGET_DEBUG] Updating widget ID: 19
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'user_name': HomeWidget='Nguyễn Thiện Nhân', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 👤 [WIDGET_DEBUG] Displaying user: Nguyễn Thiện Nhân
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'qr_widget_image_path': HomeWidget='/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔲 [WIDGET_DEBUG] QR image path: '/data/user/0/com.example.expense_manager_android/app_flutter/qr_codes/qr_1787206037140.jpg'
+I/SkJpegCodec(25350): [mId: 38] skia-debug SkJpegCodec::+SkJpegCodec
+I/SkJpegCodec(25350): [mId: 38] skia-debug SkJpegCodec::ReadHeader: width = 480, height = 470, color = 10
+I/SkJpegCodec(25350): [mId: 38] skia-debug SkJpegCodec::ReadHeader: progressive_mode = 0, streamType: SkFILEStream
+I/SkJpegCodec(25350): [mId: 38] skia-debug SkJpegCodec::onGetPixels: dstRowBytes = 1920,
+I/SkJpegCodec(25350): dstInfo: SkImageInfo: {IsRGB = 0, ColorType = 4, AlphaType = 1, Dimensions.width = 480, Dimensions.height = 470};
+I/JpegXmCodec(25350):  skia-debug JpegXmCodec::isSupported returns false for small resolution
+I/SkJpegCodec(25350): [mId: 38] skia-debug SkJpegCodec::onGetPixels ends with rowsDecodec = 470
+I/SkJpegCodec(25350): [mId: 38] skia-debug onGetGainmapInfo returns false
+W/HWUI    (25350): Image decoding logging dropped!
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] QR image loaded successfully
+D/WIDGET_DEBUG(25350): 📊 [WIDGET_DEBUG] Recent transactions count: 4
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_0_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_name': HomeWidget='Ăn Uống', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_amount': HomeWidget='-15.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_1_type': HomeWidget='expense', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_amount': HomeWidget='+190.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_2_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_name': HomeWidget='Lương', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_amount': HomeWidget='+700.000 ₫', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_time': HomeWidget='29/08', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): 🔑 [WIDGET_DEBUG] Read key 'tx_3_type': HomeWidget='income', Widget='null', Flutter='null', prefixed='null'
+D/WIDGET_DEBUG(25350): ✅ [WIDGET_DEBUG] Successfully updated app widget ID: 19
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291910534, downTime=291910534, phoneEventTime=1788060290982 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291910748, downTime=291910534, phoneEventTime=1788060291197 } moveCount:24
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291912273, downTime=291912273, phoneEventTime=1788060292722 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291912347, downTime=291912273, phoneEventTime=1788060292796 } moveCount:0
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291913015, downTime=291913015, phoneEventTime=1788060293464 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291913156, downTime=291913015, phoneEventTime=1788060293604 } moveCount:16
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291914460, downTime=291914460, phoneEventTime=1788060294909 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291914556, downTime=291914460, phoneEventTime=1788060295005 } moveCount:9
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+D/FlutterJNI(25350): Sending viewport metrics to the engine.
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+D/FlutterJNI(25350): Sending viewport metrics to the engine.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291915965, downTime=291915965, phoneEventTime=1788060296414 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291916061, downTime=291915965, phoneEventTime=1788060296509 } moveCount:9
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291916745, downTime=291916745, phoneEventTime=1788060297193 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291916804, downTime=291916745, phoneEventTime=1788060297253 } moveCount:0
+Another exception was thrown: A RenderFlex overflowed by 8.9 pixels on the right.
+I/flutter (25350): 🔍 Checking for pending notifications from when app was killed...
+I/flutter (25350):    ✅ userId: PvHSMKN1wiYFaSOZJAgtjLrRphG3
+I/flutter (25350):    ✅ ExpenseProvider: Ready
+D/BankNotificationService(25350): Cleared pending notifications
+I/flutter (25350): 🗑️ Cleared pending notifications
+I/flutter (25350): ✅ No pending notifications to process
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291918049, downTime=291918049, phoneEventTime=1788060298497 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_CANCEL, id[0]=0, id[1]=1, id[2]=2, pointerCount=3, eventTime=291918078, downTime=291918049, phoneEventTime=1788060298527 } moveCount:0
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291918924, downTime=291918924, phoneEventTime=1788060299373 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291919404, downTime=291918924, phoneEventTime=1788060299853 } moveCount:54
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291919629, downTime=291919629, phoneEventTime=1788060300078 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=291920007, downTime=291919629, phoneEventTime=1788060300455 } moveCount:38
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+W/WindowOnBackDispatcher(25350): sendCancelIfRunning: isInProgress=false callback=androidx.navigationevent.OnBackInvokedInput$createOnBackAnimationCallback$1@99ddad2
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+D/FlutterJNI(25350): Sending viewport metrics to the engine.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+Another exception was thrown: ListTile background color or ink splashes may be invisible.
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=291922352, downTime=291922352, phoneEventTime=1788060302801 } moveCount:0
+D/VRI[MainActivity](25350): getMiuiFreeformStackInfo mTmpFrames.miuiFreeFormStackInfo: null
+I/MIUIInput(25350): [MotionEvent] ViewRootImpl windowName 'com.example.expense_manager_android/com.example.expense_manager_android.MainActivity', { action=ACTION_CANCEL, id[0]=0, id[1]=1, id[2]=2, pointerCount=3, eventTime=291922404, downTime=291922352, phoneEventTime=1788060302853 } moveCount:5
+W/InsetsSource(25350): Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+I/ContentCatcher(25350): SettingTrigger : unregister status observer com.example.expense_manager_android.MainActivity
+I/ContentCatcher(25350): SettingTrigger : unregisterUIAgentListener com.example.expense_manager_android.MainActivity, uid:10507
+D/VRI[MainActivity](25350): visibilityChanged oldVisibility=true newVisibility=false
+D/BufferQueueProducer(25350): [264fb6f SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity]#3(BLAST Consumer)3](id:630600000003,api:1,p:25350,c:25350) disconnect: api 1 (caller=25350)
+D/BufferQueueProducer(25350): [264fb6f SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity]#3(BLAST Consumer)3](id:630600000003,api:0,p:-1,c:25350) disconnect: api -1 (caller=25350)
+D/BufferQueueConsumer(25350): [264fb6f SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity]#3(BLAST Consumer)3](id:630600000003,api:0,p:-1,c:25350) disconnect: caller 25350
+D/ViewRootImplStubImpl(25350): onSurfaceViewDetached:
+D/ViewRootImplStubImpl(25350): , vri:android.view.ViewRootImpl@75107c, com.example.expense_manager_android/com.example.expense_manager_android.MainActivity
+D/ViewRootImplStubImpl(25350): , vri size:1080x2400
+D/ViewRootImplStubImpl(25350): , surfaceView:io.flutter.embedding.android.FlutterSurfaceView{264fb6f V.E...... ........ 0,0-1080,2400}, SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity]
+D/ViewRootImplStubImpl(25350): , surfaceView size:1080x2400
+D/ViewRootImplStubImpl(25350): , surfaceControl:Surface(name=264fb6f SurfaceView[com.example.expense_manager_android/com.example.expense_manager_android.MainActivity](BLAST)#111269)/@0xea9a1e6
+D/BufferQueueProducer(25350): [VRI[MainActivity]#2(BLAST Consumer)2](id:630600000002,api:1,p:25350,c:25350) disconnect: api 1 (caller=25350)
+I/manager_android(25350): This is non sticky GC, maxfree is 33554432 minfree is 8388608
+W/InsetsSource(25350): Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+W/manager_android(25350): Binder 0xb400007bcd9dad00 destroyed after setInheritRt before being parceled.
+D/BufferQueueConsumer(25350): [VRI[MainActivity]#2(BLAST Consumer)2](id:630600000002,api:0,p:-1,c:25350) disconnect: caller 25350
+W/InsetsSource(25350): Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+I/VRI[MainActivity](25350): DisplayState - old: 2, new: 1
+I/VRI[MainActivity](25350): DisplayState - old: 1, new: 3
 Lost connection to device.
-Terminate batch job (Y/N)? 
