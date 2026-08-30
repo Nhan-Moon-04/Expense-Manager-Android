@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:google_fonts/google_fonts.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../l10n/app_localizations.dart';
@@ -14,6 +15,7 @@ import '../../providers/expense_provider.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../expenses/expense_detail_screen.dart';
+import 'widgets/transfer_money_sheet.dart';
 
 class WalletDetailScreen extends StatefulWidget {
   final WalletModel wallet;
@@ -219,13 +221,32 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           onSelected: (value) {
-            if (value == 'edit') {
+            if (value == 'transfer') {
+              TransferMoneySheet.show(
+                context,
+                initialSourceWalletId: _wallet.id,
+              );
+            } else if (value == 'edit') {
               _showEditWalletDialog();
             } else if (value == 'delete') {
               _showDeleteWalletDialog();
             }
           },
           itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'transfer',
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.swap_horiz_rounded,
+                    size: 20,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text('Chuyển tiền từ ví này'),
+                ],
+              ),
+            ),
             PopupMenuItem(
               value: 'edit',
               child: Row(
@@ -275,17 +296,14 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: _wallet.isPrimary
-              ? AppColors.primaryGradient
-              : [AppColors.secondary, AppColors.secondaryLight],
+          colors: _wallet.cardGradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: (_wallet.isPrimary ? AppColors.primary : AppColors.secondary)
-                .withValues(alpha: 0.3),
+            color: _wallet.cardGradient.first.withValues(alpha: 0.35),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -294,21 +312,41 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppStrings.balance,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.white70,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Số dư khả dụng',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white70,
+                ),
+              ),
+              Row(
+                children: [
+                  Icon(_wallet.brandIcon, color: Colors.white70, size: 20),
+                  const SizedBox(width: 6),
+                  Text(
+                    _wallet.typeCategory,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(
             currencyFormat.format(balance),
-            style: const TextStyle(
+            style: GoogleFonts.inter(
               fontSize: 32,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w900,
               color: Colors.white,
+              letterSpacing: -0.5,
             ),
           ),
           const SizedBox(height: 20),
@@ -322,7 +360,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                   Colors.greenAccent,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: _buildSummaryItem(
                   AppStrings.expense,

@@ -232,6 +232,78 @@ class WalletProvider with ChangeNotifier {
     return primaryWallet?.id;
   }
 
+  /// Transfer money between wallets
+  Future<bool> transferMoney({
+    required String fromWalletId,
+    required String toWalletId,
+    required double amount,
+    required String userId,
+    String? note,
+    required dynamic expenseProvider,
+  }) async {
+    if (fromWalletId == toWalletId || amount <= 0) return false;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final fromWallet = getWalletById(fromWalletId);
+      final toWallet = getWalletById(toWalletId);
+      final fromName = fromWallet?.name ?? 'Ví nguồn';
+      final toName = toWallet?.name ?? 'Ví đích';
+      final now = DateTime.now();
+
+      final transferNote = note != null && note.trim().isNotEmpty
+          ? note.trim()
+          : 'Chuyển từ $fromName sang $toName';
+
+      // 1. Create Expense transaction for source wallet
+      final outExpense = ExpenseModel(
+        id: '',
+        userId: userId,
+        amount: amount,
+        type: ExpenseType.expense,
+        category: ExpenseCategory.other,
+        description: 'Chuyển đến $toName: $transferNote',
+        walletId: fromWalletId,
+        date: now,
+        metadata: {
+          'isTransfer': true,
+          'transferType': 'out',
+          'targetWalletId': toWalletId,
+        },
+      );
+
+      // 2. Create Income transaction for target wallet
+      final inExpense = ExpenseModel(
+        id: '',
+        userId: userId,
+        amount: amount,
+        type: ExpenseType.income,
+        category: ExpenseCategory.other,
+        description: 'Nhận từ $fromName: $transferNote',
+        walletId: toWalletId,
+        date: now,
+        metadata: {
+          'isTransfer': true,
+          'transferType': 'in',
+          'sourceWalletId': fromWalletId,
+        },
+      );
+
+      await expenseProvider.addExpense(outExpense);
+      await expenseProvider.addExpense(inExpense);
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = 'Lỗi khi chuyển tiền: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   /// Clear data
   void clearAllData() {
     _wallets.clear();

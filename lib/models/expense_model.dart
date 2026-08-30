@@ -107,6 +107,8 @@ class ExpenseModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? receiptUrl,
+    bool clearReceiptUrl = false,
+    bool clearDescription = false,
     Map<String, dynamic>? metadata,
     bool? isAutoAdded,
   }) {
@@ -118,11 +120,11 @@ class ExpenseModel {
       amount: amount ?? this.amount,
       type: type ?? this.type,
       category: category ?? this.category,
-      description: description ?? this.description,
+      description: clearDescription ? null : (description ?? this.description),
       date: date ?? this.date,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      receiptUrl: receiptUrl ?? this.receiptUrl,
+      receiptUrl: clearReceiptUrl ? null : (receiptUrl ?? this.receiptUrl),
       metadata: metadata ?? this.metadata,
       isAutoAdded: isAutoAdded ?? this.isAutoAdded,
     );

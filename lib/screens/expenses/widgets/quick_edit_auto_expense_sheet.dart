@@ -223,6 +223,7 @@ class _QuickEditAutoExpenseSheetState extends State<QuickEditAutoExpenseSheet> {
     final updatedExpense = widget.expense.copyWith(
       description: newDescription,
       receiptUrl: _receiptUrl,
+      clearReceiptUrl: _receiptUrl == null,
       metadata: updatedMetadata,
       updatedAt: DateTime.now(),
     );

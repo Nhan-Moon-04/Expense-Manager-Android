@@ -145,6 +145,41 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
     }
   }
 
+  Future<void> _deleteReceipt(ExpenseModel currentExpense) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Xóa ảnh hóa đơn?'),
+        content: const Text('Bạn có chắc muốn gỡ bỏ ảnh hóa đơn khỏi giao dịch này không?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Hủy')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Xóa'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+      final updated = currentExpense.copyWith(
+        clearReceiptUrl: true,
+        updatedAt: DateTime.now(),
+      );
+      await expenseProvider.updateExpense(updated);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đã xóa ảnh hóa đơn thành công!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    }
+  }
+
   void _showFullScreenImage(String imageUrl) {
     showDialog(
       context: context,
@@ -645,6 +680,16 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
+                              TextButton.icon(
+                                onPressed: () => _deleteReceipt(expense),
+                                icon: const Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.error),
+                                label: const Text('Xóa ảnh', style: TextStyle(color: AppColors.error)),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppColors.error,
+                                  textStyle: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
                               TextButton.icon(
                                 onPressed: () => _captureAndUploadReceipt(expense),
                                 icon: const Icon(Icons.camera_alt_rounded, size: 16),

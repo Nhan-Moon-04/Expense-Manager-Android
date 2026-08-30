@@ -175,17 +175,22 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
         Text(
           AppStrings.expenses,
           style: GoogleFonts.inter(
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.w800,
             color: AppColors.textPrimary,
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(width: 8),
-        _buildWalletSelector(),
-        const Spacer(),
-        _buildMonthSelectorButton(),
         const SizedBox(width: 6),
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: _buildWalletSelector(),
+          ),
+        ),
+        const SizedBox(width: 6),
+        _buildMonthSelectorButton(),
+        const SizedBox(width: 4),
         GestureDetector(
           onTap: () {
             setState(() {
@@ -197,33 +202,33 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
             });
           },
           child: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
               color: AppColors.surfaceVariant,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(color: AppColors.borderColor, width: 1),
             ),
             child: Icon(
               _isSearching ? Icons.search_off_rounded : Icons.search_rounded,
               color: AppColors.textPrimary,
-              size: 18,
+              size: 16,
             ),
           ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 4),
         GestureDetector(
           onTap: _showFilterDialog,
           child: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
               color: AppColors.surfaceVariant,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(color: AppColors.borderColor, width: 1),
             ),
             child: Icon(
               Icons.tune_rounded,
               color: AppColors.textPrimary,
-              size: 18,
+              size: 16,
             ),
           ),
         ),
@@ -331,7 +336,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
         return GestureDetector(
           onTap: () => _showWalletPicker(walletProvider),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
@@ -343,18 +348,17 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.account_balance_wallet_rounded,
                   color: AppColors.primary,
-                  size: 14,
+                  size: 13,
                 ),
-                const SizedBox(width: 5),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 85),
+                const SizedBox(width: 4),
+                Flexible(
                   child: Text(
                     displayName,
                     style: GoogleFonts.inter(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: AppColors.primary,
                     ),
@@ -363,10 +367,10 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                   ),
                 ),
                 const SizedBox(width: 2),
-                Icon(
+                const Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: AppColors.primary,
-                  size: 16,
+                  size: 14,
                 ),
               ],
             ),

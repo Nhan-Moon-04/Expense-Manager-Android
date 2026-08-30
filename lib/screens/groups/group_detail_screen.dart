@@ -11,6 +11,7 @@ import '../../providers/settings_provider.dart';
 import '../../models/group_model.dart';
 import '../../models/expense_model.dart';
 import 'create_group_screen.dart';
+import 'widgets/settle_up_qr_sheet.dart';
 
 class GroupDetailScreen extends StatefulWidget {
   final GroupModel group;
@@ -1235,15 +1236,58 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                       ],
                     ),
                   ),
-                  Text(
-                    currencyFormat.format(balance.abs()),
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isOwed
-                          ? AppColors.incomeColor
-                          : AppColors.expenseColor,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        currencyFormat.format(balance.abs()),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: isOwed
+                              ? AppColors.incomeColor
+                              : AppColors.expenseColor,
+                        ),
+                      ),
+                      if (!isOwed && balance.abs() > 0) ...[
+                        const SizedBox(height: 4),
+                        GestureDetector(
+                          onTap: () {
+                            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                            final currentUserName = authProvider.user?.fullName ?? 'Thành viên';
+                            SettleUpQrSheet.show(
+                              context,
+                              debtorName: member.displayName ?? currentUserName,
+                              creditorName: group.members.firstWhere((m) => m.role == 'owner', orElse: () => group.members.first).displayName ?? 'Chủ nhóm',
+                              amount: balance.abs(),
+                              groupName: group.name,
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.qr_code_2_rounded, size: 13, color: AppColors.primary),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Trả nợ QR',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),
