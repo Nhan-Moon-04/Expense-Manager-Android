@@ -195,21 +195,25 @@ class ExpenseWidgetProvider : AppWidgetProvider() {
                 Log.d(TAG, "📊 [WIDGET_DEBUG] Recent transactions count: $count")
 
                 val itemIds = arrayOf(
-                    Triple(R.id.tx_item_0, R.id.tx_name_0, R.id.tx_amount_0),
-                    Triple(R.id.tx_item_1, R.id.tx_name_1, R.id.tx_amount_1),
-                    Triple(R.id.tx_item_2, R.id.tx_name_2, R.id.tx_amount_2),
-                    Triple(R.id.tx_item_3, R.id.tx_name_3, R.id.tx_amount_3)
+                    arrayOf(R.id.tx_item_0, R.id.tx_name_0, R.id.tx_time_0, R.id.tx_amount_0),
+                    arrayOf(R.id.tx_item_1, R.id.tx_name_1, R.id.tx_time_1, R.id.tx_amount_1),
+                    arrayOf(R.id.tx_item_2, R.id.tx_name_2, R.id.tx_time_2, R.id.tx_amount_2),
+                    arrayOf(R.id.tx_item_3, R.id.tx_name_3, R.id.tx_time_3, R.id.tx_amount_3)
                 )
 
                 if (count <= 0) {
                     views.setViewVisibility(R.id.empty_tx_text, View.VISIBLE)
-                    itemIds.forEach { (layoutId, _, _) ->
-                        views.setViewVisibility(layoutId, View.GONE)
+                    itemIds.forEach { ids ->
+                        views.setViewVisibility(ids[0], View.GONE)
                     }
                 } else {
                     views.setViewVisibility(R.id.empty_tx_text, View.GONE)
                     for (i in 0 until 4) {
-                        val (layoutId, nameId, amountId) = itemIds[i]
+                        val ids = itemIds[i]
+                        val layoutId = ids[0]
+                        val nameId = ids[1]
+                        val timeId = ids[2]
+                        val amountId = ids[3]
                         if (i < count) {
                             views.setViewVisibility(layoutId, View.VISIBLE)
                             val name = getStringVal("tx_${i}_name", "")
@@ -217,7 +221,8 @@ class ExpenseWidgetProvider : AppWidgetProvider() {
                             val time = getStringVal("tx_${i}_time", "")
                             val type = getStringVal("tx_${i}_type", "expense")
 
-                            views.setTextViewText(nameId, "$name • $time")
+                            views.setTextViewText(nameId, name)
+                            views.setTextViewText(timeId, time)
                             views.setTextViewText(amountId, amount)
 
                             // Light theme colors for amount

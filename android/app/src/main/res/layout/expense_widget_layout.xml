@@ -83,6 +83,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:paddingTop="3dp"
         android:paddingBottom="3dp"
         android:visibility="gone">
@@ -96,6 +97,15 @@
             android:textSize="11sp"
             android:ellipsize="end"
             android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/tx_time_0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="10dp"
+            android:textColor="#94A3B8"
+            android:textSize="10sp" />
 
         <TextView
             android:id="@+id/tx_amount_0"
@@ -112,6 +122,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:paddingTop="3dp"
         android:paddingBottom="3dp"
         android:visibility="gone">
@@ -125,6 +136,15 @@
             android:textSize="11sp"
             android:ellipsize="end"
             android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/tx_time_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="10dp"
+            android:textColor="#94A3B8"
+            android:textSize="10sp" />
 
         <TextView
             android:id="@+id/tx_amount_1"
@@ -141,6 +161,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:paddingTop="3dp"
         android:paddingBottom="3dp"
         android:visibility="gone">
@@ -154,6 +175,15 @@
             android:textSize="11sp"
             android:ellipsize="end"
             android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/tx_time_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="10dp"
+            android:textColor="#94A3B8"
+            android:textSize="10sp" />
 
         <TextView
             android:id="@+id/tx_amount_2"
@@ -170,6 +200,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:paddingTop="3dp"
         android:paddingBottom="3dp"
         android:visibility="gone">
@@ -185,6 +216,15 @@
             android:maxLines="1" />
 
         <TextView
+            android:id="@+id/tx_time_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="10dp"
+            android:textColor="#94A3B8"
+            android:textSize="10sp" />
+
+        <TextView
             android:id="@+id/tx_amount_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -198,38 +238,38 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#F0F2F5"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="6dp"
         android:layout_marginBottom="8dp" />
 
-    <!-- Action Buttons Row -->
+    <!-- Action Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
+        <Button
             android:id="@+id/btn_widget_expense"
             android:layout_width="0dp"
-            android:layout_height="36dp"
+            android:layout_height="34dp"
             android:layout_weight="1"
+            android:layout_marginEnd="4dp"
             android:background="@drawable/widget_btn_expense"
             android:text="Chi Tiêu"
             android:textColor="#E11D48"
             android:textSize="11sp"
-            android:textStyle="bold"
-            android:gravity="center" />
+            android:textStyle="bold" />
 
-        <TextView
+        <Button
             android:id="@+id/btn_widget_income"
             android:layout_width="0dp"
-            android:layout_height="36dp"
+            android:layout_height="34dp"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
             android:background="@drawable/widget_btn_income"
             android:text="Thu Nhập"
             android:textColor="#059669"
             android:textSize="11sp"
-            android:textStyle="bold"
-            android:gravity="center" />
+            android:textStyle="bold" />
     </LinearLayout>
+
 </LinearLayout>

@@ -11,6 +11,7 @@ import '../../providers/wallet_provider.dart';
 import '../expenses/expense_list_screen.dart';
 import '../expenses/add_expense_screen.dart';
 import '../expenses/scanner_screen.dart';
+import '../expenses/camera_scanner_screen.dart';
 import '../notes/notes_screen.dart';
 import '../groups/groups_screen.dart';
 import '../profile/profile_screen.dart';
@@ -110,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const ScannerScreen(),
+        builder: (context) => const CameraScannerScreen(),
       ),
     );
   }
