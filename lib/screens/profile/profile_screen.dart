@@ -420,13 +420,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.cardBackground,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.borderColor, width: 1),
+        Material(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderColor, width: 1),
+            ),
+            child: Column(children: items),
           ),
-          child: Column(children: items),
         ),
       ],
     );

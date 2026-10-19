@@ -56,6 +56,23 @@ class MainActivity : FlutterFragmentActivity() {
                     }
                     result.success(started)
                 }
+                "openVoiceInputSettings" -> {
+                    try {
+                        val intent = android.content.Intent(android.provider.Settings.ACTION_VOICE_INPUT_SETTINGS)
+                        intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        try {
+                            val intent = android.content.Intent(android.provider.Settings.ACTION_LOCALE_SETTINGS)
+                            intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                            result.success(true)
+                        } catch (e2: Exception) {
+                            result.success(false)
+                        }
+                    }
+                }
                 "ensureServiceRunning" -> {
                     BankNotificationService.ensureServiceRunning(this)
                     result.success(true)

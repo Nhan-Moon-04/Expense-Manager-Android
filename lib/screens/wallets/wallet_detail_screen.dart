@@ -487,7 +487,6 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               decoration: BoxDecoration(
-                color: AppColors.cardBackground,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
@@ -497,33 +496,37 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                   ),
                 ],
               ),
-              child: ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.info.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+              child: Material(
+                color: AppColors.cardBackground,
+                borderRadius: BorderRadius.circular(12),
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.info.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.account_balance_rounded,
+                      color: AppColors.info,
+                      size: 20,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.account_balance_rounded,
-                    color: AppColors.info,
-                    size: 20,
+                  title: Text(
+                    bankName,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                ),
-                title: Text(
-                  bankName,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                trailing: IconButton(
-                  icon: const Icon(
-                    Icons.close_rounded,
-                    color: AppColors.error,
-                    size: 20,
+                  trailing: IconButton(
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: AppColors.error,
+                      size: 20,
+                    ),
+                    onPressed: () async {
+                      final userId = authProvider.user!.uid;
+                      await walletProvider.unlinkBank(userId, _wallet.id, bankId);
+                    },
                   ),
-                  onPressed: () async {
-                    final userId = authProvider.user!.uid;
-                    await walletProvider.unlinkBank(userId, _wallet.id, bankId);
-                  },
                 ),
               ),
             );
@@ -543,36 +546,56 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          AppStrings.recentTransactions,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Giao dịch gần đây',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            if (expenses.length > 20)
+              Text(
+                'Hiển thị 20/${expenses.length}',
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              ),
+          ],
         ),
         const SizedBox(height: 12),
         if (recentExpenses.isEmpty)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(vertical: 32),
             decoration: BoxDecoration(
               color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderColor),
             ),
             child: Column(
               children: [
                 Icon(
                   Icons.receipt_long_outlined,
-                  size: 40,
-                  color: AppColors.textHint,
+                  size: 48,
+                  color: AppColors.textSecondary.withValues(alpha: 0.5),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Text(
-                  AppStrings.noTransactions,
+                  'Chưa có giao dịch nào',
                   style: TextStyle(
-                    color: AppColors.textSecondary,
                     fontSize: 14,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Các giao dịch thuộc ví này sẽ hiển thị ở đây',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -580,21 +603,18 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
           )
         else
           ...recentExpenses.map(
-            (expense) => _buildTransactionItem(expense, currencyFormat),
+            (expense) => _buildExpenseItem(expense, currencyFormat),
           ),
       ],
     );
   }
 
-  Widget _buildTransactionItem(
-    ExpenseModel expense,
-    NumberFormat currencyFormat,
-  ) {
+  Widget _buildExpenseItem(ExpenseModel expense, NumberFormat currencyFormat) {
     final isExpense = expense.type == ExpenseType.expense;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -604,49 +624,53 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
           ),
         ],
       ),
-      child: ListTile(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ExpenseDetailScreen(expense: expense),
+      child: Material(
+        color: AppColors.cardBackground,
+        borderRadius: BorderRadius.circular(12),
+        child: ListTile(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ExpenseDetailScreen(expense: expense),
+              ),
+            );
+          },
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: (isExpense ? AppColors.expenseColor : AppColors.incomeColor)
+                  .withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-          );
-        },
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: (isExpense ? AppColors.expenseColor : AppColors.incomeColor)
-                .withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(10),
+            child: Icon(
+              isExpense
+                  ? Icons.arrow_upward_rounded
+                  : Icons.arrow_downward_rounded,
+              color: isExpense ? AppColors.expenseColor : AppColors.incomeColor,
+              size: 20,
+            ),
           ),
-          child: Icon(
-            isExpense
-                ? Icons.arrow_upward_rounded
-                : Icons.arrow_downward_rounded,
-            color: isExpense ? AppColors.expenseColor : AppColors.incomeColor,
-            size: 20,
+          title: Text(
+            expense.description ?? ExpenseModel.getCategoryName(expense.category),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-        ),
-        title: Text(
-          expense.description ?? ExpenseModel.getCategoryName(expense.category),
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Text(
-          DateFormat(
-            'dd/MM/yyyy',
-            AppLocalizations.currentLanguage,
-          ).format(expense.date),
-          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-        ),
-        trailing: Text(
-          '${isExpense ? '-' : '+'}${currencyFormat.format(expense.amount)}',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: isExpense ? AppColors.expenseColor : AppColors.incomeColor,
+          subtitle: Text(
+            DateFormat(
+              'dd/MM/yyyy',
+              AppLocalizations.currentLanguage,
+            ).format(expense.date),
+            style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+          ),
+          trailing: Text(
+            '${isExpense ? '-' : '+'}${currencyFormat.format(expense.amount)}',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isExpense ? AppColors.expenseColor : AppColors.incomeColor,
+            ),
           ),
         ),
       ),

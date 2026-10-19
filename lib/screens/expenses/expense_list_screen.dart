@@ -33,6 +33,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   bool _isBalanceVisible = false;
+  bool _showWalletBalance = true; // true = tổng số dư ví, false = số dư tháng
 
   @override
   void initState() {
@@ -540,9 +541,24 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
         final totalExpense = expenses
             .where((e) => e.type == ExpenseType.expense)
             .fold(0.0, (sum, e) => sum + e.amount);
-        final balance = totalIncome - totalExpense;
+        final monthBalance = totalIncome - totalExpense;
 
-        final isPositive = balance >= 0;
+        // Số dư ví: nếu đang lọc theo ví cụ thể → lấy balance của ví đó
+        // Nếu "Tất cả" → lấy tổng tất cả ví
+        final selectedWallet = walletProvider.selectedWallet;
+        final walletTotal = selectedWallet != null
+            ? walletProvider.getWalletBalance(
+                selectedWallet.id, expenseProvider.expenses)
+            : walletProvider.getTotalBalance(expenseProvider.expenses);
+
+        // Label cho mode hiện tại
+        final walletLabel = selectedWallet != null
+            ? 'Số dư: ${selectedWallet.name}'
+            : 'Tổng số dư ví';
+
+        // Số hiển thị chính: số dư ví hoặc số dư tháng
+        final displayAmount = _showWalletBalance ? walletTotal : monthBalance;
+        final isPositive = displayAmount >= 0;
 
         return Container(
           width: double.infinity,
@@ -585,48 +601,84 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Row: Month Balance & Eye Toggle
+              // Top Row: Label & Eye Toggle
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${AppStrings.monthBalance} (${DateFormat('MM/yyyy').format(_selectedMonth)})',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: Colors.white.withValues(alpha: 0.75),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 250),
-                        child: _isBalanceVisible
-                            ? Text(
-                                currencyFormat.format(balance),
-                                key: const ValueKey('vis'),
+                  // Label + Amount (bấm vào để toggle)
+                  GestureDetector(
+                    onTap: () {
+                      setState(() => _showWalletBalance = !_showWalletBalance);
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Label với badge chỉ mode hiện tại
+                        Row(
+                          children: [
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: Text(
+                                _showWalletBalance
+                                    ? walletLabel
+                                    : '${AppStrings.monthBalance} (${DateFormat('MM/yyyy').format(_selectedMonth)})',
+                                key: ValueKey('${_showWalletBalance}_${selectedWallet?.id}'),
                                 style: GoogleFonts.inter(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                  letterSpacing: -0.5,
-                                ),
-                              )
-                            : Text(
-                                '••••••••',
-                                key: const ValueKey('hid'),
-                                style: GoogleFonts.inter(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                  letterSpacing: 3,
+                                  fontSize: 11,
+                                  color: Colors.white.withValues(alpha: 0.75),
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                      ),
-                    ],
+                            ),
+                            const SizedBox(width: 6),
+                            // Tap hint icon
+                            Icon(
+                              Icons.swap_horiz_rounded,
+                              size: 12,
+                              color: Colors.white.withValues(alpha: 0.45),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        // Amount (bấm để toggle)
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          transitionBuilder: (child, anim) => FadeTransition(
+                            opacity: anim,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0, 0.15),
+                                end: Offset.zero,
+                              ).animate(anim),
+                              child: child,
+                            ),
+                          ),
+                          child: _isBalanceVisible
+                              ? Text(
+                                  currencyFormat.format(displayAmount),
+                                  key: ValueKey('${_showWalletBalance}_vis'),
+                                  style: GoogleFonts.inter(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                    letterSpacing: -0.5,
+                                  ),
+                                )
+                              : Text(
+                                  '••••••••',
+                                  key: ValueKey('${_showWalletBalance}_hid'),
+                                  style: GoogleFonts.inter(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                    letterSpacing: 3,
+                                  ),
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
+                  // Eye toggle button
                   GestureDetector(
                     onTap: () {
                       setState(() {
@@ -655,7 +707,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
                 ],
               ),
               const SizedBox(height: 12),
-              // Bottom Row: Compact Split Income & Expense Badges
+              // Bottom Row: Income & Expense badges (luôn hiện số dư tháng)
               Row(
                 children: [
                   // Income Badge Pill
