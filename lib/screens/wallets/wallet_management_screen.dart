@@ -133,7 +133,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                     ),
                     value: isPrimary,
                     activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
-                    activeColor: AppColors.primary,
+                    activeThumbColor: AppColors.primary,
                     onChanged: (val) => setModalState(() => isPrimary = val),
                   ),
                 ),

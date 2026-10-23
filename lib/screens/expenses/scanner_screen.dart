@@ -9,6 +9,7 @@ import '../../constants/app_colors.dart';
 import '../../providers/wallet_provider.dart';
 import '../../services/vps_upload_service.dart';
 import 'add_expense_screen.dart';
+import 'receipt_review_screen.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -106,11 +107,11 @@ class _ScannerScreenState extends State<ScannerScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddExpenseScreen(
-          isIncome: false,
+        builder: (context) => ReceiptReviewScreen(
+          imageFile: _capturedBillImage,
+          imageUrl: _uploadedBillUrl,
           initialAmount: _extractedAmount,
-          initialDescription: _extractedMerchant ?? 'Chi tiêu theo hóa đơn',
-          initialReceiptUrl: _uploadedBillUrl,
+          initialMerchant: _extractedMerchant ?? 'Chi tiêu theo hóa đơn',
           defaultWalletId: walletProvider.primaryWallet?.id,
         ),
       ),

@@ -99,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         value ? ThemeMode.dark : ThemeMode.light,
                                       );
                                     },
-                                    activeColor: AppColors.primary,
+                                    activeThumbColor: AppColors.primary,
                                   ),
                                 ),
                               ),
@@ -148,7 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 trailing: Switch(
                                   value: true,
                                   onChanged: (value) {},
-                                  activeColor: AppColors.primary,
+                                  activeThumbColor: AppColors.primary,
                                 ),
                               ),
                             ],

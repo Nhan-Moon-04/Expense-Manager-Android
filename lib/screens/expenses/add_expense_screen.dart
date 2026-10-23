@@ -16,6 +16,8 @@ class AddExpenseScreen extends StatefulWidget {
   final double? initialAmount;
   final String? initialDescription;
   final String? initialReceiptUrl;
+  final ExpenseCategory? initialCategory;
+  final DateTime? initialDate;
 
   const AddExpenseScreen({
     super.key,
@@ -25,6 +27,8 @@ class AddExpenseScreen extends StatefulWidget {
     this.initialAmount,
     this.initialDescription,
     this.initialReceiptUrl,
+    this.initialCategory,
+    this.initialDate,
   });
 
   @override
@@ -35,11 +39,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
+  late final FocusNode _amountFocusNode;
 
   late ExpenseType _type;
+  bool _isTransfer = false;
   ExpenseCategory _category = ExpenseCategory.other;
   DateTime _selectedDate = DateTime.now();
   String? _selectedWalletId;
+  String? _targetWalletId;
   String? _receiptUrl;
   bool _isLoading = false;
 
@@ -67,6 +74,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   @override
   void initState() {
     super.initState();
+    _amountFocusNode = FocusNode();
     _type = widget.isIncome ? ExpenseType.income : ExpenseType.expense;
 
     if (widget.expense != null) {
@@ -86,15 +94,30 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         _descriptionController.text = widget.initialDescription!;
       }
       _receiptUrl = widget.initialReceiptUrl;
-      _category = widget.isIncome
-          ? ExpenseCategory.salary
-          : ExpenseCategory.food;
+      if (widget.initialCategory != null) {
+        _category = widget.initialCategory!;
+      } else {
+        _category = widget.isIncome
+            ? ExpenseCategory.salary
+            : ExpenseCategory.food;
+      }
+      if (widget.initialDate != null) {
+        _selectedDate = widget.initialDate!;
+      }
       _selectedWalletId = widget.defaultWalletId;
+
+      // Auto-focus amount field when creating new transaction (Phase 1.6)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _amountFocusNode.requestFocus();
+        }
+      });
     }
   }
 
   @override
   void dispose() {
+    _amountFocusNode.dispose();
     _amountController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -186,8 +209,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       return;
     }
 
-    setState(() => _isLoading = true);
-
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final expenseProvider = Provider.of<ExpenseProvider>(
       context,
@@ -195,8 +216,151 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     );
     final walletProvider = Provider.of<WalletProvider>(context, listen: false);
 
-    final walletId = _selectedWalletId ?? walletProvider.primaryWallet?.id;
+    // ─── CHUYỂN TIỀN GIỮA 2 VÍ (Phase 1.6) ───
+    if (_isTransfer) {
+      final sourceWalletId =
+          _selectedWalletId ?? walletProvider.primaryWallet?.id;
+      final targetWalletId = _targetWalletId ??
+          walletProvider.wallets
+              .where((w) => w.id != sourceWalletId)
+              .firstOrNull
+              ?.id;
+
+      if (sourceWalletId == null || targetWalletId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Vui lòng chọn cả ví nguồn và ví đích.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
+      if (sourceWalletId == targetWalletId) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Ví nguồn và ví đích không được trùng nhau.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
+      setState(() => _isLoading = true);
+
+      final sourceWalletName = walletProvider.getWalletName(sourceWalletId);
+      final targetWalletName = walletProvider.getWalletName(targetWalletId);
+      final note = _descriptionController.text.trim();
+
+      final outgoingExpense = ExpenseModel(
+        id: '',
+        userId: authProvider.user!.uid,
+        amount: parsedAmount,
+        type: ExpenseType.expense,
+        category: ExpenseCategory.other,
+        description:
+            'Chuyển sang $targetWalletName${note.isNotEmpty ? " ($note)" : ""}',
+        date: _selectedDate,
+        walletId: sourceWalletId,
+      );
+
+      final incomingExpense = ExpenseModel(
+        id: '',
+        userId: authProvider.user!.uid,
+        amount: parsedAmount,
+        type: ExpenseType.income,
+        category: ExpenseCategory.other,
+        description:
+            'Nhận từ $sourceWalletName${note.isNotEmpty ? " ($note)" : ""}',
+        date: _selectedDate,
+        walletId: targetWalletId,
+      );
+
+      final successOut = await expenseProvider.addExpense(outgoingExpense);
+      final successIn = await expenseProvider.addExpense(incomingExpense);
+
+      setState(() => _isLoading = false);
+
+      if (mounted) {
+        if (successOut && successIn) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Đã chuyển ${_currencyFormatter.format(parsedAmount)} đ từ $sourceWalletName sang $targetWalletName',
+              ),
+              backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+          Navigator.pop(context, true);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Có lỗi xảy ra khi thực hiện chuyển tiền.'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+      return;
+    }
+
+    // ─── CẢNH BÁO TRÙNG LẶP (Duplicate detection - Phase 1.6) ───
     final now = DateTime.now();
+    final duplicateExpense = expenseProvider.expenses.where((e) {
+      final diff = now.difference(e.date).inMinutes.abs();
+      return diff <= 10 &&
+          (e.amount - parsedAmount).abs() < 1.0 &&
+          e.category == _category &&
+          e.type == _type &&
+          (widget.expense == null || e.id != widget.expense!.id);
+    }).firstOrNull;
+
+    if (duplicateExpense != null) {
+      final proceed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: AppColors.warning),
+              SizedBox(width: 8),
+              Text(
+                'Cảnh báo trùng lặp',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          content: Text(
+            'Bạn vừa ghi nhận giao dịch ${_currencyFormatter.format(parsedAmount)} đ với danh mục "${ExpenseModel.getCategoryName(_category)}" cách đây ít phút. Bạn có muốn tiếp tục lưu?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Kiểm tra lại'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Vẫn lưu'),
+            ),
+          ],
+        ),
+      );
+      if (proceed != true) return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final walletId = _selectedWalletId ?? walletProvider.primaryWallet?.id;
 
     ExpenseModel expense = ExpenseModel(
       id: widget.expense?.id ?? '',
@@ -231,6 +395,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
     if (mounted) {
       if (success) {
+        final lastExpenseId =
+            widget.expense == null ? expenseProvider.expenses.firstOrNull?.id : null;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -243,9 +409,18 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            action: lastExpenseId != null
+                ? SnackBarAction(
+                    label: 'Hoàn tác',
+                    textColor: Colors.white,
+                    onPressed: () {
+                      expenseProvider.deleteExpense(lastExpenseId);
+                    },
+                  )
+                : null,
           ),
         );
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -279,9 +454,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   Widget build(BuildContext context) {
     final isEditing = widget.expense != null;
     final isIncome = _type == ExpenseType.income;
-    final themeGradient =
-        isIncome ? AppColors.incomeGradient : AppColors.expenseGradient;
-    final themeColor = isIncome ? AppColors.incomeColor : AppColors.expenseColor;
+    final themeGradient = _isTransfer
+        ? const [Color(0xFF4F46E5), Color(0xFF6366F1)]
+        : (isIncome ? AppColors.incomeGradient : AppColors.expenseGradient);
+    final themeColor = _isTransfer
+        ? const Color(0xFF6366F1)
+        : (isIncome ? AppColors.incomeColor : AppColors.expenseColor);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -304,27 +482,38 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     _buildQuickAmountChips(themeColor),
                     const SizedBox(height: 28),
 
-                    // 2. Danh mục
-                    _buildSectionTitle(
-                      title: AppStrings.category,
-                      icon: Icons.grid_view_rounded,
-                      color: themeColor,
-                    ),
-                    const SizedBox(height: 14),
-                    _buildCategoryGrid(),
-                    const SizedBox(height: 28),
+                    // 2. Danh mục hoặc Bộ chuyển tiền giữa các ví (Phase 1.6)
+                    if (_isTransfer) ...[
+                      _buildSectionTitle(
+                        title: 'Chuyển tiền giữa các ví',
+                        icon: Icons.swap_horiz_rounded,
+                        color: themeColor,
+                      ),
+                      const SizedBox(height: 14),
+                      _buildTransferWalletPickers(),
+                      const SizedBox(height: 28),
+                    ] else ...[
+                      _buildSectionTitle(
+                        title: AppStrings.category,
+                        icon: Icons.grid_view_rounded,
+                        color: themeColor,
+                      ),
+                      const SizedBox(height: 14),
+                      _buildCategoryGrid(),
+                      const SizedBox(height: 28),
 
-                    // 3. Ví tiền
-                    _buildSectionTitle(
-                      title: AppStrings.wallet,
-                      icon: Icons.account_balance_wallet_rounded,
-                      color: themeColor,
-                    ),
-                    const SizedBox(height: 14),
-                    _buildWalletSelector(themeColor),
-                    const SizedBox(height: 28),
+                      // Ví tiền
+                      _buildSectionTitle(
+                        title: AppStrings.wallet,
+                        icon: Icons.account_balance_wallet_rounded,
+                        color: themeColor,
+                      ),
+                      const SizedBox(height: 14),
+                      _buildWalletSelector(themeColor),
+                      const SizedBox(height: 28),
+                    ],
 
-                    // 4. Ngày tháng
+                    // 3. Ngày tháng
                     _buildSectionTitle(
                       title: AppStrings.date,
                       icon: Icons.calendar_month_rounded,
@@ -334,7 +523,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     _buildDateSelector(themeColor),
                     const SizedBox(height: 28),
 
-                    // 5. Ghi chú
+                    // 4. Ghi chú
                     _buildSectionTitle(
                       title: AppStrings.description,
                       icon: Icons.edit_note_rounded,
@@ -413,9 +602,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                             Text(
                               isEditing
                                   ? AppStrings.save
-                                  : (isIncome
-                                      ? 'Thêm Thu Nhập'
-                                      : 'Thêm Chi Tiêu'),
+                                  : (_isTransfer
+                                      ? 'Thực hiện Chuyển Tiền'
+                                      : (isIncome
+                                          ? 'Thêm Thu Nhập'
+                                          : 'Thêm Chi Tiêu')),
                               style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
@@ -543,6 +734,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _amountController,
+                    focusNode: _amountFocusNode,
                     keyboardType: TextInputType.number,
                     onChanged: _onAmountChanged,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -601,7 +793,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.2),
+        color: Colors.black.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
@@ -610,9 +802,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           _buildSegmentTab(
             title: AppStrings.expense,
             icon: Icons.arrow_downward_rounded,
-            isSelected: _type == ExpenseType.expense,
+            isSelected: !_isTransfer && _type == ExpenseType.expense,
             onTap: () {
               setState(() {
+                _isTransfer = false;
                 _type = ExpenseType.expense;
                 _category = ExpenseCategory.food;
               });
@@ -621,16 +814,199 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           _buildSegmentTab(
             title: AppStrings.income,
             icon: Icons.arrow_upward_rounded,
-            isSelected: _type == ExpenseType.income,
+            isSelected: !_isTransfer && _type == ExpenseType.income,
             onTap: () {
               setState(() {
+                _isTransfer = false;
                 _type = ExpenseType.income;
                 _category = ExpenseCategory.salary;
               });
             },
           ),
+          _buildSegmentTab(
+            title: 'Chuyển tiền',
+            icon: Icons.swap_horiz_rounded,
+            isSelected: _isTransfer,
+            onTap: () {
+              setState(() {
+                _isTransfer = true;
+              });
+            },
+          ),
         ],
       ),
+    );
+  }
+
+  // ─── TRANSFER WALLET PICKERS (Phase 1.6) ───
+  Widget _buildTransferWalletPickers() {
+    return Consumer<WalletProvider>(
+      builder: (context, walletProvider, child) {
+        final wallets = walletProvider.wallets;
+        if (wallets.length < 2) {
+          return Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.cardBackground,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderColor),
+            ),
+            child: Text(
+              'Cần ít nhất 2 ví để thực hiện chuyển tiền giữa các ví.',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            ),
+          );
+        }
+
+        _selectedWalletId ??=
+            walletProvider.primaryWallet?.id ?? wallets.first.id;
+        _targetWalletId ??=
+            wallets.firstWhere((w) => w.id != _selectedWalletId).id;
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.borderColor),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColor,
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Ví nguồn (Từ ví)
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEF4444).withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.north_east_rounded,
+                      size: 16,
+                      color: Color(0xFFEF4444),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Từ ví:',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedWalletId,
+                        isExpanded: true,
+                        items: wallets.map((w) {
+                          return DropdownMenuItem(
+                            value: w.id,
+                            child: Text(
+                              w.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() {
+                              _selectedWalletId = val;
+                              if (_targetWalletId == val) {
+                                _targetWalletId =
+                                    wallets.firstWhere((w) => w.id != val).id;
+                              }
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(child: Divider()),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Icon(
+                        Icons.swap_vert_rounded,
+                        color: Color(0xFF6366F1),
+                      ),
+                    ),
+                    Expanded(child: Divider()),
+                  ],
+                ),
+              ),
+              // Ví đích (Đến ví)
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.south_west_rounded,
+                      size: 16,
+                      color: Color(0xFF10B981),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Đến ví:',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _targetWalletId,
+                        isExpanded: true,
+                        items: wallets.map((w) {
+                          return DropdownMenuItem(
+                            value: w.id,
+                            child: Text(
+                              w.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() {
+                              _targetWalletId = val;
+                              if (_selectedWalletId == val) {
+                                _selectedWalletId =
+                                    wallets.firstWhere((w) => w.id != val).id;
+                              }
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

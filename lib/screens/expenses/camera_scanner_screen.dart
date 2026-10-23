@@ -12,7 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../constants/app_colors.dart';
 import '../../providers/wallet_provider.dart';
 import '../../services/vps_upload_service.dart';
-import 'add_expense_screen.dart';
+import 'receipt_review_screen.dart';
 import 'scanner_screen.dart';
 
 class CameraScannerScreen extends StatefulWidget {
@@ -239,10 +239,10 @@ class _CameraScannerScreenState extends State<CameraScannerScreen>
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => AddExpenseScreen(
-                isIncome: false,
-                initialDescription: 'Hoa don mua sam',
-                initialReceiptUrl: uploadedUrl,
+              builder: (_) => ReceiptReviewScreen(
+                imageFile: billFile,
+                imageUrl: uploadedUrl,
+                initialMerchant: 'Hóa đơn mua sắm',
                 defaultWalletId: walletProvider.primaryWallet?.id,
               ),
             ),
@@ -275,18 +275,19 @@ class _CameraScannerScreenState extends State<CameraScannerScreen>
 
       if (mounted) {
         final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+        final galleryFile = File(pickedFile.path);
         final uploadedUrl = await _vpsUploadService.uploadImage(
-          File(pickedFile.path),
+          galleryFile,
           folder: 'receipts',
         );
         if (mounted) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => AddExpenseScreen(
-                isIncome: false,
-                initialDescription: 'Hoa don mua sam',
-                initialReceiptUrl: uploadedUrl,
+              builder: (_) => ReceiptReviewScreen(
+                imageFile: galleryFile,
+                imageUrl: uploadedUrl,
+                initialMerchant: 'Hóa đơn mua sắm',
                 defaultWalletId: walletProvider.primaryWallet?.id,
               ),
             ),

@@ -459,52 +459,42 @@ class _GroupsScreenState extends State<GroupsScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                group.name,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      group.name,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  _buildGroupTypeBadge(group.type),
+                                ],
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 6),
                               Row(
                                 children: [
                                   Icon(
                                     Icons.people_outline_rounded,
-                                    size: 16,
+                                    size: 15,
                                     color: AppColors.textSecondary,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     '${group.members.length} ${AppStrings.membersCount}',
                                     style: TextStyle(
-                                      fontSize: 13,
+                                      fontSize: 12,
                                       color: AppColors.textSecondary,
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary.withValues(
-                                        alpha: 0.1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      group.inviteCode,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primary,
-                                        letterSpacing: 1,
-                                      ),
-                                    ),
-                                  ),
+                                  const SizedBox(width: 8),
+                                  _buildDebtPill(group),
                                 ],
                               ),
                             ],
@@ -513,7 +503,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                         Icon(
                           Icons.chevron_right_rounded,
                           color: AppColors.textHint,
-                          size: 28,
+                          size: 26,
                         ),
                       ],
                     ),
@@ -562,6 +552,93 @@ class _GroupsScreenState extends State<GroupsScreen>
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildGroupTypeBadge(GroupType type) {
+    final isFund = type == GroupType.sharedFund;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+      decoration: BoxDecoration(
+        color: isFund
+            ? const Color(0xFF0D9488).withValues(alpha: 0.12)
+            : const Color(0xFF6366F1).withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isFund ? Icons.savings_rounded : Icons.call_split_rounded,
+            size: 11,
+            color: isFund ? const Color(0xFF0D9488) : const Color(0xFF6366F1),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            isFund ? 'Quỹ chung' : 'Chia tiền',
+            style: TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+              color: isFund ? const Color(0xFF0D9488) : const Color(0xFF6366F1),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDebtPill(GroupModel group) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final groupProvider = Provider.of<GroupProvider>(context, listen: false);
+    final currentUserId = authProvider.user?.uid;
+
+    if (currentUserId == null) return const SizedBox.shrink();
+
+    final netDebt = groupProvider.getUserNetDebt(currentUserId, group);
+
+    Color color;
+    Color bg;
+    String text;
+    IconData icon;
+
+    if (netDebt > 500) {
+      color = AppColors.incomeColor;
+      bg = AppColors.incomeColor.withValues(alpha: 0.12);
+      text = 'Được nợ +${currencyFormat.format(netDebt)}';
+      icon = Icons.south_west_rounded;
+    } else if (netDebt < -500) {
+      color = AppColors.expenseColor;
+      bg = AppColors.expenseColor.withValues(alpha: 0.12);
+      text = 'Bạn nợ ${currencyFormat.format(netDebt.abs())}';
+      icon = Icons.north_east_rounded;
+    } else {
+      color = AppColors.textSecondary;
+      bg = AppColors.textHint.withValues(alpha: 0.12);
+      text = 'Sòng phẳng';
+      icon = Icons.check_circle_outline_rounded;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 10, color: color),
+          const SizedBox(width: 3),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }

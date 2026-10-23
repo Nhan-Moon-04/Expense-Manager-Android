@@ -22,6 +22,7 @@ import '../../services/backup_service.dart';
 import '../../services/version_service.dart';
 import '../../services/biometric_service.dart';
 import '../widgets/update_dialog.dart';
+import 'auto_expense_settings_screen.dart';
 import 'qr_bank_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -85,19 +86,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(height: 24),
                       _buildSecuritySection(),
                       const SizedBox(height: 24),
-                      _buildAutoExpenseSection(),
+                      _buildAutomationAndNotificationsSection(),
                       const SizedBox(height: 24),
-                      _buildNotificationsSection(),
+                      _buildDisplayAndPreferencesSection(),
                       const SizedBox(height: 24),
-                      _buildDisplaySection(),
-                      const SizedBox(height: 24),
-                      _buildQrBankSection(),
-                      const SizedBox(height: 24),
-                      _buildDataSection(),
-                      const SizedBox(height: 24),
-                      _buildDangerSection(),
-                      const SizedBox(height: 24),
-                      _buildAboutSection(),
+                      _buildDataAndDangerSection(),
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -205,6 +198,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: settingsProvider.isBiometricEnabled,
                 onChanged: (value) async {
                   if (value) {
+                    final messenger = ScaffoldMessenger.of(context);
                     final biometricService = BiometricService();
                     final available = await biometricService.isBiometricAvailable();
                     if (!available) {
@@ -219,7 +213,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (authenticated) {
                       await settingsProvider.setBiometricEnabled(true);
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           SnackBar(
                             content: const Row(
                               children: [
@@ -725,368 +719,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Widget _buildAutoExpenseSection() {
+  Widget _buildAutomationAndNotificationsSection() {
     return Consumer<AutoExpenseProvider>(
       builder: (context, provider, child) {
+        final isEnabled = provider.isEnabled;
+        final hasPermission = provider.isNotificationAccessGranted;
+
+        String autoExpenseSubtitle;
+        if (!isEnabled) {
+          autoExpenseSubtitle = 'Đang tắt';
+        } else if (!hasPermission) {
+          autoExpenseSubtitle = 'Cần cấp quyền thông báo';
+        } else {
+          autoExpenseSubtitle = 'Đang tự động nhận diện từ ngân hàng';
+        }
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionHeader(
-              AppStrings.autoRecordExpense,
-              Icons.auto_awesome_rounded,
+              'Tự Động & Thông Báo',
+              Icons.notifications_active_rounded,
             ),
             const SizedBox(height: 12),
             _buildSettingsCard([
-              _buildMainAutoExpenseToggle(provider),
-              if (provider.isEnabled) ...[
-                const Divider(height: 1, indent: 16, endIndent: 16),
-                _buildAutoExpenseOption(
-                  title: AppStrings.autoAddExpenseLabel,
-                  subtitle: AppStrings.autoAddExpenseSubtitle,
-                  value: provider.autoAddExpense,
-                  onChanged: provider.setAutoAddExpense,
-                ),
-                const Divider(height: 1, indent: 16, endIndent: 16),
-                _buildAutoExpenseOption(
-                  title: AppStrings.autoAddIncomeLabel,
-                  subtitle: AppStrings.autoAddIncomeSubtitle,
-                  value: provider.autoAddIncome,
-                  onChanged: provider.setAutoAddIncome,
-                ),
-              ],
+              _buildListTile(
+                icon: Icons.account_balance_rounded,
+                iconColor: isEnabled
+                    ? (hasPermission ? AppColors.primary : AppColors.warning)
+                    : AppColors.textSecondary,
+                title: AppStrings.readBankNotifications,
+                subtitle: autoExpenseSubtitle,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const AutoExpenseSettingsScreen(),
+                    ),
+                  );
+                },
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              _buildSwitchTile(
+                icon: Icons.notifications_rounded,
+                title: AppStrings.generalNotifications,
+                subtitle: AppStrings.generalNotificationsSubtitle,
+                value: _notificationsEnabled,
+                onChanged: (value) => setState(() => _notificationsEnabled = value),
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              _buildSwitchTile(
+                icon: Icons.alarm_rounded,
+                title: AppStrings.reminders,
+                subtitle: AppStrings.reminderNotificationsSubtitle,
+                value: _reminderEnabled,
+                onChanged: (value) => setState(() => _reminderEnabled = value),
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              _buildListTile(
+                icon: Icons.science_rounded,
+                title: AppStrings.testNotification,
+                subtitle: AppStrings.testNotificationSubtitle,
+                onTap: _testNotification,
+              ),
             ]),
-            if (!provider.isNotificationAccessGranted && provider.isEnabled)
-              _buildPermissionWarning(provider),
-            const SizedBox(height: 12),
-            _buildSupportedAppsInfo(),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildMainAutoExpenseToggle(AutoExpenseProvider provider) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: provider.isEnabled
-            ? const LinearGradient(
-                colors: AppColors.primaryGradient,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: provider.isEnabled
-                  ? Colors.white.withValues(alpha: 0.2)
-                  : AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              Icons.account_balance_rounded,
-              color: provider.isEnabled ? Colors.white : AppColors.primary,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.readBankNotifications,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                    color: provider.isEnabled
-                        ? Colors.white
-                        : AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  AppStrings.readBankNotificationsSubtitle,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: provider.isEnabled
-                        ? Colors.white.withValues(alpha: 0.8)
-                        : AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Switch.adaptive(
-            value: provider.isEnabled,
-            onChanged: (value) => provider.setEnabled(value),
-            activeThumbColor: Colors.white,
-            activeTrackColor: Colors.white.withValues(alpha: 0.3),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAutoExpenseOption({
-    required String title,
-    required String subtitle,
-    required bool value,
-    required Function(bool) onChanged,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Switch.adaptive(
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: AppColors.primary,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPermissionWarning(AutoExpenseProvider provider) {
-    return Container(
-      margin: const EdgeInsets.only(top: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.warning.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              Icons.warning_amber_rounded,
-              color: AppColors.warning,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.permissionRequired,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                Text(
-                  AppStrings.permissionRequiredSubtitle,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          TextButton(
-            onPressed: () => provider.requestNotificationAccess(),
-            style: TextButton.styleFrom(
-              backgroundColor: AppColors.warning,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: Text(
-              AppStrings.grantPermission,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSupportedAppsInfo() {
-    return Consumer<AutoExpenseProvider>(
-      builder: (context, provider, _) {
-        final banks = [
-          {'source': 'momo', 'name': 'MoMo'},
-          {'source': 'vcb', 'name': 'Vietcombank'},
-          {'source': 'mbbank', 'name': 'MB Bank'},
-          {'source': 'techcombank', 'name': 'Techcombank'},
-          {'source': 'bidv', 'name': 'BIDV'},
-          {'source': 'tpbank', 'name': 'TPBank'},
-          {'source': 'vietinbank', 'name': 'VietinBank'},
-          {'source': 'acb', 'name': 'ACB'},
-          {'source': 'sacombank', 'name': 'Sacombank'},
-          {'source': 'agribank', 'name': 'Agribank'},
-        ];
-
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.info.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    color: AppColors.info,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    AppStrings.supportedBanks,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: AppColors.info,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                AppStrings.supportedBanksSubtitle,
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: banks.map((bank) {
-                  final source = bank['source']!;
-                  final name = bank['name']!;
-                  final isEnabled = provider.isBankEnabled(source);
-
-                  return GestureDetector(
-                    onTap: () {
-                      provider.setBankEnabled(source, !isEnabled);
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isEnabled
-                            ? AppColors.primary.withValues(alpha: 0.1)
-                            : Colors.grey.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isEnabled
-                              ? AppColors.primary.withValues(alpha: 0.5)
-                              : Colors.grey.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isEnabled
-                                ? Icons.check_circle_rounded
-                                : Icons.radio_button_unchecked_rounded,
-                            size: 16,
-                            color: isEnabled ? AppColors.primary : Colors.grey,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            name,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: isEnabled
-                                  ? AppColors.primary
-                                  : Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildNotificationsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(
-          AppStrings.notifications,
-          Icons.notifications_rounded,
-        ),
-        const SizedBox(height: 12),
-        _buildSettingsCard([
-          _buildSwitchTile(
-            icon: Icons.notifications_active_rounded,
-            title: AppStrings.generalNotifications,
-            subtitle: AppStrings.generalNotificationsSubtitle,
-            value: _notificationsEnabled,
-            onChanged: (value) => setState(() => _notificationsEnabled = value),
-          ),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          _buildSwitchTile(
-            icon: Icons.alarm_rounded,
-            title: AppStrings.reminders,
-            subtitle: AppStrings.reminderNotificationsSubtitle,
-            value: _reminderEnabled,
-            onChanged: (value) => setState(() => _reminderEnabled = value),
-          ),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          _buildListTile(
-            icon: Icons.science_rounded,
-            title: AppStrings.testNotification,
-            subtitle: AppStrings.testNotificationSubtitle,
-            onTap: _testNotification,
-          ),
-        ]),
-      ],
     );
   }
 
@@ -1119,13 +818,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Widget _buildDisplaySection() {
+  Widget _buildDisplayAndPreferencesSection() {
     return Consumer<SettingsProvider>(
       builder: (context, settings, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionHeader(AppStrings.display, Icons.palette_rounded),
+            _buildSectionHeader(
+              'Giao Diện & Tùy Chọn',
+              Icons.palette_rounded,
+            ),
             const SizedBox(height: 12),
             _buildSettingsCard([
               _buildListTile(
@@ -1150,6 +852,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: settings.themeModeDisplayName,
                 onTap: _showThemeModePicker,
               ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              _buildListTile(
+                icon: Icons.qr_code_scanner_rounded,
+                title: 'Quản lý QR ngân hàng',
+                subtitle: 'Thêm QR Code nhận tiền hiển thị trên widget',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const QrBankSettingsScreen(),
+                    ),
+                  );
+                },
+              ),
             ]),
           ],
         );
@@ -1157,36 +873,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildQrBankSection() {
+  Widget _buildDataAndDangerSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('QR Ngân Hàng', Icons.qr_code_rounded),
-        const SizedBox(height: 12),
-        _buildSettingsCard([
-          _buildListTile(
-            icon: Icons.qr_code_scanner_rounded,
-            title: 'Quản lý QR ngân hàng',
-            subtitle: 'Thêm QR Code để hiển thị trên widget',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const QrBankSettingsScreen(),
-                ),
-              );
-            },
-          ),
-        ]),
-      ],
-    );
-  }
-
-  Widget _buildDataSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(AppStrings.dataSection, Icons.storage_rounded),
+        _buildSectionHeader(
+          'Dữ Liệu & Hệ Thống',
+          Icons.storage_rounded,
+        ),
         const SizedBox(height: 12),
         _buildSettingsCard([
           _buildListTile(
@@ -1209,22 +903,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: AppStrings.exportReportSubtitle,
             onTap: _isExporting ? () {} : _performExport,
           ),
-        ]),
-      ],
-    );
-  }
-
-  Widget _buildDangerSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(
-          AppStrings.dangerZone,
-          Icons.warning_rounded,
-          color: AppColors.error,
-        ),
-        const SizedBox(height: 12),
-        _buildSettingsCard([
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _buildListTile(
+            icon: Icons.update_rounded,
+            title: AppStrings.version,
+            subtitle: _currentVersion.isNotEmpty
+                ? 'v$_currentVersion • Kiểm tra cập nhật'
+                : AppStrings.loading,
+            onTap: () => _checkForUpdate(),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
           _buildListTile(
             icon: Icons.delete_forever_rounded,
             title: AppStrings.deleteAllData,
@@ -2190,25 +1878,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Widget _buildAboutSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(AppStrings.info, Icons.info_rounded),
-        const SizedBox(height: 12),
-        _buildSettingsCard([
-          _buildListTile(
-            icon: Icons.update_rounded,
-            title: AppStrings.version,
-            subtitle: _currentVersion.isNotEmpty
-                ? 'v$_currentVersion'
-                : AppStrings.loading,
-            onTap: () => _checkForUpdate(),
-          ),
-        ]),
-      ],
-    );
-  }
 
   Future<void> _checkForUpdate() async {
     // Hiện loading

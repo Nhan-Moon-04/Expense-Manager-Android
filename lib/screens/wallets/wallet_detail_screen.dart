@@ -829,6 +829,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                                     : isLinked
                                     ? null
                                     : () async {
+                                        final messenger = ScaffoldMessenger.of(this.context);
                                         await walletProvider.linkBank(
                                           userId,
                                           _wallet.id,
@@ -836,9 +837,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                                         );
                                         if (context.mounted) {
                                           Navigator.pop(context);
-                                          ScaffoldMessenger.of(
-                                            this.context,
-                                          ).showSnackBar(
+                                          messenger.showSnackBar(
                                             SnackBar(
                                               content: Text(
                                                 '${AppStrings.assigned} $bankName → ${_wallet.name}',
@@ -897,12 +896,13 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                 name: name,
                 updatedAt: DateTime.now(),
               );
+              final messenger = ScaffoldMessenger.of(this.context);
               final success = await walletProvider.updateWallet(updated);
               if (context.mounted) {
                 Navigator.pop(context);
                 if (success) {
                   setState(() => _wallet = updated);
-                  ScaffoldMessenger.of(this.context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text(AppStrings.walletRenamed),
                       backgroundColor: AppColors.success,
@@ -952,15 +952,17 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
+              final navigator = Navigator.of(this.context);
+              final messenger = ScaffoldMessenger.of(this.context);
               final success = await walletProvider.deleteWallet(
                 authProvider.user!.uid,
                 _wallet.id,
               );
               if (context.mounted) {
                 Navigator.pop(context); // Close dialog
-                if (success && this.context.mounted) {
-                  Navigator.pop(this.context); // Go back to wallet list
-                  ScaffoldMessenger.of(this.context).showSnackBar(
+                if (success) {
+                  navigator.pop(); // Go back to wallet list
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text(AppStrings.walletDeleted),
                       backgroundColor: AppColors.success,

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../constants/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
@@ -34,6 +35,23 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
   late Animation<double> _fadeAnimation;
   bool _isBalanceVisible = false;
   bool _showWalletBalance = true; // true = tổng số dư ví, false = số dư tháng
+
+  // Advanced filters (Phase 1.5)
+  final Set<ExpenseCategory> _filterCategories = {};
+  final Set<String> _filterWalletIds = {};
+  double? _filterAmountMin;
+  double? _filterAmountMax;
+
+  bool get _hasActiveFilters =>
+      _filterCategories.isNotEmpty ||
+      _filterWalletIds.isNotEmpty ||
+      _filterAmountMin != null ||
+      _filterAmountMax != null;
+
+  int get _activeFilterCount =>
+      _filterCategories.length +
+      _filterWalletIds.length +
+      (_filterAmountMin != null || _filterAmountMax != null ? 1 : 0);
 
   @override
   void initState() {
@@ -100,6 +118,28 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
       filtered = filtered.where((e) => e.type == ExpenseType.income).toList();
     } else if (_filterType == 'expense') {
       filtered = filtered.where((e) => e.type == ExpenseType.expense).toList();
+    }
+
+    // Category filter (Phase 1.5)
+    if (_filterCategories.isNotEmpty) {
+      filtered = filtered
+          .where((e) => _filterCategories.contains(e.category))
+          .toList();
+    }
+
+    // Wallet multi-select filter (Phase 1.5)
+    if (_filterWalletIds.isNotEmpty) {
+      filtered = filtered
+          .where((e) => e.walletId != null && _filterWalletIds.contains(e.walletId))
+          .toList();
+    }
+
+    // Amount range filter (Phase 1.5)
+    if (_filterAmountMin != null) {
+      filtered = filtered.where((e) => e.amount >= _filterAmountMin!).toList();
+    }
+    if (_filterAmountMax != null) {
+      filtered = filtered.where((e) => e.amount <= _filterAmountMax!).toList();
     }
 
     // Search filter
@@ -219,18 +259,59 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
         const SizedBox(width: 4),
         GestureDetector(
           onTap: _showFilterDialog,
-          child: Container(
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor, width: 1),
-            ),
-            child: Icon(
-              Icons.tune_rounded,
-              color: AppColors.textPrimary,
-              size: 16,
-            ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: _hasActiveFilters
+                      ? AppColors.primary.withValues(alpha: 0.15)
+                      : AppColors.surfaceVariant,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: _hasActiveFilters
+                        ? AppColors.primary
+                        : AppColors.borderColor,
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  Icons.tune_rounded,
+                  color: _hasActiveFilters
+                      ? AppColors.primary
+                      : AppColors.textPrimary,
+                  size: 16,
+                ),
+              ),
+              if (_hasActiveFilters)
+                Positioned(
+                  top: -4,
+                  right: -4,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$_activeFilterCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          height: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ],
@@ -1104,153 +1185,258 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
     final color = isExpense ? AppColors.expenseColor : AppColors.incomeColor;
     final categoryColor = _getCategoryColor(expense.category);
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
+    return Dismissible(
+      key: ValueKey(expense.id),
+      direction: DismissDirection.horizontal,
+      background: Container(
+        color: const Color(0xFF2563EB),
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Row(
+          children: [
+            Icon(Icons.edit_rounded, color: Colors.white, size: 20),
+            SizedBox(width: 8),
+            Text(
+              'Sửa',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
+      secondaryBackground: Container(
+        color: const Color(0xFFEF4444),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              'Xóa',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
+            SizedBox(width: 8),
+            Icon(Icons.delete_outline_rounded, color: Colors.white, size: 20),
+          ],
+        ),
+      ),
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          // Swipe right: Sửa
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ExpenseDetailScreen(expense: expense),
+              builder: (context) => AddExpenseScreen(expense: expense),
             ),
           );
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            border: !isLast
-                ? Border(
-                    bottom: BorderSide(color: AppColors.background, width: 1),
-                  )
-                : null,
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color:
-                      (expense.hasBankSource
-                              ? _getBankColor(expense.bankSource!)
-                              : categoryColor)
-                          .withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: expense.hasBankSource
-                    ? Icon(
-                        _getBankIcon(expense.bankSource!),
-                        color: _getBankColor(expense.bankSource!),
-                        size: 22,
-                      )
-                    : Icon(
-                        _getCategoryIcon(expense.category),
-                        color: categoryColor,
-                        size: 22,
-                      ),
+          return false;
+        } else {
+          final expenseProvider =
+              Provider.of<ExpenseProvider>(context, listen: false);
+          final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+          // Swipe left: Xóa với confirm dialog
+          final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            expense.displayName,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                              color: AppColors.textPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+              title: const Text('Xác nhận xóa'),
+              content: Text('Bạn có chắc chắn muốn xóa "${expense.displayName}"?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Hủy'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.error,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Xóa'),
+                ),
+              ],
+            ),
+          );
+
+          if (confirmed == true) {
+            final deletedExpense = expense;
+            final success = await expenseProvider.deleteExpense(expense.id);
+            if (success && mounted) {
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text('Đã xóa "${deletedExpense.displayName}"'),
+                  action: SnackBarAction(
+                    label: 'Hoàn tác',
+                    onPressed: () {
+                      expenseProvider.addExpense(deletedExpense);
+                    },
+                  ),
+                ),
+              );
+            }
+            return success;
+          }
+          return false;
+        }
+      },
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ExpenseDetailScreen(expense: expense),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              border: !isLast
+                  ? Border(
+                      bottom: BorderSide(color: AppColors.background, width: 1),
+                    )
+                  : null,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color:
+                        (expense.hasBankSource
+                                ? _getBankColor(expense.bankSource!)
+                                : categoryColor)
+                            .withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: expense.hasBankSource
+                      ? Icon(
+                          _getBankIcon(expense.bankSource!),
+                          color: _getBankColor(expense.bankSource!),
+                          size: 22,
+                        )
+                      : Icon(
+                          _getCategoryIcon(expense.category),
+                          color: categoryColor,
+                          size: 22,
                         ),
-                        if (expense.isAutoAdded) ...[
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
                             child: Text(
-                              AppStrings.autoBadge,
-                              style: const TextStyle(
-                                fontSize: 10,
+                              expense.displayName,
+                              style: TextStyle(
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.primary,
+                                fontSize: 15,
+                                color: AppColors.textPrimary,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ],
-                      ],
-                    ),
-                    if (expense.subtitleText != null &&
-                        expense.subtitleText!.isNotEmpty)
-                      Text(
-                        expense.subtitleText!,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    // Wallet name
-                    Consumer<WalletProvider>(
-                      builder: (context, walletProvider, _) {
-                        final walletName = walletProvider.getWalletName(
-                          expense.walletId,
-                        );
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.wallet_rounded,
-                                size: 12,
-                                color: AppColors.textHint,
+                          if (expense.isAutoAdded) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                walletName,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.textHint,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                AppStrings.autoBadge,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
                                 ),
                               ),
-                            ],
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (expense.subtitleText != null &&
+                          expense.subtitleText!.isNotEmpty)
+                        Text(
+                          expense.subtitleText!,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
                           ),
-                        );
-                      },
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      // Wallet name
+                      Consumer<WalletProvider>(
+                        builder: (context, walletProvider, _) {
+                          final walletName = walletProvider.getWalletName(
+                            expense.walletId,
+                          );
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.wallet_rounded,
+                                  size: 12,
+                                  color: AppColors.textHint,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  walletName,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.textHint,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${isExpense ? "-" : "+"}${currencyFormat.format(expense.amount)}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      DateFormat('HH:mm').format(expense.date),
+                      style: TextStyle(fontSize: 12, color: AppColors.textHint),
                     ),
                   ],
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '${isExpense ? "-" : "+"}${currencyFormat.format(expense.amount)}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: color,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    DateFormat('HH:mm').format(expense.date),
-                    style: TextStyle(fontSize: 12, color: AppColors.textHint),
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -1302,106 +1488,329 @@ class _ExpenseListScreenState extends State<ExpenseListScreen>
   void _showFilterDialog() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        return Container(
-          decoration: BoxDecoration(
-            color: AppColors.cardBackground,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.textHint,
-                      borderRadius: BorderRadius.circular(2),
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final walletProvider =
+                Provider.of<WalletProvider>(context, listen: false);
+            final allWallets = walletProvider.wallets;
+
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.82,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.cardBackground,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle bar
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppColors.textHint.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  AppStrings.filterTitle,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 14, 16, 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Bộ lọc nâng cao',
+                          style: AppTypography.h3,
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setModalState(() {
+                              _filterType = 'all';
+                              _filterCategories.clear();
+                              _filterWalletIds.clear();
+                              _filterAmountMin = null;
+                              _filterAmountMax = null;
+                            });
+                            setState(() {});
+                          },
+                          child: const Text(
+                            'Đặt lại',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                _buildFilterDialogOption(
-                  'all',
-                  AppStrings.allTransactions,
-                  Icons.list_rounded,
-                ),
-                _buildFilterDialogOption(
-                  'income',
-                  AppStrings.incomeOnly,
-                  Icons.arrow_downward_rounded,
-                ),
-                _buildFilterDialogOption(
-                  'expense',
-                  AppStrings.expenseOnly,
-                  Icons.arrow_upward_rounded,
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 14,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 1. Transaction Type
+                          Text(
+                            'Loại giao dịch',
+                            style: AppTypography.bodySmall.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              _buildDialogTypeChip(
+                                'all',
+                                'Tất cả',
+                                Icons.list_rounded,
+                                setModalState,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildDialogTypeChip(
+                                'income',
+                                'Thu nhập',
+                                Icons.south_west_rounded,
+                                setModalState,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildDialogTypeChip(
+                                'expense',
+                                'Chi tiêu',
+                                Icons.north_east_rounded,
+                                setModalState,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+
+                          // 2. Wallets filter
+                          if (allWallets.isNotEmpty) ...[
+                            Text(
+                              'Ví tiền',
+                              style: AppTypography.bodySmall.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: allWallets.map((wallet) {
+                                final isSelected =
+                                    _filterWalletIds.contains(wallet.id);
+                                return FilterChip(
+                                  label: Text(wallet.name),
+                                  selected: isSelected,
+                                  onSelected: (selected) {
+                                    setModalState(() {
+                                      if (selected) {
+                                        _filterWalletIds.add(wallet.id);
+                                      } else {
+                                        _filterWalletIds.remove(wallet.id);
+                                      }
+                                    });
+                                    setState(() {});
+                                  },
+                                  selectedColor: AppColors.primary
+                                      .withValues(alpha: 0.15),
+                                  checkmarkColor: AppColors.primary,
+                                  labelStyle: TextStyle(
+                                    color: isSelected
+                                        ? AppColors.primary
+                                        : AppColors.textPrimary,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                    fontSize: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    side: BorderSide(
+                                      color: isSelected
+                                          ? AppColors.primary
+                                          : AppColors.borderColor,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+
+                          // 3. Category filter
+                          Text(
+                            'Danh mục',
+                            style: AppTypography.bodySmall.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: ExpenseCategory.values.map((cat) {
+                              final isSelected =
+                                  _filterCategories.contains(cat);
+                              final catName =
+                                  ExpenseModel.getCategoryName(cat);
+                              final catColor = _getCategoryColor(cat);
+                              return FilterChip(
+                                avatar: CircleAvatar(
+                                  backgroundColor:
+                                      catColor.withValues(alpha: 0.2),
+                                  radius: 10,
+                                  child: Icon(
+                                    _getCategoryIcon(cat),
+                                    size: 12,
+                                    color: catColor,
+                                  ),
+                                ),
+                                label: Text(catName),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  setModalState(() {
+                                    if (selected) {
+                                      _filterCategories.add(cat);
+                                    } else {
+                                      _filterCategories.remove(cat);
+                                    }
+                                  });
+                                  setState(() {});
+                                },
+                                selectedColor: AppColors.primary
+                                    .withValues(alpha: 0.15),
+                                checkmarkColor: AppColors.primary,
+                                labelStyle: TextStyle(
+                                  color: isSelected
+                                      ? AppColors.primary
+                                      : AppColors.textPrimary,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: BorderSide(
+                                    color: isSelected
+                                        ? AppColors.primary
+                                        : AppColors.borderColor,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Bottom CTA Button
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {});
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          _hasActiveFilters
+                              ? 'Áp dụng ($_activeFilterCount bộ lọc)'
+                              : 'Áp dụng',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
   }
 
-  Widget _buildFilterDialogOption(String value, String label, IconData icon) {
+  Widget _buildDialogTypeChip(
+    String value,
+    String label,
+    IconData icon,
+    void Function(void Function()) setModalState,
+  ) {
     final isSelected = _filterType == value;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: isSelected
-            ? AppColors.primary.withValues(alpha: 0.1)
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isSelected ? AppColors.primary : AppColors.background,
-          width: 1.5,
-        ),
-      ),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setModalState(() {
+            _filterType = value;
+          });
+          setState(() {});
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: isSelected
-                ? AppColors.primary.withValues(alpha: 0.15)
-                : AppColors.background,
-            borderRadius: BorderRadius.circular(10),
+                ? AppColors.primary.withValues(alpha: 0.12)
+                : AppColors.surfaceVariant,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.borderColor,
+              width: 1.2,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: isSelected ? AppColors.primary : AppColors.textSecondary,
-            size: 20,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 14,
+                color:
+                    isSelected ? AppColors.primary : AppColors.textSecondary,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected
+                      ? AppColors.primary
+                      : AppColors.textSecondary,
+                ),
+              ),
+            ],
           ),
         ),
-        title: Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: isSelected ? AppColors.primary : AppColors.textPrimary,
-          ),
-        ),
-        trailing: isSelected
-            ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
-            : null,
-        onTap: () {
-          setState(() => _filterType = value);
-          Navigator.pop(context);
-        },
       ),
     );
   }

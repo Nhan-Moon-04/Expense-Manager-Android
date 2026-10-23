@@ -247,9 +247,24 @@ class GroupProvider with ChangeNotifier {
   }
 
   // Calculate split
-  Map<String, double> calculateSplit() {
-    if (_selectedGroup == null) return {};
-    return _groupService.calculateSplit(_selectedGroup!);
+  Map<String, double> calculateSplit([GroupModel? group]) {
+    final targetGroup = group ?? _selectedGroup;
+    if (targetGroup == null) return {};
+    return _groupService.calculateSplit(targetGroup);
+  }
+
+  // Calculate debts with minimized transaction settlements
+  List<DebtModel> calculateDebts([GroupModel? group]) {
+    final targetGroup = group ?? _selectedGroup;
+    if (targetGroup == null) return [];
+    return _groupService.calculateDebts(targetGroup);
+  }
+
+  // Get net debt for a specific user in a group (>0: is owed, <0: owes)
+  double getUserNetDebt(String userId, [GroupModel? group]) {
+    final targetGroup = group ?? _selectedGroup;
+    if (targetGroup == null) return 0.0;
+    return _groupService.getUserNetDebt(userId, targetGroup);
   }
 
   void _setLoading(bool value) {

@@ -286,4 +286,83 @@ class GroupService {
 
     return balances;
   }
+
+  // Calculate user net debt: > 0 means user is owed, < 0 means user owes
+  double getUserNetDebt(String userId, GroupModel group) {
+    if (group.members.isEmpty) return 0.0;
+    final member = group.members.firstWhere(
+      (m) => m.userId == userId,
+      orElse: () => GroupMember(
+        userId: userId,
+        role: 'member',
+        joinedAt: DateTime.now(),
+      ),
+    );
+    final averageShare = group.totalExpense / group.members.length;
+    return member.contribution - averageShare;
+  }
+
+  // Transaction minimization algorithm for debt settlement
+  List<DebtModel> calculateDebts(GroupModel group) {
+    if (group.members.length < 2 || group.totalExpense <= 0) return [];
+
+    final double averageShare = group.totalExpense / group.members.length;
+    final Map<String, GroupMember> memberMap = {
+      for (var m in group.members) m.userId: m,
+    };
+
+    // Separate into debtors (owes > 0) and creditors (is owed > 0)
+    List<MapEntry<String, double>> debtors = [];
+    List<MapEntry<String, double>> creditors = [];
+
+    for (var m in group.members) {
+      final double net = m.contribution - averageShare;
+      if (net < -500.0) {
+        debtors.add(MapEntry(m.userId, -net));
+      } else if (net > 500.0) {
+        creditors.add(MapEntry(m.userId, net));
+      }
+    }
+
+    // Sort descending by magnitude to minimize transactions
+    debtors.sort((a, b) => b.value.compareTo(a.value));
+    creditors.sort((a, b) => b.value.compareTo(a.value));
+
+    List<DebtModel> debts = [];
+    int d = 0;
+    int c = 0;
+
+    while (d < debtors.length && c < creditors.length) {
+      final debtor = debtors[d];
+      final creditor = creditors[c];
+
+      final double settleAmount =
+          debtor.value < creditor.value ? debtor.value : creditor.value;
+
+      if (settleAmount >= 500.0) {
+        final fromMember = memberMap[debtor.key];
+        final toMember = memberMap[creditor.key];
+
+        debts.add(
+          DebtModel(
+            fromUserId: debtor.key,
+            fromUserName: fromMember?.displayName ?? 'Thành viên',
+            fromAvatarUrl: fromMember?.avatarUrl,
+            toUserId: creditor.key,
+            toUserName: toMember?.displayName ?? 'Thành viên',
+            toAvatarUrl: toMember?.avatarUrl,
+            amount: settleAmount,
+          ),
+        );
+      }
+
+      debtors[d] = MapEntry(debtor.key, debtor.value - settleAmount);
+      creditors[c] = MapEntry(creditor.key, creditor.value - settleAmount);
+
+      if (debtors[d].value < 500.0) d++;
+      if (creditors[c].value < 500.0) c++;
+    }
+
+    return debts;
+  }
 }

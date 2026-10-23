@@ -4,9 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:speech_to_text/speech_to_text.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_theme.dart';
+import '../widgets/voice_input_sheet.dart';
 import '../../constants/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
@@ -14,7 +14,7 @@ import '../../providers/reminder_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/wallet_provider.dart';
 import '../../models/expense_model.dart';
-import '../../services/voice_expense_service.dart';
+import '../statistics/statistics_screen.dart';
 import '../expenses/add_expense_screen.dart';
 import '../expenses/expense_detail_screen.dart';
 import '../expenses/expense_list_screen.dart';
@@ -24,6 +24,13 @@ import '../notifications/notifications_screen.dart';
 import '../wallets/wallet_management_screen.dart';
 import '../wallets/wallet_detail_screen.dart';
 import '../../models/wallet_model.dart';
+
+enum DashboardTimePeriod {
+  today,
+  week,
+  month,
+  custom,
+}
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -39,6 +46,10 @@ class _DashboardScreenState extends State<DashboardScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   bool _isBalanceVisible = false;
+
+  // Time period filter state (Phase 1.2)
+  DashboardTimePeriod _selectedTimePeriod = DashboardTimePeriod.month;
+  DateTimeRange? _customDateRange;
 
   // FAB expansion
   late AnimationController _fabAnimationController;
@@ -129,6 +140,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                           _buildHeader(),
                           const SizedBox(height: 16),
                           _buildBalanceCard(),
+                          const SizedBox(height: 12),
+                          _buildTimeFilter(),
                           const SizedBox(height: 14),
                           _buildMomoStyleWalletsCard(),
                           const SizedBox(height: 18),
@@ -553,6 +566,14 @@ class _DashboardScreenState extends State<DashboardScreen>
         final growthPercent = expenseProvider.monthGrowthPercent;
         final isGrowthPositive = growthPercent >= 0;
 
+        final periodExpenses = _getFilteredExpenses(expenseProvider);
+        final double periodIncome = periodExpenses
+            .where((e) => e.type == ExpenseType.income)
+            .fold(0.0, (sum, e) => sum + e.amount);
+        final double periodExpense = periodExpenses
+            .where((e) => e.type == ExpenseType.expense)
+            .fold(0.0, (sum, e) => sum + e.amount);
+
         // Determine growth label
         String growthLabel;
         if (growthPercent > 10) {
@@ -639,193 +660,296 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
                 // Content Layer
                 Padding(
-                  padding: const EdgeInsets.all(22),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Header Row: Wallet pill + Quick Action Icons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ExpenseListScreen(),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.16),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.account_balance_wallet_rounded,
+                                    color: Colors.white.withValues(alpha: 0.95),
+                                    size: 14,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    AppStrings.totalBalance,
+                                    style: AppTypography.caption.copyWith(
+                                      color: Colors.white.withValues(alpha: 0.95),
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.2,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                    size: 14,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Visibility Toggle Button
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _isBalanceVisible = !_isBalanceVisible;
+                                  });
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(7),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(alpha: 0.16),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    _isBalanceVisible
+                                        ? Icons.visibility_rounded
+                                        : Icons.visibility_off_rounded,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              _buildBalanceMenuButton(balance),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Balance Hero Amount
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        child: Text(
+                          _isBalanceVisible
+                              ? currencyFormat.format(balance)
+                              : '••••••••',
+                          key: ValueKey(_isBalanceVisible),
+                          style: AppTypography.amount.copyWith(
+                            fontSize: 34,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            letterSpacing: _isBalanceVisible ? -0.8 : 4,
+                            height: 1.1,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Growth trend line
+                      Row(
+                        children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
+                              horizontal: 8,
+                              vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(12),
+                              color: isGrowthPositive
+                                  ? const Color(0xFF10B981).withValues(alpha: 0.22)
+                                  : const Color(0xFFF43F5E).withValues(alpha: 0.22),
+                              borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.15),
-                                width: 1,
+                                color: isGrowthPositive
+                                    ? const Color(0xFF10B981).withValues(alpha: 0.45)
+                                    : const Color(0xFFF43F5E).withValues(alpha: 0.45),
+                                width: 0.8,
                               ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  Icons.account_balance_wallet_rounded,
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  size: 14,
+                                  isGrowthPositive
+                                      ? Icons.trending_up_rounded
+                                      : Icons.trending_down_rounded,
+                                  color: isGrowthPositive
+                                      ? const Color(0xFF34D399)
+                                      : const Color(0xFFFB7185),
+                                  size: 13,
                                 ),
-                                const SizedBox(width: 6),
+                                const SizedBox(width: 4),
                                 Text(
-                                  AppStrings.totalBalance,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.2,
+                                  '${isGrowthPositive ? '+' : ''}${growthPercent.abs().toStringAsFixed(0)}% $growthLabel',
+                                  style: AppTypography.caption.copyWith(
+                                    color: isGrowthPositive
+                                        ? const Color(0xFF34D399)
+                                        : const Color(0xFFFB7185),
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          _buildBalanceMenuButton(balance),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: SizedBox(
-                              height: 38,
-                              child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 300),
-                                switchInCurve: Curves.easeOut,
-                                switchOutCurve: Curves.easeIn,
-                                layoutBuilder: (currentChild, previousChildren) {
-                                  return Stack(
-                                    alignment: Alignment.centerLeft,
-                                    children: [...previousChildren, ?currentChild],
-                                  );
-                                },
-                                child: _isBalanceVisible
-                                    ? Text(
-                                        currencyFormat.format(balance),
-                                        key: const ValueKey('visible'),
-                                        style: GoogleFonts.inter(
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.w800,
-                                          color: Colors.white,
-                                          letterSpacing: -1,
-                                          height: 1.1,
-                                        ),
-                                      )
-                                    : Text(
-                                        '••••••••',
-                                        key: const ValueKey('hidden'),
-                                        style: GoogleFonts.inter(
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.w800,
-                                          color: Colors.white,
-                                          letterSpacing: 4,
-                                          height: 1.1,
-                                        ),
-                                      ),
-                              ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'so với tháng trước',
+                            style: AppTypography.caption.copyWith(
+                              color: Colors.white.withValues(alpha: 0.65),
+                              fontSize: 11,
                             ),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
 
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isBalanceVisible = !_isBalanceVisible;
-                              });
-                            },
+                      // Two Balanced Sub-Cards: Thu nhập & Chi tiêu
+                      Row(
+                        children: [
+                          // Income Sub-Card
+                          Expanded(
                             child: Container(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.white.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.2),
+                                  color: const Color(0xFF10B981).withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
-                              child: Icon(
-                                _isBalanceVisible
-                                    ? Icons.visibility_rounded
-                                    : Icons.visibility_off_rounded,
-                                color: Colors.white.withValues(alpha: 0.9),
-                                size: 18,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          _buildBalanceTrend(
-                            isPositive: isGrowthPositive,
-                            label: growthLabel,
-                            percent: growthPercent,
-                          ),
-                          const Spacer(),
-                          // Inline Income indicator
-                          Flexible(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
                               child: Row(
-                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(
-                                    Icons.south_west_rounded,
-                                    color: Color(0xFF34D399),
-                                    size: 11,
+                                  Container(
+                                    padding: const EdgeInsets.all(7),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.south_west_rounded,
+                                      color: Color(0xFF34D399),
+                                      size: 14,
+                                    ),
                                   ),
-                                  const SizedBox(width: 4),
-                                  Flexible(
-                                    child: Text(
-                                      _isBalanceVisible
-                                          ? currencyFormat.format(expenseProvider.monthIncome)
-                                          : '••••••',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: const Color(0xFF34D399),
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${AppStrings.income} (${_getPeriodLabel()})',
+                                          style: AppTypography.caption.copyWith(
+                                            color: Colors.white.withValues(alpha: 0.7),
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          _isBalanceVisible
+                                              ? currencyFormat.format(periodIncome)
+                                              : '••••••',
+                                          style: AppTypography.amountSmall.copyWith(
+                                            color: const Color(0xFF34D399),
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                          const SizedBox(width: 6),
-                          // Inline Expense indicator
-                          Flexible(
+                          const SizedBox(width: 10),
+                          // Expense Sub-Card
+                          Expanded(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: const Color(0xFFF43F5E).withValues(alpha: 0.3),
+                                  width: 1,
+                                ),
                               ),
                               child: Row(
-                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(
-                                    Icons.north_east_rounded,
-                                    color: Color(0xFFFB7185),
-                                    size: 11,
+                                  Container(
+                                    padding: const EdgeInsets.all(7),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF43F5E).withValues(alpha: 0.2),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.north_east_rounded,
+                                      color: Color(0xFFFB7185),
+                                      size: 14,
+                                    ),
                                   ),
-                                  const SizedBox(width: 4),
-                                  Flexible(
-                                    child: Text(
-                                      _isBalanceVisible
-                                          ? currencyFormat.format(expenseProvider.monthTotal)
-                                          : '••••••',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: const Color(0xFFFB7185),
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${AppStrings.expense} (${_getPeriodLabel()})',
+                                          style: AppTypography.caption.copyWith(
+                                            color: Colors.white.withValues(alpha: 0.7),
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          _isBalanceVisible
+                                              ? currencyFormat.format(periodExpense)
+                                              : '••••••',
+                                          style: AppTypography.amountSmall.copyWith(
+                                            color: const Color(0xFFFB7185),
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -842,6 +966,233 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
         );
       },
+    );
+  }
+
+  List<ExpenseModel> _getFilteredExpenses(ExpenseProvider expenseProvider) {
+    final now = DateTime.now();
+    switch (_selectedTimePeriod) {
+      case DashboardTimePeriod.today:
+        return expenseProvider.expenses.where((e) {
+          return e.date.year == now.year &&
+              e.date.month == now.month &&
+              e.date.day == now.day;
+        }).toList();
+      case DashboardTimePeriod.week:
+        final monday = now.subtract(Duration(days: now.weekday - 1));
+        final startOfWeek = DateTime(monday.year, monday.month, monday.day);
+        final endOfWeek = startOfWeek.add(const Duration(days: 7));
+        return expenseProvider.expenses.where((e) {
+          return e.date.isAfter(startOfWeek.subtract(const Duration(milliseconds: 1))) &&
+              e.date.isBefore(endOfWeek);
+        }).toList();
+      case DashboardTimePeriod.month:
+        return expenseProvider.expenses.where((e) {
+          return e.date.year == now.year && e.date.month == now.month;
+        }).toList();
+      case DashboardTimePeriod.custom:
+        if (_customDateRange != null) {
+          final start = DateTime(
+            _customDateRange!.start.year,
+            _customDateRange!.start.month,
+            _customDateRange!.start.day,
+          );
+          final end = DateTime(
+            _customDateRange!.end.year,
+            _customDateRange!.end.month,
+            _customDateRange!.end.day,
+            23,
+            59,
+            59,
+            999,
+          );
+          return expenseProvider.expenses.where((e) {
+            return (e.date.isAfter(start) || e.date.isAtSameMomentAs(start)) &&
+                (e.date.isBefore(end) || e.date.isAtSameMomentAs(end));
+          }).toList();
+        }
+        return expenseProvider.expenses;
+    }
+  }
+
+  String _getPeriodLabel() {
+    switch (_selectedTimePeriod) {
+      case DashboardTimePeriod.today:
+        return 'Hôm nay';
+      case DashboardTimePeriod.week:
+        return 'Tuần này';
+      case DashboardTimePeriod.month:
+        return 'Tháng này';
+      case DashboardTimePeriod.custom:
+        if (_customDateRange != null) {
+          return '${DateFormat('dd/MM').format(_customDateRange!.start)} - ${DateFormat('dd/MM').format(_customDateRange!.end)}';
+        }
+        return 'Tùy chọn';
+    }
+  }
+
+  Widget _buildTimeFilter() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        children: [
+          _buildFilterChip('Hôm nay', DashboardTimePeriod.today),
+          const SizedBox(width: 8),
+          _buildFilterChip('Tuần này', DashboardTimePeriod.week),
+          const SizedBox(width: 8),
+          _buildFilterChip('Tháng này', DashboardTimePeriod.month),
+          const SizedBox(width: 8),
+          _buildCustomFilterChip(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, DashboardTimePeriod period) {
+    final isSelected = _selectedTimePeriod == period;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          setState(() {
+            _selectedTimePeriod = period;
+          });
+        },
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          decoration: BoxDecoration(
+            gradient: isSelected
+                ? const LinearGradient(
+                    colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            color: isSelected ? null : AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+            border: Border.all(
+              color: isSelected
+                  ? Colors.transparent
+                  : AppColors.dividerColor.withValues(alpha: 0.8),
+              width: 1,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF2563EB).withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              color: isSelected ? Colors.white : AppColors.textSecondary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomFilterChip() {
+    final isSelected = _selectedTimePeriod == DashboardTimePeriod.custom;
+    final label = _customDateRange != null
+        ? '${DateFormat('dd/MM').format(_customDateRange!.start)} - ${DateFormat('dd/MM').format(_customDateRange!.end)}'
+        : 'Tùy chọn';
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () async {
+          HapticFeedback.lightImpact();
+          final picked = await showDateRangePicker(
+            context: context,
+            firstDate: DateTime(2020),
+            lastDate: DateTime.now().add(const Duration(days: 365)),
+            initialDateRange: _customDateRange ??
+                DateTimeRange(
+                  start: DateTime.now().subtract(const Duration(days: 7)),
+                  end: DateTime.now(),
+                ),
+            builder: (context, child) {
+              return Theme(
+                data: Theme.of(context).copyWith(
+                  colorScheme: Theme.of(context).colorScheme.copyWith(
+                        primary: AppColors.primary,
+                        surface: AppColors.cardBackground,
+                      ),
+                ),
+                child: child!,
+              );
+            },
+          );
+          if (picked != null) {
+            setState(() {
+              _customDateRange = picked;
+              _selectedTimePeriod = DashboardTimePeriod.custom;
+            });
+          }
+        },
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            gradient: isSelected
+                ? const LinearGradient(
+                    colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            color: isSelected ? null : AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+            border: Border.all(
+              color: isSelected
+                  ? Colors.transparent
+                  : AppColors.dividerColor.withValues(alpha: 0.8),
+              width: 1,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF2563EB).withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.calendar_today_rounded,
+                size: 13,
+                color: isSelected ? Colors.white : AppColors.textSecondary,
+              ),
+              const SizedBox(width: 5),
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -929,61 +1280,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildBalanceTrend({
-    required bool isPositive,
-    required String label,
-    required double percent,
-  }) {
-    // High-contrast executive fintech pill colors
-    final gradientColors = isPositive
-        ? const [Color(0xFF059669), Color(0xFF10B981)] // Luminous Emerald
-        : const [Color(0xFFE11D48), Color(0xFFF43F5E)]; // Vibrant Rose Red
-    final shadowColor = isPositive
-        ? const Color(0xFF10B981)
-        : const Color(0xFFF43F5E);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: gradientColors,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withValues(alpha: 0.45),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            isPositive
-                ? Icons.trending_up_rounded
-                : Icons.trending_down_rounded,
-            color: Colors.white,
-            size: 15,
-          ),
-          const SizedBox(width: 5),
-          Text(
-            '${percent.abs().toStringAsFixed(0)}% $label',
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.2,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
 
 
   Widget _buildQuickActions() {
@@ -992,64 +1288,46 @@ class _DashboardScreenState extends State<DashboardScreen>
       children: [
         Text(
           AppStrings.quickActions,
-          style: GoogleFonts.inter(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-            letterSpacing: -0.2,
-          ),
+          style: AppTypography.h3,
         ),
         const SizedBox(height: 14),
         Row(
           children: [
             _buildActionButton(
-              icon: Icons.remove_rounded,
-              label: AppStrings.expense,
-              color: AppColors.expenseColor,
-              gradient: AppColors.expenseGradient,
+              icon: Icons.bar_chart_rounded,
+              label: 'Thống kê',
+              color: const Color(0xFF6366F1),
+              gradient: const [Color(0xFF4F46E5), Color(0xFF6366F1)],
               onTap: () {
-                final walletProvider = Provider.of<WalletProvider>(
-                  context,
-                  listen: false,
-                );
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddExpenseScreen(
-                      defaultWalletId: walletProvider.primaryWallet?.id,
-                    ),
+                    builder: (context) => const StatisticsScreen(),
                   ),
                 );
               },
             ),
             const SizedBox(width: 10),
             _buildActionButton(
-              icon: Icons.add_rounded,
-              label: AppStrings.income,
-              color: AppColors.incomeColor,
-              gradient: AppColors.incomeGradient,
+              icon: Icons.account_balance_wallet_rounded,
+              label: 'Ví tiền',
+              color: const Color(0xFF0EA5E9),
+              gradient: const [Color(0xFF0284C7), Color(0xFF38BDF8)],
               onTap: () {
-                final walletProvider = Provider.of<WalletProvider>(
-                  context,
-                  listen: false,
-                );
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddExpenseScreen(
-                      isIncome: true,
-                      defaultWalletId: walletProvider.primaryWallet?.id,
-                    ),
+                    builder: (context) => const WalletManagementScreen(),
                   ),
                 );
               },
             ),
             const SizedBox(width: 10),
             _buildActionButton(
-              icon: Icons.notifications_active_outlined,
+              icon: Icons.alarm_rounded,
               label: AppStrings.reminders,
               color: AppColors.warning,
-              gradient: const [Color(0xFFF59E0B), Color(0xFFFBBF24)],
+              gradient: const [Color(0xFFD97706), Color(0xFFFBBF24)],
               onTap: () {
                 Navigator.push(
                   context,
@@ -1479,19 +1757,64 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ],
                     ),
                     const SizedBox(height: 3),
-                    Text(
-                      expense.subtitleText ??
-                          DateFormat('dd/MM/yyyy').format(expense.date),
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            expense.subtitleText ??
+                                DateFormat('dd/MM/yyyy').format(expense.date),
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (context.watch<WalletProvider>().wallets.length > 1 || expense.walletId != null) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: AppColors.dividerColor.withValues(alpha: 0.5),
+                                width: 0.5,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.account_balance_wallet_outlined,
+                                  size: 10,
+                                  color: AppColors.textSecondary,
+                                ),
+                                const SizedBox(width: 3),
+                                ConstrainedBox(
+                                  constraints: const BoxConstraints(maxWidth: 80),
+                                  child: Text(
+                                    context.watch<WalletProvider>().getWalletName(expense.walletId),
+                                    style: GoogleFonts.inter(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -1901,791 +2224,6 @@ class _DashboardScreenState extends State<DashboardScreen>
           ],
         ),
       ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════
-// VOICE LISTENING SHEET
-// ═══════════════════════════════════════════════════════════
-class VoiceListeningSheet extends StatefulWidget {
-  final void Function(VoiceExpenseResult result) onResult;
-
-  const VoiceListeningSheet({super.key, required this.onResult});
-
-  @override
-  State<VoiceListeningSheet> createState() => _VoiceListeningSheetState();
-}
-
-class _VoiceListeningSheetState extends State<VoiceListeningSheet>
-    with TickerProviderStateMixin {
-  final SpeechToText _speech = SpeechToText();
-
-  bool _isInitialized = false;
-  bool _isListening = false;
-  bool _hasError = false;
-  bool _needsPermission = false;
-  String _transcribedText = '';
-  VoiceExpenseResult? _parsedResult;
-  String? _errorMessage;
-  String _detectedLocaleId = 'vi_VN';
-  late final TextEditingController _textController;
-
-  // Mic pulse animation
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnim;
-
-  // Wave bars animation
-  late AnimationController _waveController;
-  late List<Animation<double>> _waveAnims;
-
-  @override
-  void initState() {
-    super.initState();
-    _textController = TextEditingController();
-
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-    _pulseAnim = Tween<double>(begin: 1.0, end: 1.18).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-
-    _waveController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _waveAnims = List.generate(5, (i) {
-      final start = i * 0.15;
-      return Tween<double>(begin: 0.15, end: 1.0).animate(
-        CurvedAnimation(
-          parent: _waveController,
-          curve: Interval(start, (start + 0.55).clamp(0, 1), curve: Curves.easeInOut),
-        ),
-      );
-    });
-
-    _initSpeech();
-  }
-
-  Future<void> _initSpeech() async {
-    try {
-      // 1. Kiểm tra và xin quyền microphone trước
-      final micStatus = await Permission.microphone.status;
-      if (!micStatus.isGranted) {
-        final req = await Permission.microphone.request();
-        if (!req.isGranted) {
-          if (mounted) {
-            setState(() {
-              _needsPermission = true;
-              _hasError = false;
-            });
-          }
-          return;
-        }
-      }
-
-      if (mounted) {
-        setState(() {
-          _needsPermission = false;
-          _hasError = false;
-          _errorMessage = null;
-        });
-      }
-
-      // 2. Khởi tạo Speech Recognizer
-      _isInitialized = await _speech.initialize(
-        debugLogging: true,
-        onStatus: (status) {
-          debugPrint('🎙️ [Speech] Status: $status');
-          if (status == 'done' || status == 'notListening') {
-            if (mounted) {
-              setState(() => _isListening = false);
-              _stopAnimations();
-              _tryParse();
-            }
-          } else if (status == 'listening') {
-            if (mounted) {
-              setState(() => _isListening = true);
-              _startAnimations();
-            }
-          }
-        },
-        onError: (error) {
-          debugPrint('🎙️ [Speech] Error: ${error.errorMsg}');
-          if (mounted) {
-            Permission.microphone.isGranted.then((granted) {
-              if (mounted) {
-                if (!granted) {
-                  setState(() {
-                    _isListening = false;
-                    _needsPermission = true;
-                  });
-                } else {
-                  setState(() {
-                    _isListening = false;
-                    _hasError = true;
-                    _errorMessage = error.errorMsg;
-                  });
-                }
-                _stopAnimations();
-              }
-            });
-          }
-        },
-      );
-
-      String localeId = 'vi_VN';
-      try {
-        final locales = await _speech.locales();
-        debugPrint('🎙️ [Speech] Available locales: ${locales.map((l) => l.localeId).join(', ')}');
-        final viLocale = locales.where((l) => l.localeId.toLowerCase().startsWith('vi')).firstOrNull;
-        if (viLocale != null) {
-          localeId = viLocale.localeId;
-        } else if (locales.isNotEmpty) {
-          localeId = locales.first.localeId;
-        }
-      } catch (_) {}
-      _detectedLocaleId = localeId;
-      debugPrint('🎙️ [Speech] Using locale: $_detectedLocaleId');
-
-      if (!_isInitialized && mounted) {
-        setState(() {
-          _hasError = true;
-          _errorMessage = 'Thiết bị chưa bật Dịch vụ nhận diện giọng nói (Google Voice Recognition).';
-        });
-        return;
-      }
-
-      if (_isInitialized && mounted) {
-        _startListening();
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _hasError = true;
-          _errorMessage = e.toString();
-        });
-      }
-    }
-  }
-
-  Future<void> _startListening([String? localeId]) async {
-    if (!_isInitialized) return;
-    final targetLocale = localeId ?? _detectedLocaleId;
-    debugPrint('🎙️ [Speech] Starting listen with locale: $targetLocale');
-    setState(() {
-      _isListening = true;
-      _hasError = false;
-      _transcribedText = '';
-      _parsedResult = null;
-    });
-    _textController.clear();
-    _startAnimations();
-
-    await _speech.listen(
-      onResult: (result) {
-        debugPrint('🎙️ [Speech] Recognized: "${result.recognizedWords}" (final: ${result.finalResult})');
-        if (mounted) {
-          setState(() {
-            _transcribedText = result.recognizedWords;
-            _textController.text = result.recognizedWords;
-            _parsedResult = VoiceExpenseService.parse(_transcribedText);
-          });
-        }
-      },
-      listenOptions: SpeechListenOptions(
-        localeId: targetLocale,
-        listenFor: const Duration(seconds: 30),
-        pauseFor: const Duration(seconds: 5),
-        partialResults: true,
-        cancelOnError: false,
-        listenMode: ListenMode.confirmation,
-      ),
-    );
-  }
-
-  Future<void> _stopListening() async {
-    debugPrint('🎙️ [Speech] Manual stop requested');
-    await _speech.stop();
-    if (mounted) {
-      setState(() => _isListening = false);
-      _stopAnimations();
-      _tryParse();
-    }
-  }
-
-  void _startAnimations() {
-    _pulseController.repeat(reverse: true);
-    _waveController.repeat(reverse: true);
-  }
-
-  void _stopAnimations() {
-    _pulseController.stop();
-    _waveController.stop();
-  }
-
-  void _tryParse() {
-    if (_transcribedText.isNotEmpty) {
-      setState(() {
-        _parsedResult = VoiceExpenseService.parse(_transcribedText);
-      });
-    }
-  }
-
-  void _confirm() {
-    if (_parsedResult != null) {
-      widget.onResult(_parsedResult!);
-    }
-  }
-
-  @override
-  void dispose() {
-    _speech.cancel();
-    _textController.dispose();
-    _pulseController.dispose();
-    _waveController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final bottomPad = MediaQuery.of(context).padding.bottom;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.18),
-            blurRadius: 24,
-            offset: const Offset(0, -6),
-          ),
-        ],
-      ),
-      padding: EdgeInsets.fromLTRB(24, 16, 24, bottomPad + 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.borderColor,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Title
-          Text(
-            'Nhập chi tiêu bằng giọng nói',
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Nói tự nhiên: "Chi 50k cafe" hoặc "Thu 2 triệu lương"',
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 28),
-
-          // Mic button with pulse
-          if (_needsPermission)
-            _buildPermissionState()
-          else if (_hasError)
-            _buildErrorState()
-          else ...[
-            // Animated mic
-            GestureDetector(
-              onTap: _isListening ? _stopListening : _startListening,
-              child: AnimatedBuilder(
-                animation: _pulseAnim,
-                builder: (ctx, child) {
-                  return Transform.scale(
-                    scale: _isListening ? _pulseAnim.value : 1.0,
-                    child: child,
-                  );
-                },
-                child: Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: _isListening
-                          ? [const Color(0xFF7C3AED), const Color(0xFF8B5CF6)]
-                          : [AppColors.primary, AppColors.primaryLight],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (_isListening
-                                ? const Color(0xFF8B5CF6)
-                                : AppColors.primary)
-                            .withValues(alpha: 0.45),
-                        blurRadius: 20,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    _isListening ? Icons.mic_rounded : Icons.mic_none_rounded,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Wave bars (animated when listening)
-            if (_isListening)
-              _buildWaveBars()
-            else
-              Text(
-                _isListening ? '' : 'Nhấn mic để bắt đầu',
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-
-            // Transcribed / Input text field
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: _isListening ? const Color(0xFF8B5CF6) : AppColors.borderColor,
-                  width: _isListening ? 1.5 : 1.0,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    _isListening ? Icons.graphic_eq_rounded : Icons.edit_note_rounded,
-                    size: 20,
-                    color: _isListening ? const Color(0xFF8B5CF6) : AppColors.textSecondary,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: _textController,
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: _isListening ? 'Đang lắng nghe...' : 'Nói hoặc nhập: "chi 50k cafe"',
-                        hintStyle: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                      ),
-                      onChanged: (val) {
-                        setState(() {
-                          _transcribedText = val;
-                          _parsedResult = VoiceExpenseService.parse(val);
-                        });
-                      },
-                    ),
-                  ),
-                  if (_textController.text.isNotEmpty)
-                    GestureDetector(
-                      onTap: () {
-                        _textController.clear();
-                        setState(() {
-                          _transcribedText = '';
-                          _parsedResult = null;
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: Icon(Icons.close_rounded, size: 18, color: AppColors.textSecondary),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-
-            // Parsed result preview
-            if (_parsedResult != null) ...[
-              const SizedBox(height: 12),
-              _buildParsedPreview(_parsedResult!),
-            ],
-
-            const SizedBox(height: 20),
-
-            // Confirm button
-            if (_parsedResult != null)
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: _parsedResult!.isIncome
-                          ? AppColors.incomeGradient
-                          : AppColors.expenseGradient,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (_parsedResult!.isIncome
-                                ? AppColors.incomeColor
-                                : AppColors.expenseColor)
-                            .withValues(alpha: 0.35),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ElevatedButton.icon(
-                    onPressed: _confirm,
-                    icon: const Icon(Icons.check_rounded, color: Colors.white, size: 20),
-                    label: Text(
-                      'Tiếp tục điền thông tin',
-                      style: GoogleFonts.inter(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                    ),
-                  ),
-                ),
-              ),
-
-            if (!_isListening && _transcribedText.isNotEmpty)
-              TextButton.icon(
-                onPressed: _startListening,
-                icon: Icon(Icons.refresh_rounded, size: 16, color: AppColors.primary),
-                label: Text(
-                  'Thử lại',
-                  style: GoogleFonts.inter(color: AppColors.primary, fontSize: 13),
-                ),
-              ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWaveBars() {
-    return AnimatedBuilder(
-      animation: _waveController,
-      builder: (ctx, _) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: List.generate(5, (i) {
-            final height = 8.0 + _waveAnims[i].value * 28.0;
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: 4,
-              height: height,
-              decoration: BoxDecoration(
-                color: const Color(0xFF8B5CF6).withValues(
-                    alpha: 0.4 + _waveAnims[i].value * 0.6),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            );
-          }),
-        );
-      },
-    );
-  }
-
-  Widget _buildParsedPreview(VoiceExpenseResult result) {
-    final color = result.isIncome ? AppColors.incomeColor : AppColors.expenseColor;
-    final typeLabel = result.isIncome ? 'Thu nhập' : 'Chi tiêu';
-    final typeIcon =
-        result.isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded;
-    final amountText = result.amount != null
-        ? NumberFormat.currency(locale: 'vi_VN', symbol: 'đ', decimalDigits: 0)
-            .format(result.amount)
-        : 'Chưa xác định';
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(typeIcon, color: color, size: 16),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                typeLabel,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: color,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                amountText,
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: color,
-                ),
-              ),
-            ],
-          ),
-          if (result.description.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.notes_rounded, size: 14, color: AppColors.textSecondary),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    result.description,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState() {
-    return Column(
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.warning.withValues(alpha: 0.12),
-          ),
-          child: const Icon(Icons.settings_voice_rounded, color: AppColors.warning, size: 36),
-        ),
-        const SizedBox(height: 14),
-        Text(
-          'Cần bật Nhận diện giọng nói Google',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Máy chưa chọn Google làm dịch vụ nhận diện giọng nói.\nBấm nút bên dưới để vào cài đặt và chọn Google.',
-          style: GoogleFonts.inter(
-            fontSize: 13,
-            color: AppColors.textSecondary,
-            height: 1.4,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 20),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton.icon(
-            onPressed: () async {
-              try {
-                const channel = MethodChannel('com.example.expense_manager_android/notifications');
-                await channel.invokeMethod('openVoiceInputSettings');
-              } catch (_) {}
-            },
-            icon: const Icon(Icons.settings_rounded, size: 18),
-            label: Text(
-              'Mở Cài đặt Nhập giọng nói',
-              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        TextButton.icon(
-          onPressed: () {
-            setState(() {
-              _hasError = false;
-              _isListening = false;
-            });
-            _initSpeech();
-          },
-          icon: const Icon(Icons.refresh_rounded, size: 16),
-          label: Text('Thử lại sau khi đã bật', style: GoogleFonts.inter(fontSize: 13)),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPermissionState() {
-    return Column(
-      children: [
-        // Icon
-        Container(
-          width: 84,
-          height: 84,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [
-                const Color(0xFF8B5CF6).withValues(alpha: 0.15),
-                const Color(0xFF7C3AED).withValues(alpha: 0.08),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            border: Border.all(
-              color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-              width: 1.5,
-            ),
-          ),
-          child: const Icon(
-            Icons.mic_rounded,
-            color: Color(0xFF8B5CF6),
-            size: 38,
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        Text(
-          'Cần quyền Microphone',
-          style: GoogleFonts.inter(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Ứng dụng cần quyền truy cập microphone\nđể nhận diện giọng nói của bạn',
-          style: GoogleFonts.inter(
-            fontSize: 13,
-            color: AppColors.textSecondary,
-            height: 1.5,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 24),
-
-        // Grant permission button
-        SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF7C3AED), Color(0xFF8B5CF6)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.35),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                final result = await Permission.microphone.request();
-                if (result.isGranted) {
-                  if (mounted) {
-                    setState(() => _needsPermission = false);
-                    _initSpeech();
-                  }
-                } else if (result.isPermanentlyDenied) {
-                  // User chọn "Không hỏi lại" → mở settings
-                  await openAppSettings();
-                }
-              },
-              icon: const Icon(Icons.mic_rounded, color: Colors.white, size: 20),
-              label: Text(
-                'Cấp quyền Microphone',
-                style: GoogleFonts.inter(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 10),
-
-        // Open settings button (for permanently denied case)
-        TextButton.icon(
-          onPressed: () async {
-            await openAppSettings();
-          },
-          icon: Icon(Icons.settings_rounded,
-              size: 15, color: AppColors.textSecondary),
-          label: Text(
-            'Mở Cài đặt ứng dụng',
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

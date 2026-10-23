@@ -58,6 +58,31 @@ class GroupMember {
   }
 }
 
+enum GroupType {
+  splitBill, // Chia tiền hóa đơn / chuyến đi
+  sharedFund, // Quỹ chung / Hùn tiền mục tiêu
+}
+
+class DebtModel {
+  final String fromUserId;
+  final String fromUserName;
+  final String? fromAvatarUrl;
+  final String toUserId;
+  final String toUserName;
+  final String? toAvatarUrl;
+  final double amount;
+
+  const DebtModel({
+    required this.fromUserId,
+    required this.fromUserName,
+    this.fromAvatarUrl,
+    required this.toUserId,
+    required this.toUserName,
+    this.toAvatarUrl,
+    required this.amount,
+  });
+}
+
 class GroupModel {
   final String id;
   final String name;
@@ -66,6 +91,7 @@ class GroupModel {
   final String ownerId;
   final String inviteCode;
   final List<GroupMember> members;
+  final GroupType type;
   final double totalExpense;
   final double totalIncome;
   final double? targetAmount; // Mục tiêu hùn tiền
@@ -83,6 +109,7 @@ class GroupModel {
     required this.ownerId,
     required this.inviteCode,
     required this.members,
+    this.type = GroupType.splitBill,
     this.totalExpense = 0.0,
     this.totalIncome = 0.0,
     this.targetAmount,
@@ -114,6 +141,15 @@ class GroupModel {
           .toList();
     }
 
+    final typeStr = data['type'] as String?;
+    final GroupType resolvedType = typeStr == 'sharedFund'
+        ? GroupType.sharedFund
+        : (typeStr == 'splitBill'
+            ? GroupType.splitBill
+            : ((data['targetAmount'] != null && (data['targetAmount'] as num) > 0)
+                ? GroupType.sharedFund
+                : GroupType.splitBill));
+
     return GroupModel(
       id: doc.id,
       name: data['name'] ?? '',
@@ -122,6 +158,7 @@ class GroupModel {
       ownerId: data['ownerId'] ?? '',
       inviteCode: data['inviteCode'] ?? '',
       members: membersList,
+      type: resolvedType,
       totalExpense: (data['totalExpense'] ?? 0.0).toDouble(),
       totalIncome: (data['totalIncome'] ?? 0.0).toDouble(),
       targetAmount: data['targetAmount']?.toDouble(),
@@ -141,6 +178,7 @@ class GroupModel {
       'ownerId': ownerId,
       'inviteCode': inviteCode,
       'members': members.map((m) => m.toMap()).toList(),
+      'type': type == GroupType.sharedFund ? 'sharedFund' : 'splitBill',
       'totalExpense': totalExpense,
       'totalIncome': totalIncome,
       'targetAmount': targetAmount,
@@ -162,6 +200,7 @@ class GroupModel {
     String? ownerId,
     String? inviteCode,
     List<GroupMember>? members,
+    GroupType? type,
     double? totalExpense,
     double? totalIncome,
     double? targetAmount,
@@ -179,6 +218,7 @@ class GroupModel {
       ownerId: ownerId ?? this.ownerId,
       inviteCode: inviteCode ?? this.inviteCode,
       members: members ?? this.members,
+      type: type ?? this.type,
       totalExpense: totalExpense ?? this.totalExpense,
       totalIncome: totalIncome ?? this.totalIncome,
       targetAmount: targetAmount ?? this.targetAmount,

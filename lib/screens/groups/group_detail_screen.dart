@@ -921,6 +921,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -1293,8 +1295,179 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
               ),
             );
           }),
+          const SizedBox(height: 24),
+          _buildOptimalSettlementSection(group, groupProvider),
         ],
       ),
+    );
+  }
+
+  Widget _buildOptimalSettlementSection(
+    GroupModel group,
+    GroupProvider groupProvider,
+  ) {
+    final debts = groupProvider.calculateDebts(group);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.compare_arrows_rounded, color: AppColors.primary, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              'Phương án thanh toán tối ưu',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Thuật toán rút gọn số giao dịch chuyển tiền trực tiếp giữa các thành viên.',
+          style: TextStyle(
+            fontSize: 13,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 14),
+        if (debts.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.cardBackground,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.dividerColor),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.check_circle_rounded, color: AppColors.success, size: 20),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Tất cả thành viên đã sòng phẳng, không có khoản nợ nào.',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          ...debts.map((debt) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.cardBackground,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.dividerColor),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // From user
+                  Expanded(
+                    flex: 4,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          debt.fromUserName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        const Text(
+                          'Người trả',
+                          style: TextStyle(fontSize: 11, color: AppColors.expenseColor),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Arrow & Amount
+                  Expanded(
+                    flex: 5,
+                    child: Column(
+                      children: [
+                        Text(
+                          currencyFormat.format(debt.amount),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        const Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 18,
+                          color: AppColors.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // To user
+                  Expanded(
+                    flex: 4,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          debt.toUserName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        const Text(
+                          'Người nhận',
+                          style: TextStyle(fontSize: 11, color: AppColors.incomeColor),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  // Quick Pay QR
+                  IconButton(
+                    icon: const Icon(Icons.qr_code_2_rounded, color: AppColors.primary),
+                    tooltip: 'Chuyển tiền QR',
+                    onPressed: () {
+                      SettleUpQrSheet.show(
+                        context,
+                        debtorName: debt.fromUserName,
+                        creditorName: debt.toUserName,
+                        amount: debt.amount,
+                        groupName: group.name,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            );
+          }),
+      ],
     );
   }
 
